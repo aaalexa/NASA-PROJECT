@@ -19,7 +19,7 @@ export async function POST(req: Request) {
       contents: [
         { inlineData: { mimeType, data: audio } },
         {
-          text: `Transcribe this short voice command exactly as spoken. The speaker uses ${language}, and may mention geographic places or Earth-science terms. Reply with the transcript only, no quotes or commentary. Never invent words: tones, noise, music or unintelligible sound are not speech. If there is no intelligible speech, reply with an empty string.`,
+          text: `Transcribe this short voice command exactly as spoken. The speaker uses ${language}, and usually names a geographic place (e.g. Amazonas, Sahara, Nicaragua, Mediterráneo, Groenlandia, a city or a country) or answers a short question (nuevo/experiencia, lluvia/calor/plantas/suelo, cinco/diez años). Prefer the geographic or scientific reading of ambiguous sounds. Reply with the transcript only, no quotes or commentary. Never invent words: tones, noise, music or unintelligible sound are not speech. If there is no intelligible speech, reply with an empty string.`,
         },
       ],
       config: { temperature: 0 },

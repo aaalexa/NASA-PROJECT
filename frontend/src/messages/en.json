@@ -84,6 +84,7 @@
     "suggestedTitle": "Reference regions",
     "delimited": "Region outlined",
     "continue": "Continue to period",
+    "locating": "Locating with Gemini…",
     "notFound": "I did not recognise that place. Try another name."
   },
   "periodStep": {

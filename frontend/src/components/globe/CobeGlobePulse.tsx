@@ -10,101 +10,115 @@ interface CobeGlobePulseProps {
   className?: string;
 }
 
+type RGB = [number, number, number];
+
+// Moody Trends palette
+const BRICK_RED: RGB = [0.757, 0.071, 0.122];
+const STEEL_BLUE: RGB = [0.4, 0.608, 0.737];
+const PALM_LEAF: RGB = [0.612, 0.569, 0.31];
+const MOLTEN_LAVA: RGB = [0.47, 0, 0];
+
 function locationToAngles(lat: number, lng: number): [number, number] {
-  return [
-    Math.PI - ((lng * Math.PI) / 180 - Math.PI / 2),
-    (lat * Math.PI) / 180,
-  ];
+  return [Math.PI - ((lng * Math.PI) / 180 - Math.PI / 2), (lat * Math.PI) / 180];
 }
 
-function interpolateEdge(p1: GeoPoint, p2: GeoPoint, steps = 12): Marker[] {
-  const edgeMarkers: Marker[] = [];
-  for (let i = 1; i < steps; i++) {
-    const t = i / steps;
-    edgeMarkers.push({
-      location: [
-        p1.lat + (p2.lat - p1.lat) * t,
-        p1.lng + (p2.lng - p1.lng) * t,
-      ],
-      size: 0.012,
-      color: [0.4, 0.608, 0.737], // steel blue
-    });
+const mix = (a: GeoPoint, b: GeoPoint, t: number): [number, number] => [
+  a.lat + (b.lat - a.lat) * t,
+  a.lng + (b.lng - a.lng) * t,
+];
+
+interface RegionShape {
+  edges: Marker[];
+  fill: Marker[];
+  arcs: Arc[];
+  vertices: GeoPoint[];
+  /** Approximate angular size in degrees, used to scale the pulse rings. */
+  span: number;
+}
+
+/** Delicate outline (fine blue dots), a soft dotted fill (palm leaf) and three thin arcs. */
+function buildShape(points: GeoPoint[]): RegionShape | null {
+  if (points.length !== 3) return null;
+  const [a, b, c] = points;
+  const sides: [GeoPoint, GeoPoint][] = [[a, b], [b, c], [c, a]];
+
+  const span = Math.max(
+    ...sides.map(([p, q]) => Math.hypot(p.lat - q.lat, (p.lng - q.lng) * Math.cos(((p.lat + q.lat) / 2) * (Math.PI / 180))))
+  );
+
+  const edgeSteps = Math.max(18, Math.min(60, Math.round(span * 3)));
+  const edges: Marker[] = [];
+  for (const [p, q] of sides) {
+    for (let i = 1; i < edgeSteps; i++) {
+      edges.push({ location: mix(p, q, i / edgeSteps), size: 0.009, color: STEEL_BLUE });
+    }
   }
-  return edgeMarkers;
+
+  // Interior dots on a barycentric grid (interior points only).
+  const n = Math.max(5, Math.min(13, Math.round(span / 3)));
+  const fill: Marker[] = [];
+  for (let i = 1; i < n; i++) {
+    for (let j = 1; i + j < n; j++) {
+      const k = n - i - j;
+      fill.push({
+        location: [(a.lat * i + b.lat * j + c.lat * k) / n, (a.lng * i + b.lng * j + c.lng * k) / n],
+        size: 0.007,
+        color: PALM_LEAF,
+      });
+    }
+  }
+
+  const arcs: Arc[] = sides.map(([p, q]) => ({
+    from: [p.lat, p.lng],
+    to: [q.lat, q.lng],
+    color: STEEL_BLUE,
+  }));
+
+  return { edges, fill, arcs, vertices: points, span };
 }
 
 export default function CobeGlobePulse({ trianglePoints, className }: CobeGlobePulseProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const pointerInteracting = useRef<number | null>(null);
   const pointerInteractionMovement = useRef(0);
-  const focusRef = useRef<[number, number]>([0, 0]);
+  const focusRef = useRef<[number, number] | null>(null);
+  const shapeRef = useRef<RegionShape | null>(null);
   const { theme } = useTheme();
   const isDark = theme === "dark";
 
-  // Sincronizar foco cuando cambian los puntos
+  // New region: rebuild the shape and aim the globe at it right away (no globe re-creation).
   useEffect(() => {
-    if (trianglePoints && trianglePoints.length > 0) {
-      const avgLat =
-        trianglePoints.reduce((sum, p) => sum + p.lat, 0) / trianglePoints.length;
-      const avgLng =
-        trianglePoints.reduce((sum, p) => sum + p.lng, 0) / trianglePoints.length;
-      focusRef.current = locationToAngles(avgLat, avgLng);
+    shapeRef.current = buildShape(trianglePoints);
+    if (trianglePoints.length > 0) {
+      const lat = trianglePoints.reduce((s, p) => s + p.lat, 0) / trianglePoints.length;
+      const lng = trianglePoints.reduce((s, p) => s + p.lng, 0) / trianglePoints.length;
+      focusRef.current = locationToAngles(lat, lng);
+      pointerInteractionMovement.current = 0;
+    } else {
+      focusRef.current = null;
     }
   }, [trianglePoints]);
 
   useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
     let phi = 0;
     let theta = 0.2;
-    let width = 0;
+    let zoom = 1;
+    let width = canvas.offsetWidth || 600;
     const doublePi = Math.PI * 2;
-    let animationFrameId: number;
-    let globeInstance: Globe | null = null;
+    let raf = 0;
+    let globe: Globe | null = null;
 
     const onResize = () => {
-      if (canvasRef.current) {
-        width = canvasRef.current.offsetWidth || 600;
-      }
+      width = canvas.offsetWidth || 600;
     };
     window.addEventListener("resize", onResize);
-    onResize();
-
-    if (!canvasRef.current) return;
-    if (width === 0) width = 600;
-
-    // Aristas del triángulo (Azul NASA)
-    const edgeMarkers: Marker[] =
-      trianglePoints && trianglePoints.length === 3
-        ? [
-            ...interpolateEdge(trianglePoints[0], trianglePoints[1], 12),
-            ...interpolateEdge(trianglePoints[1], trianglePoints[2], 12),
-            ...interpolateEdge(trianglePoints[2], trianglePoints[0], 12),
-          ]
-        : [];
-
-    const arcs: Arc[] =
-      trianglePoints && trianglePoints.length === 3
-        ? [
-            {
-              from: [trianglePoints[0].lat, trianglePoints[0].lng],
-              to: [trianglePoints[1].lat, trianglePoints[1].lng],
-              color: [0.4, 0.608, 0.737],
-            },
-            {
-              from: [trianglePoints[1].lat, trianglePoints[1].lng],
-              to: [trianglePoints[2].lat, trianglePoints[2].lng],
-              color: [0.4, 0.608, 0.737],
-            },
-            {
-              from: [trianglePoints[2].lat, trianglePoints[2].lng],
-              to: [trianglePoints[0].lat, trianglePoints[0].lng],
-              color: [0.4, 0.608, 0.737],
-            },
-          ]
-        : [];
 
     try {
-      globeInstance = createGlobe(canvasRef.current, {
-        devicePixelRatio: Math.min(typeof window !== "undefined" ? window.devicePixelRatio : 2, 2),
+      globe = createGlobe(canvas, {
+        devicePixelRatio: Math.min(window.devicePixelRatio || 2, 2),
         width: width * 2,
         height: width * 2,
         phi: 0,
@@ -115,73 +129,80 @@ export default function CobeGlobePulse({ trianglePoints, className }: CobeGlobeP
         mapBrightness: isDark ? 3.2 : 1.6,
         mapBaseBrightness: 0,
         baseColor: isDark ? [0.0, 0.1, 0.16] : [0.9, 0.94, 0.97],
-        markerColor: [0.757, 0.071, 0.122], // brick red
-        glowColor: isDark ? [0.0, 0.19, 0.29] : [0.4, 0.608, 0.737],
+        markerColor: BRICK_RED,
+        glowColor: isDark ? [0.0, 0.19, 0.29] : STEEL_BLUE,
         markers: [],
-        arcs,
-        arcWidth: 0.35,
-        arcHeight: 0.03,
+        arcs: [],
+        arcWidth: 0.16,
+        arcHeight: 0.02,
       });
 
       const render = () => {
-        if (!trianglePoints || trianglePoints.length === 0) {
-          if (!pointerInteracting.current) {
-            phi += 0.003;
-          }
+        const focus = focusRef.current;
+        if (!focus) {
+          if (pointerInteracting.current === null) phi += 0.003;
         } else {
-          const [focusPhi, focusTheta] = focusRef.current;
-          const distPositive = (focusPhi - phi + doublePi) % doublePi;
-          const distNegative = (phi - focusPhi + doublePi) % doublePi;
+          const [focusPhi, focusTheta] = focus;
+          const diff = ((focusPhi - phi + Math.PI) % doublePi + doublePi) % doublePi - Math.PI;
+          phi += diff * 0.1;
+          theta += (focusTheta - theta) * 0.1;
+        }
+        // Zoom in on small regions, stay wide for continents.
+        const span = shapeRef.current?.span ?? 0;
+        const zoomTarget = !focus ? 1 : span < 10 ? 1.7 : span < 25 ? 1.45 : span < 50 ? 1.2 : 1.05;
+        zoom += (zoomTarget - zoom) * 0.06;
 
-          if (distPositive < distNegative) {
-            phi += distPositive * 0.08;
-          } else {
-            phi -= distNegative * 0.08;
+        const shape = shapeRef.current;
+        const t = Date.now();
+        const markers: Marker[] = [];
+        if (shape) {
+          markers.push(...shape.edges, ...shape.fill);
+          // Vertices: a small solid core plus a soft ring that breathes outward.
+          const breathe = 0.5 + 0.5 * Math.sin(t / 700);
+          const ringRadius = Math.max(0.6, shape.span * 0.035) * (0.7 + breathe * 0.6);
+          for (const v of shape.vertices) {
+            markers.push({ location: [v.lat, v.lng], size: 0.024, color: BRICK_RED });
+            const cos = Math.max(0.2, Math.cos((v.lat * Math.PI) / 180));
+            for (let i = 0; i < 12; i++) {
+              const ang = (i / 12) * doublePi;
+              markers.push({
+                location: [v.lat + ringRadius * Math.sin(ang), v.lng + (ringRadius * Math.cos(ang)) / cos],
+                size: 0.0045,
+                color: i % 2 ? MOLTEN_LAVA : BRICK_RED,
+              });
+            }
           }
-          theta = theta * 0.92 + focusTheta * 0.08;
         }
 
-        // Animación Pulse en los 3 vértices rojos
-        const pulse = 0.032 + Math.sin(Date.now() / 450) * 0.008;
-        const currentMarkers: Marker[] = [
-          ...(trianglePoints || []).map((p) => ({
-            location: [p.lat, p.lng] as [number, number],
-            size: pulse,
-            color: [0.757, 0.071, 0.122] as [number, number, number],
-          })),
-          ...edgeMarkers,
-        ];
-
-        globeInstance?.update({
+        globe?.update({
           phi: phi + pointerInteractionMovement.current,
           theta,
-          markers: currentMarkers,
+          scale: zoom,
+          markers,
+          arcs: shape ? shape.arcs : [],
           width: width * 2,
           height: width * 2,
         });
-
-        animationFrameId = requestAnimationFrame(render);
+        raf = requestAnimationFrame(render);
       };
-
-      animationFrameId = requestAnimationFrame(render);
-
+      raf = requestAnimationFrame(render);
       setTimeout(() => {
-        if (canvasRef.current) canvasRef.current.style.opacity = "1";
+        if (canvas) canvas.style.opacity = "1";
       }, 50);
     } catch (e) {
       console.error("Error initializing Cobe globe:", e);
     }
 
     return () => {
-      cancelAnimationFrame(animationFrameId);
-      globeInstance?.destroy();
+      cancelAnimationFrame(raf);
+      globe?.destroy();
       window.removeEventListener("resize", onResize);
     };
-  }, [trianglePoints, isDark]);
+  }, [isDark]);
 
   return (
     <div
-      className={`fixed inset-0 z-0 flex items-center justify-center bg-background transition-colors duration-300 overflow-hidden ${
+      className={`fixed inset-0 z-0 flex items-center justify-center overflow-hidden bg-background transition-colors duration-300 ${
         className || ""
       }`}
     >
@@ -202,11 +223,10 @@ export default function CobeGlobePulse({ trianglePoints, className }: CobeGlobeP
           }}
           onMouseMove={(e) => {
             if (pointerInteracting.current !== null) {
-              const delta = e.clientX - pointerInteracting.current;
-              pointerInteractionMovement.current = delta / 200;
+              pointerInteractionMovement.current = (e.clientX - pointerInteracting.current) / 200;
             }
           }}
-          className="w-full h-full opacity-0 transition-opacity duration-700 cursor-grab select-none touch-none"
+          className="h-full w-full cursor-grab touch-none select-none opacity-0 transition-opacity duration-700"
         />
       </div>
     </div>

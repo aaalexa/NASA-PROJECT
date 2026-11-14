@@ -18,7 +18,7 @@ function ChoiceButton({
       variant="outline"
       data-selected={selected}
       className={cn(
-        "h-auto w-full flex-row items-start justify-start gap-3 rounded-2xl px-4 py-3 text-left font-normal whitespace-normal hover:border-foreground/40 data-[selected=true]:border-primary data-[selected=true]:ring-1 data-[selected=true]:ring-primary",
+        "h-auto w-full flex-row items-start justify-start gap-3 rounded-2xl px-4 py-3 text-left font-normal whitespace-normal hover:border-foreground/40 data-[selected=true]:border-brand-blue data-[selected=true]:bg-brand-blue/10 data-[selected=true]:ring-1 data-[selected=true]:ring-brand-blue",
         className
       )}
       {...props}

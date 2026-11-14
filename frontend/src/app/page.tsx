@@ -18,7 +18,7 @@ import { RegionStep } from "@/components/nasa/RegionStep";
 import { PeriodStep } from "@/components/nasa/PeriodStep";
 import { VariablesStep } from "@/components/nasa/VariablesStep";
 import { ResultsStep } from "@/components/nasa/ResultsStep";
-import { PREDEFINED_REGIONS } from "@/components/nasa/PredefinedRegions";
+import { PREDEFINED_REGIONS, findMatchingPredefinedRegion } from "@/components/nasa/PredefinedRegions";
 import { PERIODS } from "@/lib/catalog";
 import { DEMOS, DemoDef, DemoStep } from "@/lib/demos";
 import { useSpeak } from "@/hooks/useSpeak";
@@ -122,6 +122,12 @@ export default function HomePage() {
 
   const searchRegion = useCallback(
     async (text: string): Promise<boolean> => {
+      // Known regions: turn the globe instantly, no network round trip.
+      const local = findMatchingPredefinedRegion(text);
+      if (local) {
+        selectPredefined(local);
+        return true;
+      }
       setIsSearching(true);
       try {
         const res = await fetch("/api/parse-voice", {
@@ -138,7 +144,20 @@ export default function HomePage() {
         setIsSearching(false);
       }
     },
-    [applyRegion, language]
+    [applyRegion, language, selectPredefined]
+  );
+
+  // Typing preview: as soon as the text matches a known region, aim the globe at it.
+  const previewTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const previewText = useCallback(
+    (text: string) => {
+      if (previewTimer.current) clearTimeout(previewTimer.current);
+      previewTimer.current = setTimeout(() => {
+        const m = findMatchingPredefinedRegion(text);
+        if (m) selectPredefined(m);
+      }, 250);
+    },
+    [selectPredefined]
   );
 
   // ---- Voice ------------------------------------------------------------------------------
@@ -263,6 +282,7 @@ export default function HomePage() {
           regionData={regionData}
           onSelectPredefined={selectPredefined}
           onSearchManual={searchRegion}
+          onPreviewText={previewText}
           isSearching={isSearching}
           onContinue={() => setActiveStep("period")}
         />
@@ -443,6 +463,7 @@ export default function HomePage() {
                   isSearching={isSearching}
                   onSelectPredefined={selectPredefined}
                   onSearchRegion={searchRegion}
+                  onPreviewText={previewText}
                   onSetRange={setDateRange}
                   selectedVariables={selectedVariables}
                   onSetVariables={setSelectedVariables}

@@ -26,6 +26,7 @@ interface GuidedFlowProps {
   onSelectPredefined: (reg: PredefinedRegion) => void;
   /** Resolves true when the text was turned into a region. */
   onSearchRegion: (text: string) => Promise<boolean>;
+  onPreviewText?: (text: string) => void;
   onSetRange: (range: DateRange) => void;
   selectedVariables: VariableId[];
   onSetVariables: (ids: VariableId[]) => void;
@@ -49,6 +50,7 @@ export function GuidedFlow({
   isSearching,
   onSelectPredefined,
   onSearchRegion,
+  onPreviewText,
   onSetRange,
   selectedVariables,
   onSetVariables,
@@ -242,7 +244,11 @@ export function GuidedFlow({
               <Input
                 className="pl-10"
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setNotice(null);
+                  onPreviewText?.(e.target.value);
+                }}
                 placeholder={t("header.searchPlaceholder")}
                 aria-label={t("guided.q2")}
               />
@@ -251,6 +257,12 @@ export function GuidedFlow({
               {isSearching ? "…" : t("regionStep.searchButton")}
             </Button>
           </form>
+
+          {isSearching && (
+            <p role="status" className="animate-pulse text-xs text-brand-blue">
+              {t("regionStep.locating")}
+            </p>
+          )}
 
           <div className="grid grid-cols-2 gap-2">
             {PREDEFINED_REGIONS.slice(0, 6).map((reg) => (

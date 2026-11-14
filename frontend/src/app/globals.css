@@ -26,6 +26,7 @@
   --color-brand-red: var(--red);
   --color-brand-blue: var(--blue);
   --color-brand-olive: var(--olive);
+  --color-brand-lava: var(--lava);
 
   --radius-sm: calc(var(--radius) - 2px);
   --radius-md: var(--radius);
@@ -48,15 +49,15 @@
   --card-foreground: var(--deep-space-blue);
   --popover: #ffffff;
   --popover-foreground: var(--deep-space-blue);
-  --primary: var(--deep-space-blue);
+  --primary: var(--brick-red);
   --primary-foreground: #ffffff;
-  --secondary: color-mix(in srgb, var(--steel-blue) 16%, #fff);
-  --secondary-foreground: var(--deep-space-blue);
+  --secondary: var(--palm-leaf);
+  --secondary-foreground: #ffffff;
   --muted: color-mix(in srgb, var(--steel-blue) 12%, #fff);
   --muted-foreground: color-mix(in srgb, var(--deep-space-blue) 62%, #fff);
   --accent: color-mix(in srgb, var(--steel-blue) 22%, #fff);
   --accent-foreground: var(--deep-space-blue);
-  --destructive: var(--brick-red);
+  --destructive: var(--molten-lava);
   --destructive-foreground: #ffffff;
   --border: color-mix(in srgb, var(--steel-blue) 38%, #fff);
   --input: color-mix(in srgb, var(--steel-blue) 45%, #fff);
@@ -64,6 +65,7 @@
   --red: var(--brick-red);
   --blue: var(--steel-blue);
   --olive: var(--palm-leaf);
+  --lava: var(--molten-lava);
   --radius: 16px;
 }
 
@@ -74,22 +76,23 @@
   --card-foreground: #ffffff;
   --popover: color-mix(in srgb, var(--deep-space-blue) 85%, #000);
   --popover-foreground: #ffffff;
-  --primary: var(--steel-blue);
-  --primary-foreground: var(--deep-space-blue);
-  --secondary: color-mix(in srgb, var(--steel-blue) 18%, var(--deep-space-blue));
+  --primary: var(--brick-red);
+  --primary-foreground: #ffffff;
+  --secondary: var(--palm-leaf);
   --secondary-foreground: #ffffff;
   --muted: color-mix(in srgb, var(--steel-blue) 14%, var(--deep-space-blue));
   --muted-foreground: color-mix(in srgb, var(--steel-blue) 82%, #fff);
   --accent: color-mix(in srgb, var(--steel-blue) 24%, var(--deep-space-blue));
   --accent-foreground: #ffffff;
-  --destructive: color-mix(in srgb, var(--brick-red) 75%, #fff);
+  --destructive: color-mix(in srgb, var(--molten-lava) 50%, #fff);
   --destructive-foreground: #ffffff;
   --border: color-mix(in srgb, var(--steel-blue) 28%, var(--deep-space-blue));
   --input: color-mix(in srgb, var(--steel-blue) 34%, var(--deep-space-blue));
   --ring: var(--steel-blue);
   --red: color-mix(in srgb, var(--brick-red) 72%, #fff);
   --blue: var(--steel-blue);
-  --olive: color-mix(in srgb, var(--palm-leaf) 85%, #fff);
+  --olive: color-mix(in srgb, var(--palm-leaf) 88%, #fff);
+  --lava: color-mix(in srgb, var(--molten-lava) 70%, var(--brick-red));
 }
 
 body {

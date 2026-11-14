@@ -13,11 +13,12 @@ interface RegionStepProps {
   regionData: RegionAnalysisPayload | null;
   onSelectPredefined: (region: PredefinedRegion) => void;
   onSearchManual: (query: string) => Promise<boolean>;
+  onPreviewText?: (text: string) => void;
   isSearching: boolean;
   onContinue: () => void;
 }
 
-export function RegionStep({ regionData, onSelectPredefined, onSearchManual, isSearching, onContinue }: RegionStepProps) {
+export function RegionStep({ regionData, onSelectPredefined, onSearchManual, onPreviewText, isSearching, onContinue }: RegionStepProps) {
   const { language, t } = useTranslation();
   const [query, setQuery] = useState("");
   const [notFound, setNotFound] = useState(false);
@@ -41,7 +42,11 @@ export function RegionStep({ regionData, onSelectPredefined, onSearchManual, isS
           <Input
             className="pl-10"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setNotFound(false);
+              onPreviewText?.(e.target.value);
+            }}
             placeholder={t("header.searchPlaceholder")}
             aria-label={t("regionStep.title")}
           />
@@ -50,6 +55,11 @@ export function RegionStep({ regionData, onSelectPredefined, onSearchManual, isS
           {isSearching ? "…" : t("regionStep.searchButton")}
         </Button>
       </form>
+      {isSearching && (
+        <p role="status" className="-mt-3 animate-pulse text-xs text-brand-blue">
+          {t("regionStep.locating")}
+        </p>
+      )}
       {notFound && (
         <p role="alert" className="-mt-3 text-xs text-brand-red">
           {t("regionStep.notFound")}

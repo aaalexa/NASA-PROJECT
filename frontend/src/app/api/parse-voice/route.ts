@@ -16,18 +16,59 @@ function toPolygon(v: GeoPoint[]) {
   };
 }
 
+const sideDeg = (p: GeoPoint, q: GeoPoint) =>
+  Math.hypot(p.lat - q.lat, (p.lng - q.lng) * Math.cos(((p.lat + q.lat) / 2) * (Math.PI / 180)));
+
+/** A usable study triangle: valid coordinates, not degenerate, not absurdly large or tiny. */
 function validTriangle(v: unknown): v is GeoPoint[] {
-  return (
-    Array.isArray(v) &&
-    v.length >= 3 &&
-    v.slice(0, 3).every(
-      (p) =>
-        typeof p?.lat === "number" &&
-        typeof p?.lng === "number" &&
-        Math.abs(p.lat) <= 90 &&
-        Math.abs(p.lng) <= 180
-    )
+  if (!Array.isArray(v) || v.length < 3) return false;
+  const pts = v.slice(0, 3) as GeoPoint[];
+  const ok = pts.every(
+    (p) => typeof p?.lat === "number" && typeof p?.lng === "number" && Math.abs(p.lat) <= 90 && Math.abs(p.lng) <= 180
   );
+  if (!ok) return false;
+  const [a, b, c] = pts;
+  const area = Math.abs((b.lng - a.lng) * (c.lat - a.lat) - (c.lng - a.lng) * (b.lat - a.lat)) / 2;
+  const longest = Math.max(sideDeg(a, b), sideDeg(b, c), sideDeg(c, a));
+  return area > 0.002 && longest > 0.15 && longest < 120;
+}
+
+async function locateWithGemini(prompt: string, lang: "es" | "en", retryNote = "") {
+  const language = lang === "en" ? "English" : "Spanish";
+  const response = await generate({
+    contents: `Task: locate a place on Earth for a climate-trend study.
+User text (may come from speech recognition, so tolerate typos and homophones): "${prompt}"
+
+Rules:
+- Identify the single most likely real place (country, region, basin, desert, lake, mountain range, city...). If the text is not a real place, set found=false.
+- Give exactly 3 vertices (lat, lng in decimal degrees; south and west are negative) of a triangle that encloses the main LAND area of that place. The triangle should match the true extent of the place: a city about 0.3-0.6 degrees across, a country or large region its real size. Do not pad it with ocean when avoidable, and never make it a thin sliver.
+- regionName: the official, short name in ${language}, with the country or continent after a comma when helpful.
+- description: ONE plain sentence in ${language} (max 22 words) about why this place is interesting for rainfall, heat or soil-water trends. No causal claims.
+- confidence: 0 to 1 for how sure you are about the place.${retryNote}`,
+    config: {
+      temperature: 0,
+      responseMimeType: "application/json",
+      responseSchema: {
+        type: Type.OBJECT,
+        properties: {
+          found: { type: Type.BOOLEAN },
+          regionName: { type: Type.STRING },
+          description: { type: Type.STRING },
+          confidence: { type: Type.NUMBER },
+          triangleVertices: {
+            type: Type.ARRAY,
+            items: {
+              type: Type.OBJECT,
+              properties: { lat: { type: Type.NUMBER }, lng: { type: Type.NUMBER } },
+              required: ["lat", "lng"],
+            },
+          },
+        },
+        required: ["found", "regionName", "description", "confidence", "triangleVertices"],
+      },
+    },
+  });
+  return JSON.parse(response.text || "{}");
 }
 
 export async function POST(req: Request) {
@@ -38,45 +79,30 @@ export async function POST(req: Request) {
     }
     const lang = locale === "en" ? "en" : "es";
 
+    // Curated regions answer instantly and exactly.
+    const preset = findMatchingPredefinedRegion(prompt);
+    if (preset) {
+      return NextResponse.json({
+        regionName: preset.name[lang],
+        description: preset.area[lang],
+        triangleVertices: preset.triangle,
+        geoJsonPolygon: toPolygon(preset.triangle),
+        suggestedVariables: [],
+        source: "curated",
+      });
+    }
+
     if (ai) {
       try {
-        const instruction =
-          lang === "en"
-            ? `The user wants to investigate environmental change in a place on Earth. User input: "${prompt}".
-1. Identify the geographic region mentioned. If no real place is mentioned, set found=false.
-2. Give exactly 3 [lat, lng] points forming a balanced triangle that covers the LAND area of that region (lat -90..90, lng -180..180).
-3. Name the region in English and describe in one plain sentence why it is interesting for studying rainfall, heat or soil water.`
-            : `El usuario quiere investigar cambios ambientales en un lugar de la Tierra. Entrada: "${prompt}".
-1. Identifica la región geográfica mencionada. Si no menciona un lugar real, found=false.
-2. Da exactamente 3 puntos [lat, lng] que formen un triángulo equilibrado que cubra el área TERRESTRE de esa región (lat -90..90, lng -180..180).
-3. Nombra la región en español y describe en una frase simple por qué es interesante para estudiar lluvia, calor o agua del suelo.`;
-
-        const response = await generate({
-          contents: instruction,
-          config: {
-            responseMimeType: "application/json",
-            responseSchema: {
-              type: Type.OBJECT,
-              properties: {
-                found: { type: Type.BOOLEAN },
-                regionName: { type: Type.STRING },
-                description: { type: Type.STRING },
-                triangleVertices: {
-                  type: Type.ARRAY,
-                  items: {
-                    type: Type.OBJECT,
-                    properties: { lat: { type: Type.NUMBER }, lng: { type: Type.NUMBER } },
-                    required: ["lat", "lng"],
-                  },
-                },
-              },
-              required: ["found", "regionName", "description", "triangleVertices"],
-            },
-          },
-        });
-
-        const parsed = JSON.parse(response.text || "{}");
-        if (parsed.found === false) {
+        let parsed = await locateWithGemini(prompt, lang);
+        if (parsed.found !== false && !validTriangle(parsed.triangleVertices)) {
+          parsed = await locateWithGemini(
+            prompt,
+            lang,
+            "\n- Your previous triangle was degenerate or the wrong size. Return a proper non-degenerate triangle covering the place."
+          );
+        }
+        if (parsed.found === false || (typeof parsed.confidence === "number" && parsed.confidence < 0.35)) {
           return NextResponse.json({ error: "region-not-found" }, { status: 404 });
         }
         if (validTriangle(parsed.triangleVertices)) {
@@ -87,25 +113,15 @@ export async function POST(req: Request) {
             triangleVertices: v,
             geoJsonPolygon: toPolygon(v),
             suggestedVariables: [],
+            source: "gemini",
           });
         }
       } catch (err) {
-        console.warn("[api/parse-voice] Gemini unavailable, using local regions:", err);
+        console.warn("[api/parse-voice] Gemini unavailable:", err);
       }
     }
 
-    // Local fallback: only answers for known regions instead of silently guessing one.
-    const preset = findMatchingPredefinedRegion(prompt);
-    if (!preset) {
-      return NextResponse.json({ error: "region-not-found" }, { status: 404 });
-    }
-    return NextResponse.json({
-      regionName: preset.name[lang],
-      description: preset.area[lang],
-      triangleVertices: preset.triangle,
-      geoJsonPolygon: toPolygon(preset.triangle),
-      suggestedVariables: [],
-    });
+    return NextResponse.json({ error: "region-not-found" }, { status: 404 });
   } catch (error) {
     console.error("[api/parse-voice]", error);
     return NextResponse.json({ error: "parse-failed" }, { status: 500 });

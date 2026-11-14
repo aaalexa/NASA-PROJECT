@@ -51,7 +51,7 @@ export function VoiceController({ onTranscript, onBeforeListen, hint, className 
           </Button>
         ) : heard ? (
           <Badge variant="secondary" className="h-auto max-w-full whitespace-normal px-3 py-1">
-            <span className="text-muted-foreground">{t("voice.heard")}</span> “{heard}”
+            <span className="opacity-80">{t("voice.heard")}</span> “{heard}”
           </Badge>
         ) : hint && !listening && !processing ? (
           <span className="hidden text-xs text-muted-foreground sm:inline">{hint}</span>
@@ -79,7 +79,7 @@ export function VoiceController({ onTranscript, onBeforeListen, hint, className 
           disabled={processing}
           aria-label={listening ? t("voice.stop") : t("voice.speak")}
           aria-pressed={listening}
-          className={`relative ${listening ? "bg-brand-red text-white hover:bg-brand-red" : ""}`}
+          className={`relative ${listening ? "bg-brand-red text-white hover:bg-brand-lava" : "bg-brand-blue text-[var(--deep-space-blue)] hover:bg-brand-blue/85"}`}
         >
           {processing ? <ArrowPathIcon className="size-6 animate-spin" /> : listening ? <StopIcon className="size-5" /> : <MicrophoneIcon className="size-6" />}
         </Button>

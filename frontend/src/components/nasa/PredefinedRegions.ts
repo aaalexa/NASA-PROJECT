@@ -49,9 +49,9 @@ export const PREDEFINED_REGIONS: PredefinedRegion[] = [
     area: { es: "Sudamerica", en: "South America" },
     center: { lat: -3.4, lng: -62.2 },
     triangle: [
-      { lat: -3.12, lng: -60.02 },
-      { lat: -8.76, lng: -63.9 },
-      { lat: -2.5, lng: -54.7 },
+      { lat: 3.5, lng: -67.0 },
+      { lat: -14.5, lng: -73.0 },
+      { lat: -8.0, lng: -51.0 },
     ],
     aliases: ["amazonas", "amazon", "cuenca amazonica", "brasil", "selva amazonica"],
   },
@@ -79,9 +79,9 @@ export const PREDEFINED_REGIONS: PredefinedRegion[] = [
     area: { es: "Norteamerica", en: "North America" },
     center: { lat: 37.2, lng: -120.2 },
     triangle: [
-      { lat: 38.5, lng: -121.5 },
-      { lat: 35.3, lng: -119.0 },
-      { lat: 37.0, lng: -122.0 },
+      { lat: 40.2, lng: -122.4 },
+      { lat: 35.0, lng: -118.7 },
+      { lat: 36.4, lng: -122.2 },
     ],
     aliases: ["california", "valle central", "san joaquin", "sierra nevada"],
   },
@@ -109,9 +109,9 @@ export const PREDEFINED_REGIONS: PredefinedRegion[] = [
     area: { es: "Oceania", en: "Oceania" },
     center: { lat: -18.1, lng: 147.7 },
     triangle: [
-      { lat: -16.5, lng: 145.8 },
-      { lat: -21.0, lng: 149.5 },
-      { lat: -14.0, lng: 144.2 },
+      { lat: -10.5, lng: 142.5 },
+      { lat: -24.5, lng: 153.3 },
+      { lat: -20.5, lng: 145.5 },
     ],
     aliases: ["gran barrera", "coral", "barrera de coral", "australia", "queensland"],
   },
@@ -125,6 +125,9 @@ export function findMatchingPredefinedRegion(query: string): PredefinedRegion | 
     .trim();
 
   return PREDEFINED_REGIONS.find((reg) =>
-    reg.aliases.some((alias) => clean.includes(alias.toLowerCase()))
+    reg.aliases.some((alias) => {
+      const a = alias.toLowerCase();
+      return clean.includes(a) || (clean.length >= 3 && a.startsWith(clean));
+    })
   );
 }
