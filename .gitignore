@@ -1,0 +1,15 @@
+# Credenciales: nunca al repositorio
+.netrc
+_netrc
+.env
+.env.*
+
+# Datos descargados y caché (pueden pesar decenas de GB)
+data/
+
+# Entorno y temporales de Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.tmp

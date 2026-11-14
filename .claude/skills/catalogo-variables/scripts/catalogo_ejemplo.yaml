@@ -1,0 +1,185 @@
+# catalogo.yaml — copiar a la raíz del proyecto.
+# Versiones verificadas con earthaccess.search_datasets el 2026-11-13. "POR VERIFICAR" = confirmar al abrir el primer archivo.
+variables:
+  - id: lluvia_gpcp
+    grupo: lluvia
+    nombre_simple: Lluvia (GPCP)
+    definicion_simple: Cuánta lluvia cayó en el mes, combinando satélites y pluviómetros.
+    dataset: GPCP Precipitation Level 3 Monthly 0.5-Degree
+    short_name: GPCPMON
+    version: "3.3"   # v3.2 (pedido original) termina en 2023-12; v3.3 llega a 2025-12
+    variable: sat_gauge_precip   # POR VERIFICAR en v3.3
+    unidad_original: mm/dia
+    conversion: {op: dias_del_mes}
+    unidad_final: mm/mes
+    desde: "1983-01"
+    resolucion: 0.5°
+    frecuencia: mensual
+
+  - id: lluvia_merra2
+    grupo: lluvia
+    nombre_simple: Lluvia (MERRA-2)
+    definicion_simple: Cuánta agua cae del cielo cada día, según un modelo que combina muchas observaciones.
+    dataset: MERRA-2 tavgM_2d_flx_Nx
+    short_name: M2TMNXFLX
+    version: "5.12.4"
+    variable: PRECTOTCORR
+    unidad_original: kg m-2 s-1
+    conversion: {op: factor, valor: 86400}
+    unidad_final: mm/dia
+    desde: "1980-01"
+    resolucion: 0.5° x 0.625°
+    frecuencia: mensual
+
+  - id: lluvia_imerg_mes
+    grupo: lluvia
+    nombre_simple: Lluvia (IMERG mensual)
+    definicion_simple: Lluvia medida por la constelación de satélites GPM, promediada en el mes.
+    dataset: GPM IMERG Final Precipitation L3 1 month 0.1 degree
+    short_name: GPM_3IMERGM
+    version: "07"
+    variable: precipitation
+    unidad_original: mm/h
+    conversion: {op: factor, valor: 24}
+    unidad_final: mm/dia
+    desde: "1998-01"
+    resolucion: 0.1°
+    frecuencia: mensual
+
+  - id: lluvia_imerg_dia
+    grupo: lluvia
+    nombre_simple: Lluvia diaria (IMERG)
+    definicion_simple: Lluvia de cada día medida por satélites; sirve para contar días secos y tormentas.
+    dataset: GPM IMERG Final Precipitation L3 1 day 0.1 degree
+    short_name: GPM_3IMERGDF
+    version: "07"
+    variable: precipitation
+    unidad_original: mm/dia
+    conversion: {op: ninguna}
+    unidad_final: mm/dia
+    desde: "1998-01"
+    resolucion: 0.1°
+    frecuencia: diaria
+
+  - id: temp_aire
+    grupo: causa
+    nombre_simple: Temperatura del aire
+    definicion_simple: Qué tan caliente está el aire a 2 metros del suelo.
+    dataset: MERRA-2 tavgM_2d_slv_Nx
+    short_name: M2TMNXSLV
+    version: "5.12.4"
+    variable: T2M
+    unidad_original: K
+    conversion: {op: suma, valor: -273.15}
+    unidad_final: degC
+    desde: "1980-01"
+    resolucion: 0.5° x 0.625°
+    frecuencia: mensual
+
+  - id: vapor_agua
+    grupo: causa
+    nombre_simple: Vapor de agua en el aire
+    definicion_simple: Cuánta agua invisible lleva el aire; si toda cayera, formaría una capa de este grosor.
+    dataset: MERRA-2 tavgM_2d_slv_Nx
+    short_name: M2TMNXSLV
+    version: "5.12.4"
+    variable: TQV
+    unidad_original: kg m-2
+    conversion: {op: ninguna}
+    unidad_final: mm
+    desde: "1980-01"
+    resolucion: 0.5° x 0.625°
+    frecuencia: mensual
+
+  - id: humedad_suelo
+    grupo: agua
+    nombre_simple: Humedad del suelo
+    definicion_simple: Cuánta agua guardan los primeros 10 cm de tierra.
+    dataset: GLDAS Noah Land Surface Model L4 monthly 0.25 degree
+    short_name: GLDAS_NOAH025_M
+    version: "2.1"
+    variable: SoilMoi0_10cm_inst
+    unidad_original: kg m-2
+    conversion: {op: ninguna}
+    unidad_final: mm
+    desde: "2000-01"
+    resolucion: 0.25°
+    frecuencia: mensual
+
+  - id: evaporacion
+    grupo: agua
+    nombre_simple: Evaporación
+    definicion_simple: Cuánta agua sube del suelo y las plantas al aire cada día.
+    dataset: GLDAS Noah Land Surface Model L4 monthly 0.25 degree
+    short_name: GLDAS_NOAH025_M
+    version: "2.1"
+    variable: Evap_tavg
+    unidad_original: kg m-2 s-1
+    conversion: {op: factor, valor: 86400}
+    unidad_final: mm/dia
+    desde: "2000-01"
+    resolucion: 0.25°
+    frecuencia: mensual
+
+  - id: escorrentia
+    grupo: agua
+    nombre_simple: Agua que escurre
+    definicion_simple: Cuánta lluvia corre por la superficie hacia ríos en vez de entrar al suelo.
+    dataset: GLDAS Noah Land Surface Model L4 monthly 0.25 degree
+    short_name: GLDAS_NOAH025_M
+    version: "2.1"
+    variable: Qs_acc
+    unidad_original: kg m-2 3h-1
+    conversion: {op: factor, valor: 8}
+    unidad_final: mm/dia
+    desde: "2000-01"
+    resolucion: 0.25°
+    frecuencia: mensual
+
+  - id: ndvi
+    grupo: agua
+    nombre_simple: Verdor de la vegetación
+    definicion_simple: Qué tan verdes y vivas están las plantas, de 0 (sin plantas) a 1 (muy verdes).
+    dataset: MODIS/Terra Vegetation Indices Monthly L3 Global 0.05Deg CMG
+    short_name: MOD13C2
+    version: "061"
+    acceso: appeears
+    variable: CMG_0_05_Deg_Monthly_NDVI   # POR VERIFICAR con GET /product/MOD13C2.061
+    unidad_original: escalado
+    conversion: {op: factor, valor: 0.0001}
+    unidad_final: "1"
+    desde: "2000-02"
+    resolucion: 0.05°
+    frecuencia: mensual
+
+  - id: cultivos
+    grupo: social
+    nombre_simple: Zonas de cultivo
+    definicion_simple: Lugares donde la mayor parte de la tierra se usa para sembrar.
+    dataset: MODIS/Terra+Aqua Land Cover Type Yearly L3 Global 500m
+    short_name: MCD12Q1
+    version: "061"
+    acceso: appeears
+    variable: LC_Type1
+    unidad_original: clase IGBP
+    conversion: {op: clases, valores: [12, 14]}
+    unidad_final: booleano
+    desde: "2001"
+    resolucion: 500 m
+    frecuencia: anual
+
+  - id: poblacion
+    grupo: social
+    nombre_simple: Población
+    definicion_simple: Cuántas personas viven en cada zona.
+    dataset: Gridded Population of the World v4.11, Population Count
+    short_name: CIESIN_SEDAC_GPWv4_POPCOUNT_R11
+    version: "4.11"
+    acceso: sedac
+    variable: Population Count   # POR VERIFICAR: nombre largo y dimensión 'raster' en el NetCDF
+    unidad_original: personas
+    conversion: {op: ninguna}
+    unidad_final: personas
+    desde: "2000"
+    resolucion: 15 arcmin
+    frecuencia: anual
