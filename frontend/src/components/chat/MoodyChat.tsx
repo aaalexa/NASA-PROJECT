@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ArrowPathIcon, ChatBubbleLeftRightIcon, PaperAirplaneIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { ArrowPathIcon, ChatBubbleLeftRightIcon, MicrophoneIcon, PaperAirplaneIcon, StopIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useTranslation } from "@/context/LanguageContext";
+import { useVoiceInput } from "@/hooks/useVoiceInput";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -66,6 +67,12 @@ export function MoodyChat({ context }: { context: MoodyContext }) {
   const [loading, setLoading] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
 
+  // Voice: Gemini transcribes the recording and the text is sent as a question.
+  const askRef = useRef<(text: string) => void>(() => undefined);
+  const voice = useVoiceInput({ locale: language, onTranscript: (text) => askRef.current(text) });
+  const listening = voice.status === "listening";
+  const transcribing = voice.status === "processing";
+
   useEffect(() => {
     // Wait a tick so the new bubble and suggestion chips are laid out before scrolling.
     const id = setTimeout(() => endRef.current?.scrollIntoView({ block: "end" }), 60);
@@ -99,6 +106,10 @@ export function MoodyChat({ context }: { context: MoodyContext }) {
       setLoading(false);
     }
   }
+
+  useEffect(() => {
+    askRef.current = (text: string) => void ask(text);
+  });
 
   return (
     <div className="fixed bottom-6 right-4 z-[60]">
@@ -178,6 +189,11 @@ export function MoodyChat({ context }: { context: MoodyContext }) {
 
           {/* Composer */}
           <Separator />
+          {voice.error && (
+            <button type="button" onClick={voice.clearError} className="px-4 pt-2 text-left text-xs text-brand-red">
+              {t(`voice.${voice.error}`)}
+            </button>
+          )}
           <form
             className="flex gap-2 p-3"
             onSubmit={(e) => {
@@ -185,7 +201,28 @@ export function MoodyChat({ context }: { context: MoodyContext }) {
               void ask(input);
             }}
           >
-            <Input value={input} onChange={(e) => setInput(e.target.value)} placeholder={t("chat.placeholder")} aria-label={t("chat.placeholder")} maxLength={500} />
+            <Button
+              type="button"
+              size="icon"
+              variant={listening ? "default" : "outline"}
+              className={`size-10 shrink-0 ${listening ? "bg-brand-red text-white hover:bg-brand-lava" : ""}`}
+              onClick={voice.toggle}
+              disabled={loading || transcribing}
+              aria-pressed={listening}
+              aria-label={listening ? t("voice.stop") : t("voice.speak")}
+              title={listening ? t("voice.stop") : t("voice.speak")}
+              style={listening ? { boxShadow: `0 0 0 ${2 + voice.level * 8}px color-mix(in srgb, var(--red) 30%, transparent)` } : undefined}
+            >
+              {transcribing ? <ArrowPathIcon className="size-4 animate-spin" /> : listening ? <StopIcon className="size-4" /> : <MicrophoneIcon className="size-4" />}
+            </Button>
+            <Input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder={listening ? t("voice.listening") : transcribing ? t("voice.processing") : t("chat.placeholder")}
+              aria-label={t("chat.placeholder")}
+              maxLength={500}
+              disabled={listening || transcribing}
+            />
             <Button type="submit" size="icon" className="size-10 shrink-0" disabled={loading || !input.trim()} aria-label={t("chat.send")}>
               <PaperAirplaneIcon className="size-4" />
             </Button>
