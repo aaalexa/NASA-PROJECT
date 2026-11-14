@@ -12,6 +12,7 @@ import {
 // Swap back to CobeGlobePulse to restore the previous globe.
 import GlobeGlExplorer from "@/components/globe/GlobeGlExplorer";
 import { VoiceController } from "@/components/hud/VoiceController";
+import { MoodyChat } from "@/components/chat/MoodyChat";
 import { ExperienceModal } from "@/components/onboarding/ExperienceModal";
 import { GuidedFlow, GuidedStage } from "@/components/guided/GuidedFlow";
 import { StepNavigation } from "@/components/nasa/StepNavigation";
@@ -490,6 +491,17 @@ export default function HomePage() {
       )}
 
       {phase === "onboarding" && <ExperienceModal onChoose={chooseExperience} registerVoice={registerVoice} speak={speech.speak} />}
+
+      <MoodyChat
+        context={{
+          phase,
+          step: activeStep,
+          region: regionData?.regionName ?? null,
+          period: `${dateRange.start.slice(0, 4)}-${dateRange.end.slice(0, 4)}`,
+          variables: selectedVariables,
+          demo: demo ? demo.def.title.en : null,
+        }}
+      />
 
       <VoiceController
         onTranscript={handleTranscript}

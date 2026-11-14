@@ -76,6 +76,18 @@
     "another": "Ver otro ejemplo",
     "note": "Los valores del análisis en este ejemplo son ilustrativos."
   },
+  "chat": {
+    "open": "Hablar con Moody",
+    "close": "Cerrar chat",
+    "subtitle": "Tu guía de Moody Trends",
+    "greeting": "¡Hola! Soy Moody. Puedo explicarte cualquier parte de Moody Trends: las regiones, los datos de la NASA o cómo leer los resultados. ¿Qué te gustaría saber?",
+    "placeholder": "Escribe tu pregunta…",
+    "send": "Enviar",
+    "reset": "Nueva conversación",
+    "thinking": "Moody está pensando",
+    "error": "No pude responder ahora. Inténtalo de nuevo en unos segundos.",
+    "noKey": "Falta la clave GEMINI_API_KEY en el servidor, así que no puedo responder todavía."
+  },
   "regionStep": {
     "title": "Región de estudio",
     "description": "Escribe o di la zona que quieres investigar.",

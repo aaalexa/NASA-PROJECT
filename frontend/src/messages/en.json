@@ -76,6 +76,18 @@
     "another": "Watch another example",
     "note": "Analysis values in this example are illustrative."
   },
+  "chat": {
+    "open": "Talk to Moody",
+    "close": "Close chat",
+    "subtitle": "Your Moody Trends guide",
+    "greeting": "Hi! I'm Moody. I can explain any part of Moody Trends: regions, NASA data, or how to read the results. What would you like to know?",
+    "placeholder": "Type your question…",
+    "send": "Send",
+    "reset": "New conversation",
+    "thinking": "Moody is thinking",
+    "error": "I could not answer right now. Please try again in a few seconds.",
+    "noKey": "The GEMINI_API_KEY is missing on the server, so I cannot answer yet."
+  },
   "regionStep": {
     "title": "Study region",
     "description": "Type or say the area you want to investigate.",
