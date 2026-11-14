@@ -4,6 +4,7 @@ from __future__ import annotations
 from typing import Any, Literal
 
 from fastapi import APIRouter, Query
+from fastapi.responses import PlainTextResponse
 
 from core.api.esquemas import (
     PeticionDosCarasDTO,
@@ -12,13 +13,16 @@ from core.api.esquemas import (
     TendenciaRespuestaDTO,
 )
 from core.config import PERIODO_COMUN
+from core.motor.down_to_earth import PERIODO_DTE_DEFECTO
 from core.servicios.consultas import (
+    consultar_demo_dte,
     consultar_indicadores,
     consultar_mapa_tendencias,
     consultar_serie,
     consultar_tendencia,
     ejecutar_dos_caras,
     ejecutar_escaner_region,
+    exportar_csv_dte,
 )
 
 router = APIRouter(tags=["Series, Tendencias y Mapas"])
@@ -52,7 +56,9 @@ def ruta_consultar_serie(
     norte: float | None = Query(default=None, description="Latitud máxima [-90, 90]"),
     inicio: str = Query(default=PERIODO_COMUN[0], description="Inicio del periodo (AAAA-MM)"),
     fin: str = Query(default=PERIODO_COMUN[1], description="Fin del periodo (AAAA-MM)"),
-    anual: Literal["suma", "media"] | None = Query(default=None, description="Agregación anual opcional"),
+    anual: Literal["suma", "media", "media_ponderada_dias"] | None = Query(
+        default=None, description="Agregación anual opcional (suma, media o media_ponderada_dias)"
+    ),
     unidad: str | None = Query(default=None, description="Conversión opcional entre mm/dia y mm/mes"),
     mascara: Literal["tierra"] | None = Query(default=None, description="Aplicar máscara de tierra firme"),
     descargar: bool = Query(default=False, description="Descargar de NASA si no está en caché"),
@@ -87,7 +93,9 @@ def ruta_consultar_tendencia(
     norte: float | None = Query(default=None),
     inicio: str = Query(default=PERIODO_COMUN[0], description="Inicio del periodo (AAAA-MM)"),
     fin: str = Query(default=PERIODO_COMUN[1], description="Fin del periodo (AAAA-MM)"),
-    anual: Literal["suma", "media"] | None = Query(default=None, description="Agregación anual opcional"),
+    anual: Literal["suma", "media", "media_ponderada_dias"] | None = Query(
+        default=None, description="Agregación anual opcional (suma, media o media_ponderada_dias)"
+    ),
     unidad: str | None = Query(default=None, description="Conversión opcional entre mm/dia y mm/mes"),
     mascara: Literal["tierra"] | None = Query(default=None),
     alfa: float = Query(default=0.05, gt=0.0, lt=0.5, description="Nivel de significancia bilateral"),
@@ -272,5 +280,90 @@ def ruta_mapa_tendencias(
         alfa=alfa,
         descargar=descargar,
         sintetico=sintetico,
+    )
+
+
+@router.get(
+    "/demo/result",
+    tags=["Down to Earth (4 Variables)"],
+    summary="Análisis completo Down to Earth: 4 variables (P, T, SM, ET), OLS+HAC+Holm y lectura conjunta",
+)
+@router.get(
+    "/down-to-earth/analisis",
+    tags=["Down to Earth (4 Variables)"],
+    summary="Análisis completo Down to Earth: 4 variables (P, T, SM, ET), OLS+HAC+Holm y lectura conjunta",
+)
+def ruta_demo_result_dte(
+    region: str | None = Query(default="sahel", description="Id de región predefinida o slug personalizado"),
+    oeste: float | None = Query(default=None, description="Longitud mínima [-180, 180]"),
+    sur: float | None = Query(default=None, description="Latitud mínima [-90, 90]"),
+    este: float | None = Query(default=None, description="Longitud máxima [-180, 180]"),
+    norte: float | None = Query(default=None, description="Latitud máxima [-90, 90]"),
+    inicio: str = Query(default=PERIODO_DTE_DEFECTO[0], description="Inicio del periodo (AAAA-MM), por defecto 2001-01"),
+    fin: str = Query(default=PERIODO_DTE_DEFECTO[1], description="Fin del periodo (AAAA-MM), por defecto 2024-12"),
+    alfa: float = Query(default=0.05, gt=0.0, lt=0.5, description="Umbral de significancia familiar Holm"),
+    mascara: Literal["tierra"] | None = Query(default=None, description="Aplicar máscara terrestre"),
+    descargar: bool = Query(default=False, description="Descargar en vivo de OPeNDAP NASA si no está en RAM"),
+    sintetico: bool = Query(default=False, description="Forzar modo sintético determinista"),
+    estricto_memoria: bool = Query(
+        default=False,
+        description="Si es True y no está en RAM ni se pide descargar, devuelve 404 en vez de precalculado demo",
+    ),
+) -> dict[str, Any]:
+    bbox = _armar_bbox(oeste, sur, este, norte)
+    return consultar_demo_dte(
+        region=region,
+        bbox=bbox,
+        inicio=inicio,
+        fin=fin,
+        alfa=alfa,
+        mascara=mascara,
+        descargar=descargar,
+        sintetico=sintetico,
+        fallback_sintetico=not estricto_memoria,
+    )
+
+
+@router.get(
+    "/demo/csv/{frecuencia}",
+    tags=["Down to Earth (4 Variables)"],
+    response_class=PlainTextResponse,
+    summary="Exporta en memoria el CSV mensual (288 meses) o anual (24 años) de P, T, SM y ET",
+)
+@router.get(
+    "/down-to-earth/csv/{frecuencia}",
+    tags=["Down to Earth (4 Variables)"],
+    response_class=PlainTextResponse,
+    summary="Exporta en memoria el CSV mensual (288 meses) o anual (24 años) de P, T, SM y ET",
+)
+def ruta_demo_csv_dte(
+    frecuencia: Literal["mensual", "anual"],
+    region: str | None = Query(default="sahel"),
+    oeste: float | None = Query(default=None),
+    sur: float | None = Query(default=None),
+    este: float | None = Query(default=None),
+    norte: float | None = Query(default=None),
+    inicio: str = Query(default=PERIODO_DTE_DEFECTO[0]),
+    fin: str = Query(default=PERIODO_DTE_DEFECTO[1]),
+    mascara: Literal["tierra"] | None = Query(default=None),
+    descargar: bool = Query(default=False),
+    sintetico: bool = Query(default=False),
+) -> PlainTextResponse:
+    bbox = _armar_bbox(oeste, sur, este, norte)
+    contenido = exportar_csv_dte(
+        frecuencia,
+        region=region,
+        bbox=bbox,
+        inicio=inicio,
+        fin=fin,
+        mascara=mascara,
+        descargar=descargar,
+        sintetico=sintetico,
+    )
+    nombre_archivo = f"down_to_earth_{frecuencia}_{region or 'bbox'}_{inicio}_{fin}.csv"
+    return PlainTextResponse(
+        content=contenido,
+        media_type="text/csv; charset=utf-8",
+        headers={"Content-Disposition": f'attachment; filename="{nombre_archivo}"'},
     )
 

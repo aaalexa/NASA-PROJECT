@@ -1,0 +1,174 @@
+name: CI/CD — Build, Empaquetado, Tests y Despliegue (api.moody-trends.earth)
+
+on:
+  push:
+    branches: ["main", "master", "develop"]
+  pull_request:
+    branches: ["main", "master", "develop"]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ============================================================================
+  # 1. Pruebas unitarias/integración y empaquetado local Python (.whl y .tar.gz)
+  # ============================================================================
+  test-and-package:
+    name: Tests (pytest) y Empaquetado Python (uv build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Instalar dependencias nativas C (HDF5, NetCDF, GEOS, PROJ)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libhdf5-dev \
+            libnetcdf-dev \
+            libgeos-dev \
+            libproj-dev
+
+      - name: Instalar uv y Python 3.15
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: "backend/uv.lock"
+
+      - name: Instalar Python 3.15 e inicializar entorno virtual
+        run: |
+          uv python install 3.15
+          uv sync --frozen
+
+      - name: Ejecutar suite completa de pruebas (pytest)
+        run: |
+          uv run pytest tests -v
+
+      - name: Construir y empaquetar proyecto local (wheel y sdist en backend/dist/)
+        run: |
+          uv build
+          ls -lh dist/
+
+      - name: Subir artefacto del paquete Python (wheel + tar.gz)
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-package-dist
+          path: backend/dist/*
+          retention-days: 14
+
+  # ============================================================================
+  # 2. Build local de imagen Docker, empaquetado de imagen y smoke tests HTTP
+  # ============================================================================
+  docker-build-and-smoke-test:
+    name: Build Docker Compose y Smoke Test de Endpoints
+    runs-on: ubuntu-latest
+    needs: test-and-package
+
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Construir imagen Docker local con Docker Compose
+        run: |
+          cp .env.example .env
+          docker compose build api
+
+      - name: Ejecutar pytest dentro del contenedor empaquetado
+        run: |
+          docker compose run --rm api pytest tests -q
+
+      - name: Levantar servicio API y ejecutar Smoke Tests (/salud, /catalog, /demo/result, /regiones)
+        run: |
+          docker compose up -d api
+          echo "Esperando a que el contenedor nasa-down-to-earth-api esté saludable..."
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8000/api/v1/salud >/dev/null 2>&1; then
+              echo "API lista en el intento ${i}"
+              break
+            fi
+            sleep 2
+          done
+
+          curl -fsS http://127.0.0.1:8000/api/v1/salud | grep -q '"almacenamiento_disco":false'
+          curl -fsS http://127.0.0.1:8000/catalog | grep -q '"Down to Earth'
+          curl -fsS "http://127.0.0.1:8000/demo/result?region=corredor_seco_centroamericano&sintetico=true" | grep -q '"P-SM"'
+          curl -fsS "http://127.0.0.1:8000/api/v1/regiones?zona=mexico_centroamerica" | grep -q '"corredor_seco_centroamericano"'
+          docker compose down
+
+      - name: Empaquetar imagen Docker en archivo comprimido (.tar.gz)
+        run: |
+          docker save nasa-down-to-earth-api:latest | gzip > nasa-down-to-earth-api.tar.gz
+          ls -lh nasa-down-to-earth-api.tar.gz
+
+      - name: Subir artefacto de imagen Docker empaquetada
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image-tarball
+          path: nasa-down-to-earth-api.tar.gz
+          retention-days: 7
+
+  # ============================================================================
+  # 3. Despliegue automático opcional en VM Azure Debian 12 (api.moody-trends.earth)
+  #    Se ejecuta en push a main si el secreto AZURE_VM_SSH_KEY está configurado.
+  # ============================================================================
+  deploy-azure-vm:
+    name: Desplegar en VM Azure Debian 12 (api.moody-trends.earth)
+    runs-on: ubuntu-latest
+    needs: docker-build-and-smoke-test
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    env:
+      HAS_SSH_KEY: ${{ secrets.AZURE_VM_SSH_KEY != '' }}
+
+    steps:
+      - name: Verificar si los secretos de despliegue en Azure VM están configurados
+        if: env.HAS_SSH_KEY != 'true'
+        run: |
+          echo "Omitiendo despliegue SSH: define AZURE_VM_HOST, AZURE_VM_USER y AZURE_VM_SSH_KEY en GitHub Secrets para activar el despliegue automático en api.moody-trends.earth."
+
+      - name: Descargar imagen Docker empaquetada
+        if: env.HAS_SSH_KEY == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image-tarball
+
+      - name: Checkout de archivos de despliegue (docker-compose.yml y Caddyfile)
+        if: env.HAS_SSH_KEY == 'true'
+        uses: actions/checkout@v4
+
+      - name: Transferir paquete e iniciar contenedores en Azure VM (api.moody-trends.earth)
+        if: env.HAS_SSH_KEY == 'true'
+        env:
+          VM_HOST: ${{ secrets.AZURE_VM_HOST || 'api.moody-trends.earth' }}
+          VM_USER: ${{ secrets.AZURE_VM_USER }}
+          VM_PORT: ${{ secrets.AZURE_VM_PORT || '22' }}
+          VM_PATH: ${{ secrets.AZURE_VM_APP_DIR || '/opt/nasa-down-to-earth' }}
+          SSH_KEY: ${{ secrets.AZURE_VM_SSH_KEY }}
+        run: |
+          install -m 600 -D /dev/null ~/.ssh/id_deploy
+          printf '%s\n' "${SSH_KEY}" > ~/.ssh/id_deploy
+          ssh-keyscan -p "${VM_PORT}" -H "${VM_HOST}" >> ~/.ssh/known_hosts
+
+          ssh -i ~/.ssh/id_deploy -p "${VM_PORT}" "${VM_USER}@${VM_HOST}" "sudo mkdir -p ${VM_PATH}/deploy && sudo chown -R ${VM_USER}:${VM_USER} ${VM_PATH}"
+          scp -i ~/.ssh/id_deploy -P "${VM_PORT}" docker-compose.yml .env.example "${VM_USER}@${VM_HOST}:${VM_PATH}/"
+          scp -i ~/.ssh/id_deploy -P "${VM_PORT}" deploy/Caddyfile deploy/setup-debian12-docker.sh "${VM_USER}@${VM_HOST}:${VM_PATH}/deploy/"
+          scp -i ~/.ssh/id_deploy -P "${VM_PORT}" nasa-down-to-earth-api.tar.gz "${VM_USER}@${VM_HOST}:${VM_PATH}/"
+
+          ssh -i ~/.ssh/id_deploy -p "${VM_PORT}" "${VM_USER}@${VM_HOST}" <<EOF
+            set -euo pipefail
+            cd "${VM_PATH}"
+            [ -f .env ] || cp .env.example .env
+            gunzip -c nasa-down-to-earth-api.tar.gz | docker load
+            rm -f nasa-down-to-earth-api.tar.gz
+            docker compose up -d
+            docker compose ps
+          EOF
+

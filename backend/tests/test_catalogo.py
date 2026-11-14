@@ -24,11 +24,13 @@ RUTA_CATALOGO = DIR_RECURSOS / "catalogo.yaml"
 def test_cargar_catalogo_y_datasets_oficiales():
     cat = cargar_catalogo(RUTA_CATALOGO)
     ds = cargar_datasets(RUTA_CATALOGO)
-    assert set(ds.keys()) == {"gpcp", "merra2", "imerg"}
+    assert set(ds.keys()) == {"gpcp", "merra2", "gldas", "imerg"}
     esperadas = {
         "lluvia_gpcp",
         "lluvia_merra2",
         "temp_aire",
+        "humedad_suelo",
+        "evapotranspiracion",
         "vapor_agua",
         "lluvia_imerg_mes",
         "lluvia_imerg_dia",
@@ -41,6 +43,8 @@ def test_cargar_catalogo_y_datasets_oficiales():
     assert esperadas.issubset(cat.keys())
     assert "lluvia_gpcp" in variables_por_grupo(cat, "lluvia")
     assert "temp_aire" in variables_por_grupo(cat, "causa")
+    assert "humedad_suelo" in variables_por_grupo(cat, "agua")
+    assert "evapotranspiracion" in variables_por_grupo(cat, "agua")
     assert "cdd_imerg" in variables_por_grupo(cat, "calculada")
 
 

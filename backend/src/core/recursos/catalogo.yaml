@@ -44,6 +44,27 @@ datasets:
     formato: OPeNDAP stream en memoria (MERRA2_<stream>.tavgM_2d_<flx|slv>_Nx.AAAAMM.nc4)
     url: https://disc.gsfc.nasa.gov/datasets/M2TMNXFLX_5.12.4/summary
 
+  - id: gldas
+    nombre: GLDAS Noah mensual v2.1
+    descripcion: >-
+      Global Land Data Assimilation System (modelo terrestre Noah). Aporta humedad superficial del suelo (0–10 cm)
+      y evapotranspiración real en una malla global terrestre de 0.25°.
+    proveedor: NASA GES DISC (GLDAS)
+    short_names: [GLDAS_NOAH025_M]
+    version: "2.1"
+    concept_ids: {GLDAS_NOAH025_M: C1342986036-GES_DISC}
+    desde: "2000-01"
+    hasta: null
+    resolucion: 0.25°
+    frecuencia: mensual
+    protocolo_acceso: opendap
+    opendap_base: https://hydro1.gesdisc.eosdis.nasa.gov/opendap/GLDAS/GLDAS_NOAH025_M.2.1
+    formato: OPeNDAP stream en memoria (GLDAS_NOAH025_M.AAAAMM.021.nc4)
+    url: https://disc.gsfc.nasa.gov/datasets/GLDAS_NOAH025_M_2.1/summary
+    notas: >-
+      SM representa los primeros 10 cm (no toda la zona de raíces). ET es evapotranspiración real (no potencial).
+      SM y ET comparten modelo y entradas: no son pruebas totalmente independientes.
+
   - id: imerg
     nombre: GPM IMERG Final v07
     descripcion: >-
@@ -65,10 +86,13 @@ datasets:
 variables:
   # ------------------------------------------------------------------ GPCP
   - id: lluvia_gpcp
+    codigo_dte: P
     grupo: lluvia
     fuente: gpcp
-    nombre_simple: Lluvia (GPCP)
+    nombre_simple: Precipitación (P)
     definicion_simple: Cuánta lluvia cayó en el mes, combinando satélites y pluviómetros.
+    pregunta: "¿Está llegando más o menos agua?"
+    por_que_elegirla: "Es el fenómeno principal del proyecto."
     dataset: GPCP Precipitation Level 3 Monthly 0.5-Degree V3.3
     short_name: GPCPMON
     version: "3.3"
@@ -106,10 +130,13 @@ variables:
     frecuencia: mensual
 
   - id: temp_aire
+    codigo_dte: T
     grupo: causa
     fuente: merra2
-    nombre_simple: Temperatura del aire
-    definicion_simple: Qué tan caliente está el aire a 2 metros del suelo.
+    nombre_simple: Temperatura del aire (T)
+    definicion_simple: Qué tan caliente está el aire a 2 metros del suelo (no de la superficie).
+    pregunta: "¿La región se está calentando?"
+    por_que_elegirla: "Permite estudiar si los cambios de lluvia coinciden con más calor."
     dataset: MERRA-2 tavgM_2d_slv_Nx
     short_name: M2TMNXSLV
     version: "5.12.4"
@@ -118,7 +145,7 @@ variables:
     conversion: {op: suma, valor: -273.15}
     unidad_final: degC
     rango_valido: [150, 350]
-    agregacion_anual: media
+    agregacion_anual: media_ponderada_dias
     metodo_descarga: opendap
     grilla: {lat_min: -90.0, lat_max: 90.0, dlat: 0.5, lon_min: -180.0, lon_max: 179.375, dlon: 0.625, orden_dims: [time, lat, lon]}
     desde: "1980-01"
@@ -143,6 +170,53 @@ variables:
     grilla: {lat_min: -90.0, lat_max: 90.0, dlat: 0.5, lon_min: -180.0, lon_max: 179.375, dlon: 0.625, orden_dims: [time, lat, lon]}
     desde: "1980-01"
     resolucion: 0.5° x 0.625°
+    frecuencia: mensual
+
+  # ------------------------------------------------------------------ GLDAS Noah 2.1 (Down to Earth: SM y ET)
+  - id: humedad_suelo
+    codigo_dte: SM
+    grupo: agua
+    fuente: gldas
+    nombre_simple: Humedad superficial del suelo (SM)
+    definicion_simple: Agua almacenada en la capa superficial de 0 a 10 cm del suelo en proporción de volumen.
+    pregunta: "¿El suelo conserva más o menos agua?"
+    por_que_elegirla: "Muestra una respuesta terrestre a las condiciones de agua y energía."
+    dataset: GLDAS Noah Land Surface Model L4 monthly 0.25 x 0.25 degree V2.1
+    short_name: GLDAS_NOAH025_M
+    version: "2.1"
+    variable: SoilMoi0_10cm_inst
+    unidad_original: kg m-2
+    conversion: {op: factor, valor: 0.01}
+    unidad_final: m3/m3
+    rango_valido: [0, 100]
+    agregacion_anual: media_ponderada_dias
+    metodo_descarga: opendap
+    grilla: {lat_min: -59.875, lat_max: 89.875, dlat: 0.25, lon_min: -179.875, lon_max: 179.875, dlon: 0.25, orden_dims: [time, lat, lon]}
+    desde: "2000-01"
+    resolucion: 0.25°
+    frecuencia: mensual
+
+  - id: evapotranspiracion
+    codigo_dte: ET
+    grupo: agua
+    fuente: gldas
+    nombre_simple: Evapotranspiración real (ET)
+    definicion_simple: Agua que pasa del suelo y las plantas al aire acumulada en el mes (real, no potencial).
+    pregunta: "¿Cuánta agua pasa del suelo y las plantas al aire?"
+    por_que_elegirla: "Ayuda a interpretar intercambios de agua, junto con lluvia y humedad."
+    dataset: GLDAS Noah Land Surface Model L4 monthly 0.25 x 0.25 degree V2.1
+    short_name: GLDAS_NOAH025_M
+    version: "2.1"
+    variable: Evap_tavg
+    unidad_original: kg m-2 s-1
+    conversion: {op: factor_dias_del_mes, valor: 86400}
+    unidad_final: mm/mes
+    rango_valido: [-0.001, 0.01]
+    agregacion_anual: suma
+    metodo_descarga: opendap
+    grilla: {lat_min: -59.875, lat_max: 89.875, dlat: 0.25, lon_min: -179.875, lon_max: 179.875, dlon: 0.25, orden_dims: [time, lat, lon]}
+    desde: "2000-01"
+    resolucion: 0.25°
     frecuencia: mensual
 
   # ------------------------------------------------------------------ GPM IMERG

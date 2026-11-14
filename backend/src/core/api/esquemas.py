@@ -7,11 +7,17 @@ from pydantic import BaseModel, Field
 
 
 class RegionDTO(BaseModel):
-    id: str = Field(..., description="Identificador slug de la región (ej. 'sahel', 'noreste_mexico').")
+    id: str = Field(..., description="Identificador slug de la región (ej. 'noreste_mexico', 'corredor_seco_centroamericano').")
     nombre: str
     descripcion: str = ""
+    zona: str = "personalizada"
+    pais: str = ""
+    es_latinoamerica: bool = False
     bbox: list[float] = Field(..., min_length=4, max_length=4, description="[oeste, sur, este, norte] en grados.")
     predefinida: bool = True
+    coordenadas: dict[str, Any] | None = None
+    mallas_reales: dict[str, Any] | None = None
+    shortcut: dict[str, Any] | None = None
 
 
 class CalidadDTO(BaseModel):

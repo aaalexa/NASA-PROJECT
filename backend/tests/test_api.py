@@ -22,20 +22,21 @@ def test_salud_catalogo_y_consulta_opendap(dir_datos_temporal):
     r_raiz = c.get("/")
     assert r_raiz.status_code == 200
     assert r_raiz.json()["modo_acceso"] == "opendap_memoria_sin_archivos"
-    assert set(r_raiz.json()["datasets"]) == {"gpcp", "merra2", "imerg"}
+    assert set(r_raiz.json()["datasets"]) == {"gpcp", "merra2", "gldas", "imerg"}
 
     r_salud = c.get("/api/v1/salud")
     assert r_salud.status_code == 200
     datos_salud = r_salud.json()
     assert datos_salud["estado"] == "ok"
     assert datos_salud["almacenamiento_disco"] is False
-    assert datos_salud["n_datasets"] == 3
+    assert datos_salud["n_datasets"] == 4
 
     r_cat = c.get("/api/v1/catalogo")
     assert r_cat.status_code == 200
     cat = r_cat.json()
-    assert len(cat["datasets"]) == 3
+    assert len(cat["datasets"]) == 4
     assert any(v["id"] == "lluvia_gpcp" for v in cat["variables"])
+    assert "down_to_earth" in cat
 
     # Inspección de consulta OPeNDAP (índices espaciales y expresiones DAP4/DAP2)
     r_dap = c.get("/api/v1/opendap/consulta", params={"variable": "lluvia_imerg_mes", "region": "sahel"})
@@ -68,7 +69,31 @@ def test_endpoints_datasets_variables_y_regiones(dir_datos_temporal):
 
     r_reg = c.get("/api/v1/regiones/noreste_mexico")
     assert r_reg.status_code == 200
-    assert len(r_reg.json()["bbox"]) == 4
+    reg_json = r_reg.json()
+    assert len(reg_json["bbox"]) == 4
+    assert reg_json["zona"] == "mexico"
+    assert reg_json["es_latinoamerica"] is True
+    assert reg_json["coordenadas"]["centro"] == {"lat": 26.0, "lon": -101.5}
+    assert "gpcp" in reg_json["mallas_reales"]
+    assert "gldas" in reg_json["mallas_reales"]
+    assert reg_json["shortcut"]["query_region"] == "?region=noreste_mexico"
+
+    r_mex = c.get("/api/v1/regiones", params={"zona": "mexico"})
+    assert r_mex.status_code == 200
+    assert r_mex.json()["total"] >= 8
+    assert all(r["zona"] == "mexico" for r in r_mex.json()["regiones"])
+
+    r_ca = c.get("/api/v1/regiones", params={"zona": "centroamerica"})
+    assert r_ca.status_code == 200
+    assert r_ca.json()["total"] >= 6
+    assert any(r["id"] == "corredor_seco_centroamericano" for r in r_ca.json()["regiones"])
+
+    r_bbox_calc = c.get(
+        "/api/v1/regiones/calcular-bbox",
+        params={"oeste": -92.2, "sur": 11.5, "este": -85.0, "norte": 16.0, "nombre": "Corredor Seco"},
+    )
+    assert r_bbox_calc.status_code == 200
+    assert r_bbox_calc.json()["coordenadas"]["centro"] == {"lat": 13.75, "lon": -88.6}
 
 
 def test_series_y_tendencias_desde_memoria_ram(dir_datos_temporal, serie_ar1):

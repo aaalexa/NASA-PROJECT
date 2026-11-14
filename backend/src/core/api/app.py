@@ -122,6 +122,29 @@ def crear_app() -> FastAPI:
     app.include_router(catalogo.router, prefix="/api/v1")
     app.include_router(analisis.router, prefix="/api/v1")
     app.include_router(datos.router, prefix="/api/v1")
+
+    # Endpoints raíz directos especificados en la guía "Down to Earth" (§05)
+    app.add_api_route(
+        "/catalog",
+        catalogo.ruta_catalogo_down_to_earth,
+        methods=["GET"],
+        tags=["Down to Earth (4 Variables)"],
+        summary="Catálogo Down to Earth (GET /catalog)",
+    )
+    app.add_api_route(
+        "/demo/result",
+        analisis.ruta_demo_result_dte,
+        methods=["GET"],
+        tags=["Down to Earth (4 Variables)"],
+        summary="Resultado completo Down to Earth (GET /demo/result)",
+    )
+    app.add_api_route(
+        "/demo/csv/{frecuencia}",
+        analisis.ruta_demo_csv_dte,
+        methods=["GET"],
+        tags=["Down to Earth (4 Variables)"],
+        summary="Exportación CSV mensual/anual Down to Earth en memoria",
+    )
     return app
 
 

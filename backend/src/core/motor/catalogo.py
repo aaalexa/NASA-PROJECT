@@ -17,13 +17,14 @@ UNIDADES_CONOCIDAS: frozenset[str] = frozenset({
     "mm/dia", "mm/mes", "mm/anio", "mm/h", "mm",
     "kg m-2 s-1", "kg m-2", "kg m-2 3h-1",
     "K", "degC",
+    "m3/m3",
     "1", "escalado", "clase IGBP", "booleano", "fraccion",
     "personas", "dias",
 })
 GRUPOS: frozenset[str] = frozenset({"lluvia", "causa", "agua", "social", "calculada"})
 FRECUENCIAS: frozenset[str] = frozenset({"diaria", "mensual", "anual"})
-OPERACIONES: frozenset[str] = frozenset({"ninguna", "factor", "suma", "dias_del_mes", "clases"})
-AGREGACIONES: frozenset[str] = frozenset({"suma", "media"})
+OPERACIONES: frozenset[str] = frozenset({"ninguna", "factor", "suma", "dias_del_mes", "factor_dias_del_mes", "clases"})
+AGREGACIONES: frozenset[str] = frozenset({"suma", "media", "media_ponderada_dias"})
 METODOS_DESCARGA: frozenset[str] = frozenset({"opendap", "remoto", "descarga"})
 INDICADORES: frozenset[str] = frozenset({"cdd", "r20mm", "dias_humedos", "prcptot", "sdii"})
 
@@ -77,7 +78,7 @@ def validar_entrada(entrada: dict) -> list[str]:
             err("'conversion' debe ser un dict con 'op'")
         elif conv["op"] not in OPERACIONES:
             err(f"op '{conv['op']}' desconocida (válidas: {sorted(OPERACIONES)})")
-        elif conv["op"] in ("factor", "suma") and not _es_numero(conv.get("valor")):
+        elif conv["op"] in ("factor", "suma", "factor_dias_del_mes") and not _es_numero(conv.get("valor")):
             err(f"op '{conv['op']}' necesita 'valor' numérico")
         elif conv["op"] == "clases":
             valores = conv.get("valores")
@@ -211,6 +212,10 @@ def convertir(da: xr.DataArray, entrada: dict) -> xr.DataArray:
         if "time" not in da.coords:
             raise ValueError(f"{entrada['id']}: 'dias_del_mes' necesita una coordenada 'time'")
         out = da * da["time"].dt.days_in_month
+    elif op == "factor_dias_del_mes":
+        if "time" not in da.coords:
+            raise ValueError(f"{entrada['id']}: 'factor_dias_del_mes' necesita una coordenada 'time'")
+        out = da * float(conv["valor"]) * da["time"].dt.days_in_month
     elif op == "clases":
         out = xr.where(da.isin(conv["valores"]), 1.0, 0.0).where(da.notnull())
     else:

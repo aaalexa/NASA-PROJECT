@@ -36,6 +36,7 @@ __all__ = [
     "promedio_area",
     "climatologia",
     "anomalias",
+    "anomalias_estandarizadas",
     "agregar_anual",
     "reindexar_calendario",
     "control_calidad",
@@ -43,7 +44,7 @@ __all__ = [
     "serie_region",
 ]
 
-MetodoAnual = Literal["suma", "media"]
+MetodoAnual = Literal["suma", "media", "media_ponderada_dias"]
 
 
 class SerieRechazada(ValueError):
@@ -202,10 +203,18 @@ def promedio_area(da: xr.DataArray, min_area_valida: float = 0.9,
 
     peso_valido = (w * da.notnull()).sum(("lat", "lon"))
     frac_valida = peso_valido / peso_total
+    peso_malla = w.sum(("lat", "lon"))
+    frac_malla = peso_valido / peso_malla if float(peso_malla) > 0.0 else frac_valida
 
     serie = da.weighted(w.fillna(0.0)).mean(("lat", "lon"), skipna=True)
     serie = serie.where(frac_valida >= min_area_valida)
     serie = serie.drop_vars("_fraccion_poligono", errors="ignore")
+    frac_arr = np.asarray(frac_malla.values, dtype=np.float64)
+    finitos = frac_arr[np.isfinite(frac_arr)]
+    if finitos.size > 0:
+        attrs["cobertura_area_media"] = float(np.mean(finitos))
+        attrs["cobertura_area_min"] = float(np.min(finitos))
+        attrs["cobertura_estable"] = bool((np.max(finitos) - np.min(finitos)) <= 0.05)
     serie.attrs = attrs
     serie.name = da.name
     return serie
@@ -261,17 +270,48 @@ def anomalias(serie: xr.DataArray, clim: xr.DataArray | None = None,
     return anom
 
 
+def anomalias_estandarizadas(serie: xr.DataArray, base: tuple[str, str] | None = None) -> xr.DataArray:
+    """Anomalías mensuales estandarizadas z = (valor − μ_mes) / s_mes (Down to Earth §04).
+
+    Para cada mes calendario m = 1..12 calcula el promedio μ_mes y la desviación estándar muestral s_mes (ddof=1)
+    en el periodo de referencia `base` (o en toda la serie si `base` es None). Si s_mes = 0 o hay menos de 2
+    datos válidos en ese mes calendario, devuelve NaN en ese mes. La serie resultante conserva la tendencia
+    y está en escala adimensional ('1').
+    """
+    if "time" not in serie.dims:
+        raise ValueError("anomalias_estandarizadas requiere dimensión 'time' mensual")
+    sub = serie.sel(time=slice(base[0], base[1])) if base is not None else serie
+    if sub.sizes.get("time", 0) == 0:
+        raise ValueError(f"no hay datos en el periodo base {base}")
+
+    mu_mes = sub.groupby("time.month").mean("time", skipna=True)
+    s_mes = sub.groupby("time.month").std("time", ddof=1, skipna=True)
+    n_mes = sub.notnull().groupby("time.month").sum("time")
+    s_valida = s_mes.where((s_mes > 0.0) & (n_mes >= 2))
+
+    anom = (serie.groupby("time.month") - mu_mes).drop_vars("month", errors="ignore")
+    z = (anom.groupby("time.month") / s_valida).drop_vars("month", errors="ignore")
+    attrs = {**serie.attrs, "units": "1", "escala": "z_mensual"}
+    if base is not None:
+        attrs["periodo_base"] = [str(base[0]), str(base[1])]
+    z.attrs = attrs
+    z.name = serie.name
+    return z
+
+
 # ----------------------------------------------------------------------------------------------- 5. Agregación anual
 def agregar_anual(serie: xr.DataArray, metodo: MetodoAnual) -> xr.DataArray:
-    """Agrega una serie mensual por año natural (referencia §3). Dimensión de salida: 'anio' (entero).
+    """Agrega una serie mensual por año natural (referencia §3 y Down to Earth §02). Dimensión de salida: 'anio'.
 
     - metodo='suma': solo para unidades de cantidad ('mm/mes' → 'mm/anio'). Si la serie está en 'mm/dia' u otra
       unidad de tasa, lanza ValueError (convierte antes a 'mm/mes' con cambiar_unidad).
-    - metodo='media': conserva la unidad.
+    - metodo='media': promedio aritmético simple de los 12 meses, conserva la unidad.
+    - metodo='media_ponderada_dias': promedio mensual ponderado por los días de cada mes
+      Σ(X_mes × días_mes) / Σ(días_mes) (Down to Earth §02 para T y SM). Conserva la unidad.
     Solo se agregan años con los 12 meses válidos; un año incompleto queda como NaN.
     """
-    if metodo not in ("suma", "media"):
-        raise ValueError(f"metodo debe ser 'suma' o 'media', no {metodo!r}")
+    if metodo not in ("suma", "media", "media_ponderada_dias"):
+        raise ValueError(f"metodo debe ser 'suma', 'media' o 'media_ponderada_dias', no {metodo!r}")
     if "time" not in serie.dims:
         raise ValueError("agregar_anual requiere una serie mensual con dimensión 'time'")
     unidad = serie.attrs.get("units")
@@ -284,12 +324,18 @@ def agregar_anual(serie: xr.DataArray, metodo: MetodoAnual) -> xr.DataArray:
     if metodo == "suma":
         anual = serie.groupby("time.year").sum("time", skipna=False)
         unidad_salida = "mm/anio"
+    elif metodo == "media_ponderada_dias":
+        dias = serie["time"].dt.days_in_month.astype(float)
+        num = (serie * dias).groupby("time.year").sum("time", skipna=False)
+        den = dias.where(serie.notnull()).groupby("time.year").sum("time", skipna=False)
+        anual = num / den
+        unidad_salida = unidad
     else:
         anual = serie.groupby("time.year").mean("time", skipna=False)
         unidad_salida = unidad
     anual = anual.where(conteo == 12).rename(year="anio")
     anual = anual.assign_coords(anio=anual["anio"].values.astype(int))
-    attrs = {**serie.attrs}
+    attrs = {**serie.attrs, "metodo_agregacion_anual": metodo}
     if unidad_salida is not None:
         attrs["units"] = unidad_salida
     anual.attrs = attrs

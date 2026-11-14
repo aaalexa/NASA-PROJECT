@@ -1,0 +1,24 @@
+# Configuración de Caddy para HTTPS automático (Let's Encrypt) en api.moody-trends.earth
+{$API_DOMAIN:api.moody-trends.earth} {
+    encode zstd gzip
+
+    header {
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        -Server
+    }
+
+    reverse_proxy api:8000 {
+        health_uri /api/v1/salud
+        health_interval 30s
+        health_timeout 5s
+        transport http {
+            read_timeout 180s
+            write_timeout 180s
+            dial_timeout 10s
+        }
+    }
+}
+

@@ -45,8 +45,6 @@ _MAGIC_HDF5 = b"\x89HDF\r\n\x1a\n"
 _MAGIC_CDF = (b"CDF\x01", b"CDF\x02", b"CDF\x05")
 _LOCK_HDF5 = threading.Lock()
 _TLS_HDF5 = threading.local()
-_LOCK_COORDS = threading.Lock()
-_CACHE_COORDENADAS_OPENDAP: dict[str, tuple[np.ndarray, np.ndarray]] = {}
 
 
 def _silenciar_hdf5_hilo_actual() -> None:
@@ -223,16 +221,6 @@ def normalizar_tiempo(obj: xr.DataArray | xr.Dataset, frecuencia: str) -> xr.Dat
     return obj.sortby("time")
 
 
-def _distancia_a_intervalo(valores: np.ndarray, minimo: float, maximo: float) -> float:
-    """Distancia mínima en grados desde cualquier valor de `valores` al intervalo [minimo, maximo]."""
-    arr = np.asarray(valores, dtype=np.float64)
-    if arr.size == 0:
-        return float("inf")
-    if np.any((arr >= minimo) & (arr <= maximo)):
-        return 0.0
-    return float(np.min(np.minimum(np.abs(arr - minimo), np.abs(arr - maximo))))
-
-
 def recortar_bbox(da: xr.DataArray | xr.Dataset, bbox: BBox, minimo_una_celda: bool = True):
     """Recorta a (oeste, sur, este, norte). Requiere coordenadas normalizadas. Soporta cruzar el antimeridiano."""
     oeste, sur, este, norte = bbox
@@ -246,29 +234,36 @@ def recortar_bbox(da: xr.DataArray | xr.Dataset, bbox: BBox, minimo_una_celda: b
     if not minimo_una_celda:
         raise ValueError(f"la caja {bbox} no contiene ningún centro de celda de la malla")
 
-    lats = np.asarray(da["lat"].values, dtype=np.float64)
-    lons = np.asarray(da["lon"].values, dtype=np.float64)
-    paso_lat = float(np.abs(np.diff(lats)).max()) if lats.size > 1 else 2.5
-    paso_lon = float(np.abs(np.diff(lons)).max()) if lons.size > 1 else 2.5
-    tol_lat = max(paso_lat * 1.5, 1.5)
-    tol_lon = max(paso_lon * 1.5, 1.5)
+    lat_vals = np.asarray(da["lat"].values, dtype=np.float64)
+    lon_vals = np.asarray(da["lon"].values, dtype=np.float64)
+    dlat = float(np.median(np.abs(np.diff(lat_vals)))) if lat_vals.size > 1 else 1.0
+    dlon = float(np.median(np.abs(np.diff(lon_vals)))) if lon_vals.size > 1 else 1.0
 
-    dist_lat = _distancia_a_intervalo(lats, sur, norte)
+    # Si las coordenadas recibidas ni siquiera están a menos de 1 paso de celda del bbox, los índices
+    # de recorte en el servidor estaban invertidos o desfasados (ej. lat descendente o lon 0..360).
+    dist_lat = 0.0
+    if lat_vals.max() < sur:
+        dist_lat = float(sur - lat_vals.max())
+    elif lat_vals.min() > norte:
+        dist_lat = float(lat_vals.min() - norte)
+
+    dist_lon = 0.0
     if oeste <= este:
-        dist_lon = _distancia_a_intervalo(lons, oeste, este)
-    else:
-        dist_lon = min(_distancia_a_intervalo(lons, oeste, 180.0), _distancia_a_intervalo(lons, -180.0, este))
+        if lon_vals.max() < oeste:
+            dist_lon = float(oeste - lon_vals.max())
+        elif lon_vals.min() > este:
+            dist_lon = float(lon_vals.min() - este)
 
-    if dist_lat > tol_lat or dist_lon > tol_lon:
+    if dist_lat > max(1.5 * dlat, 1.0) or dist_lon > max(1.5 * dlon, 1.0):
         raise ValueError(
-            f"la caja {bbox} no contiene ningún centro de celda de la malla "
-            f"(rango recibido: lat=[{lats.min():.2f}, {lats.max():.2f}], lon=[{lons.min():.2f}, {lons.max():.2f}])"
+            f"Subconjunto espacial [{lat_vals.min():.2f}..{lat_vals.max():.2f}, "
+            f"{lon_vals.min():.2f}..{lon_vals.max():.2f}] fuera del bbox {bbox}"
         )
 
     clat = (sur + norte) / 2.0
     clon = (oeste + este) / 2.0 if oeste <= este else ((oeste + este + 360.0) / 2.0 + 180.0) % 360.0 - 180.0
-    ilat = int(np.abs(lats - clat).argmin())
-    ilon = int(np.abs(lons - clon).argmin())
+    ilat = int(np.abs(lat_vals - clat).argmin())
+    ilon = int(np.abs(lon_vals - clon).argmin())
     return da.isel(lat=slice(ilat, ilat + 1), lon=slice(ilon, ilon + 1))
 
 
@@ -302,16 +297,29 @@ def extraer_url_opendap(granulo: Any) -> str:
     raise RuntimeError(f"El gránulo {umm.get('GranuleUR', granulo)} no expone una URL OPeNDAP ni HTTPS.")
 
 
+def indices_bbox_opendap(
+    lat_1d: np.ndarray,
+    lon_1d: np.ndarray,
+    bbox: BBox,
+) -> tuple[tuple[int, int], tuple[int, int]]:
+    """Calcula los rangos de índices inclusivos ((lat_i0, lat_i1), (lon_i0, lon_i1)) para OPeNDAP [i0:1:i1]."""
+    lat_slice, lon_slices = segmentos_indices_bbox_opendap(lat_1d, lon_1d, bbox)
+    lon_i0 = min(s[0] for s in lon_slices)
+    lon_i1 = max(s[1] for s in lon_slices)
+    return lat_slice, (lon_i0, lon_i1)
+
+
 def segmentos_indices_bbox_opendap(
     lat_1d: np.ndarray,
     lon_1d: np.ndarray,
     bbox: BBox,
 ) -> tuple[tuple[int, int], list[tuple[int, int]]]:
-    """Calcula el slice de latitud y la lista de slices contiguos de longitud para OPeNDAP.
+    """Calcula el slice de latitud y 1 o 2 slices contiguos de longitud para OPeNDAP.
 
-    Soporta mallas con latitud ascendente o descendente (`89.75 → -89.75` en GPCP) y longitudes tanto en
-    `[-180, 180)` como en `[0, 360)` (dividiendo automáticamente en 2 segmentos contiguos cuando el bbox
-    cruza la costura `0°/360°` o `-180°/180°` de la malla nativa del servidor).
+    Soporta grillas con latitud ascendente (`-90 → 90`) o descendente (`90 → -90`) y longitud en
+    `[-180, 180)` o en `[0, 360)`. Cuando el bbox cruza el meridiano de Greenwich (`0°`) en una grilla
+    `0..360` (p. ej. Sahel `-20..40`), divide los índices de longitud en dos segmentos contiguos
+    (`[(0, 79), (680, 719)]`) en lugar de pedir toda la circunferencia terrestre `[0:719]`.
     """
     oeste, sur, este, norte = validar_bbox(bbox)
     lat_arr = np.asarray(lat_1d, dtype=np.float64)
@@ -336,21 +344,9 @@ def segmentos_indices_bbox_opendap(
         return lat_slice, [(cercano_lon, cercano_lon)]
 
     cortes = np.flatnonzero(np.diff(en_lon) > 1) + 1
-    bloques = np.split(en_lon, cortes)
-    lon_slices = [(int(b[0]), int(b[-1])) for b in bloques if b.size > 0]
+    grupos = np.split(en_lon, cortes)
+    lon_slices = [(int(g[0]), int(g[-1])) for g in grupos if g.size > 0]
     return lat_slice, lon_slices
-
-
-def indices_bbox_opendap(
-    lat_1d: np.ndarray,
-    lon_1d: np.ndarray,
-    bbox: BBox,
-) -> tuple[tuple[int, int], tuple[int, int]]:
-    """Calcula los rangos de índices inclusivos ((lat_i0, lat_i1), (lon_i0, lon_i1)) para OPeNDAP [i0:1:i1]."""
-    lat_slice, lon_slices = segmentos_indices_bbox_opendap(lat_1d, lon_1d, bbox)
-    if len(lon_slices) == 1:
-        return lat_slice, lon_slices[0]
-    return lat_slice, (min(s[0] for s in lon_slices), max(s[1] for s in lon_slices))
 
 
 def indices_bbox_grilla(grilla: dict[str, Any], bbox: BBox) -> tuple[tuple[int, int], tuple[int, int]]:
@@ -358,8 +354,6 @@ def indices_bbox_grilla(grilla: dict[str, Any], bbox: BBox) -> tuple[tuple[int, 
     n_lat = int(round((float(grilla["lat_max"]) - float(grilla["lat_min"])) / float(grilla["dlat"]))) + 1
     n_lon = int(round((float(grilla["lon_max"]) - float(grilla["lon_min"])) / float(grilla["dlon"]))) + 1
     lat_1d = np.linspace(float(grilla["lat_min"]), float(grilla["lat_max"]), n_lat)
-    if grilla.get("lat_invertida"):
-        lat_1d = lat_1d[::-1]
     lon_1d = np.linspace(float(grilla["lon_min"]), float(grilla["lon_max"]), n_lon)
     return indices_bbox_opendap(lat_1d, lon_1d, bbox)
 
@@ -379,7 +373,7 @@ def construir_url_opendap_subset(
     respetando tanto el grupo HDF5 (`grupo_hdf: Grid` en IMERG mensual) como el orden de dimensiones
     (`(time, lon, lat)` en IMERG frente a `(time, lat, lon)` en GPCP y MERRA-2).
     """
-    base = re.sub(r"\.(dap\.nc4|nc4|dods|dds|das|dmr|html)$", "", url_opendap)
+    base = re.sub(r"\.(dap\.nc4|nc4|dods|dds|das|html)$", "", url_opendap)
     if url_opendap.endswith((".nc4", ".HDF5", ".hdf5", ".nc")):
         base = url_opendap
 
@@ -422,78 +416,6 @@ def construir_url_opendap_subset(
     return f"{base}.nc4?{','.join(partes_dap2)}"
 
 
-def _extraer_lat_lon_1d_de_bytes(datos_bytes: bytes, grupo: str | None = None) -> tuple[np.ndarray, np.ndarray] | None:
-    """Extrae los vectores 1-D `lat` y `lon` en el orden exacto del servidor desde un binario NetCDF/HDF5 en RAM."""
-    formato = _validar_firma_netcdf(datos_bytes)
-    if formato == "cdf" and datos_bytes[:4] in (b"CDF\x01", b"CDF\x02"):
-        with xr.open_dataset(io.BytesIO(datos_bytes), engine="scipy") as ds:
-            ds_mem = ds.load()
-        vars_map = {k: np.asarray(ds_mem[k].values, dtype=np.float64) for k in ds_mem.variables}
-    else:
-        with _LOCK_HDF5:
-            _silenciar_hdf5_hilo_actual()
-            nc_mem = netCDF4.Dataset("coords_opendap.nc", mode="r", memory=datos_bytes)
-            try:
-                origen = nc_mem.groups[grupo] if (grupo and grupo in nc_mem.groups) else nc_mem
-                vars_map = {k: np.asarray(origen.variables[k][:], dtype=np.float64) for k in origen.variables}
-            finally:
-                if nc_mem.isopen():
-                    nc_mem.close()
-
-    pref = f"{grupo}_" if grupo else ""
-    lat_1d: np.ndarray | None = None
-    lon_1d: np.ndarray | None = None
-    for cand in (*_NOMBRES_LAT, *(f"{pref}{n}" for n in _NOMBRES_LAT if pref)):
-        if cand in vars_map and vars_map[cand].ndim == 1 and vars_map[cand].size >= 2:
-            lat_1d = vars_map[cand]
-            break
-    for cand in (*_NOMBRES_LON, *(f"{pref}{n}" for n in _NOMBRES_LON if pref)):
-        if cand in vars_map and vars_map[cand].ndim == 1 and vars_map[cand].size >= 2:
-            lon_1d = vars_map[cand]
-            break
-    if lat_1d is not None and lon_1d is not None:
-        return lat_1d, lon_1d
-    return None
-
-
-def _descubrir_coordenadas_opendap(
-    url_opendap: str,
-    entrada: dict[str, Any],
-    sesion: Any,
-    timeout: int,
-) -> tuple[np.ndarray, np.ndarray] | None:
-    """Consulta únicamente los vectores 1-D `lat` y `lon` reales del servidor OPeNDAP (~4 KB) y los cachea en RAM."""
-    clave = str(entrada.get("short_name") or entrada.get("variable") or url_opendap)
-    with _LOCK_COORDS:
-        if clave in _CACHE_COORDENADAS_OPENDAP:
-            return _CACHE_COORDENADAS_OPENDAP[clave]
-
-    base = re.sub(r"\.(dap\.nc4|nc4|dods|dds|das|dmr|html)$", "", url_opendap)
-    if url_opendap.endswith((".nc4", ".HDF5", ".hdf5", ".nc")):
-        base = url_opendap
-    grupo = entrada.get("grupo_hdf")
-    pref = f"/{grupo}/" if grupo else "/"
-    lat_dap2 = f"{grupo}_lat" if grupo else "lat"
-    lon_dap2 = f"{grupo}_lon" if grupo else "lon"
-
-    urls_coords = [
-        f"{base}.dap.nc4?dap4.ce={pref}lat;{pref}lon",
-        f"{base}.nc4?{lat_dap2},{lon_dap2}",
-    ]
-    for u in urls_coords:
-        try:
-            resp = sesion.get(u, timeout=timeout)
-            if resp.status_code == 200 and resp.content:
-                par = _extraer_lat_lon_1d_de_bytes(resp.content, grupo=grupo)
-                if par is not None:
-                    with _LOCK_COORDS:
-                        _CACHE_COORDENADAS_OPENDAP[clave] = par
-                    return par
-        except Exception:  # noqa: BLE001
-            continue
-    return None
-
-
 def serializar_netcdf_en_memoria(da: xr.DataArray, grupo: str | None = None) -> bytes:
     """Serializa un DataArray a bytes NetCDF4/HDF5 íntegramente en memoria RAM (útil para tests y mocks OPeNDAP)."""
     nombre = str(da.name or "valor")
@@ -525,53 +447,10 @@ def serializar_netcdf_en_memoria(da: xr.DataArray, grupo: str | None = None) -> 
         return bytes(mem)
 
 
-def _vincular_coordenadas_opendap(
-    ds: xr.Dataset,
-    nombre: str,
-    entrada: dict[str, Any],
-    coords_esperadas: tuple[np.ndarray, np.ndarray] | None = None,
-) -> xr.DataArray:
-    """Garantiza que la variable extraída de OPeNDAP tenga las dimensiones y coordenadas `time`, `lat`, `lon`."""
-    da_var = ds[nombre]
-    orden_dims = (entrada.get("grilla") or {}).get("orden_dims", ["time", "lat", "lon"])
-
-    # Si DAP4 generó dimensiones anónimas (ej. dim0, dim1, dim2), renombrarlas según orden_dims.
-    if da_var.ndim == len(orden_dims) and any(d not in ("time", *_NOMBRES_LAT, *_NOMBRES_LON) for d in da_var.dims):
-        renombres_dims = {dim_actual: dim_esp for dim_actual, dim_esp in zip(da_var.dims, orden_dims)}
-        da_var = da_var.rename(renombres_dims)
-
-    # Asociar variables 1-D de coordenadas presentes en `ds` si no quedaron enlazadas como coords.
-    nuevas_coords: dict[str, Any] = {}
-    for eje, candidatos in (("time", ("time",)), ("lat", _NOMBRES_LAT), ("lon", _NOMBRES_LON)):
-        dim_eje = next((d for d in da_var.dims if d == eje or d in candidatos), None)
-        if dim_eje is None:
-            continue
-        if dim_eje not in da_var.coords:
-            for c_var in candidatos:
-                if c_var in ds.variables and ds[c_var].ndim == 1 and ds[c_var].size == da_var.sizes[dim_eje]:
-                    nuevas_coords[dim_eje] = (dim_eje, ds[c_var].values)
-                    break
-
-    if coords_esperadas is not None:
-        lat_esp, lon_esp = coords_esperadas
-        for dim_lat in (d for d in da_var.dims if d in _NOMBRES_LAT):
-            if dim_lat not in da_var.coords and dim_lat not in nuevas_coords and lat_esp.size == da_var.sizes[dim_lat]:
-                nuevas_coords[dim_lat] = (dim_lat, lat_esp)
-        for dim_lon in (d for d in da_var.dims if d in _NOMBRES_LON):
-            if dim_lon not in da_var.coords and dim_lon not in nuevas_coords and lon_esp.size == da_var.sizes[dim_lon]:
-                nuevas_coords[dim_lon] = (dim_lon, lon_esp)
-
-    if nuevas_coords:
-        da_var = da_var.assign_coords(nuevas_coords)
-    return da_var
-
-
 def abrir_bytes_netcdf_en_memoria(
     datos_bytes: bytes,
     entrada: dict[str, Any],
     bbox: BBox | None = None,
-    *,
-    coords_esperadas: tuple[np.ndarray, np.ndarray] | None = None,
 ) -> xr.DataArray:
     """Abre un buffer binario NetCDF4/HDF5 o NetCDF3 (respuesta de OPeNDAP) en memoria RAM sin escribir a disco.
 
@@ -615,66 +494,78 @@ def abrir_bytes_netcdf_en_memoria(
         raise KeyError(
             f"'{nombre}' no está en la respuesta OPeNDAP (variables recibidas: {sorted(ds.data_vars)})"
         )
-    da_var = _vincular_coordenadas_opendap(ds, nombre, entrada, coords_esperadas=coords_esperadas)
-    da_norm = normalizar_coordenadas(da_var)
-    if bbox is not None and ("lat" in da_norm.dims and "lon" in da_norm.dims):
-        da_norm = recortar_bbox(da_norm, bbox)
-    da = normalizar_tiempo(da_norm, frecuencia)
+    ds_norm = normalizar_coordenadas(ds[[nombre]])
+    if bbox is not None and ("lat" in ds_norm.dims and "lon" in ds_norm.dims):
+        ds_norm = recortar_bbox(ds_norm, bbox)
+    da = normalizar_tiempo(ds_norm[nombre], frecuencia)
     return da
 
 
-def _descargar_subset_con_slices(
+_CACHE_COORDENADAS_OPENDAP: dict[str, tuple[np.ndarray, np.ndarray]] = {}
+_LOCK_COORDS = threading.Lock()
+
+
+def _descubrir_coordenadas_opendap(
     url_base: str,
     entrada: dict[str, Any],
-    bbox: BBox,
     sesion: Any,
     timeout: int,
-    lat_slice: tuple[int, int] | None,
-    lon_slices: list[tuple[int, int]] | tuple[None, ...],
-    coords_srv: tuple[np.ndarray, np.ndarray] | None,
-    errores: list[str],
-) -> xr.DataArray | None:
-    """Intenta descargar uno o dos segmentos contiguos de longitud por DAP4 o DAP2 y unirlos en RAM."""
-    for protocolo in ("dap4", "dap2"):
-        try:
-            segmentos_da: list[xr.DataArray] = []
-            exito_protocolo = True
-            for lon_s in lon_slices:
-                url_sub = construir_url_opendap_subset(
-                    url_base,
-                    entrada,
-                    bbox,
-                    protocolo=protocolo,
-                    lat_slice=lat_slice,
-                    lon_slice=lon_s,
-                )
-                resp = sesion.get(url_sub, timeout=timeout)
-                if resp.status_code != 200 or not resp.content:
-                    errores.append(f"{protocolo} HTTP {resp.status_code}")
-                    exito_protocolo = False
-                    break
-                coords_esp = None
-                if coords_srv is not None and lat_slice is not None and lon_s is not None:
-                    coords_esp = (
-                        coords_srv[0][lat_slice[0] : lat_slice[1] + 1],
-                        coords_srv[1][lon_s[0] : lon_s[1] + 1],
-                    )
-                bbox_seg = bbox if len(lon_slices) == 1 else None
-                seg = abrir_bytes_netcdf_en_memoria(
-                    resp.content,
-                    entrada,
-                    bbox=bbox_seg,
-                    coords_esperadas=coords_esp,
-                )
-                segmentos_da.append(seg)
+) -> tuple[np.ndarray, np.ndarray] | None:
+    """Consulta una sola vez por colección los vectores 1-D `lat` y `lon` reales del servidor OPeNDAP."""
+    clave = str(entrada.get("short_name") or url_base)
+    with _LOCK_COORDS:
+        if clave in _CACHE_COORDENADAS_OPENDAP:
+            return _CACHE_COORDENADAS_OPENDAP[clave]
 
-            if exito_protocolo and segmentos_da:
-                if len(segmentos_da) == 1:
-                    return segmentos_da[0]
-                unido = normalizar_coordenadas(xr.concat(segmentos_da, dim="lon"))
-                return recortar_bbox(unido, bbox)
-        except Exception as exc:  # noqa: BLE001
-            errores.append(f"{protocolo}: {exc}")
+    base = re.sub(r"\.(dap\.nc4|nc4|dods|dds|das|html)$", "", url_base)
+    if url_base.endswith((".nc4", ".HDF5", ".hdf5", ".nc")):
+        base = url_base
+    grupo = entrada.get("grupo_hdf")
+    pref_dap4 = f"/{grupo}/" if grupo else "/"
+    lat_dap2 = f"{grupo}_lat" if grupo else "lat"
+    lon_dap2 = f"{grupo}_lon" if grupo else "lon"
+
+    urls_coords = (
+        f"{base}.dap.nc4?dap4.ce={pref_dap4}lat;{pref_dap4}lon",
+        f"{base}.nc4?{lat_dap2},{lon_dap2}",
+    )
+    for u in urls_coords:
+        try:
+            resp = sesion.get(u, timeout=timeout)
+            if resp.status_code != 200 or not resp.content:
+                continue
+            formato = _validar_firma_netcdf(resp.content)
+            if formato == "cdf" and resp.content[:4] in (b"CDF\x01", b"CDF\x02"):
+                with xr.open_dataset(io.BytesIO(resp.content), engine="scipy") as ds_c:
+                    ds_load = ds_c.load()
+            else:
+                with _LOCK_HDF5:
+                    _silenciar_hdf5_hilo_actual()
+                    nc_c = netCDF4.Dataset("coords_opendap.nc", mode="r", memory=resp.content)
+                    try:
+                        usar_g = grupo if (grupo and grupo in nc_c.groups) else None
+                        store = NetCDF4DataStore(nc_c, group=usar_g)
+                        with xr.open_dataset(store) as ds_c:
+                            ds_load = ds_c.load()
+                    finally:
+                        if nc_c.isopen():
+                            nc_c.close()
+
+            lat_v: np.ndarray | None = None
+            lon_v: np.ndarray | None = None
+            for k in ds_load.variables:
+                k_limpio = k.split("_")[-1] if grupo and k.startswith(f"{grupo}_") else k
+                if k_limpio in _NOMBRES_LAT and lat_v is None:
+                    lat_v = np.asarray(ds_load[k].values, dtype=np.float64).ravel()
+                elif k_limpio in _NOMBRES_LON and lon_v is None:
+                    lon_v = np.asarray(ds_load[k].values, dtype=np.float64).ravel()
+
+            if lat_v is not None and lon_v is not None and lat_v.size > 0 and lon_v.size > 0:
+                with _LOCK_COORDS:
+                    _CACHE_COORDENADAS_OPENDAP[clave] = (lat_v, lon_v)
+                return lat_v, lon_v
+        except Exception:  # noqa: BLE001
+            continue
     return None
 
 
@@ -693,40 +584,57 @@ def leer_granulo_opendap(
 
         sesion = earthaccess.get_requests_https_session()
 
-    errores: list[str] = []
-    clave_col = str(entrada.get("short_name") or entrada.get("variable") or url_base)
+    clave = str(entrada.get("short_name") or url_base)
     with _LOCK_COORDS:
-        coords_cacheadas = _CACHE_COORDENADAS_OPENDAP.get(clave_col)
+        coords_reales = _CACHE_COORDENADAS_OPENDAP.get(clave)
 
-    # 1. Si ya descubrimos la grilla real del servidor para esta colección, usar sus índices exactos.
-    if coords_cacheadas is not None:
-        lat_s, lon_ss = segmentos_indices_bbox_opendap(coords_cacheadas[0], coords_cacheadas[1], bbox)
-        da = _descargar_subset_con_slices(
-            url_base, entrada, bbox, sesion, timeout, lat_s, lon_ss, coords_cacheadas, errores
-        )
-        if da is not None:
-            return da
+    errores: list[str] = []
 
-    # 2. Intentar con los índices de la grilla declarada en el catálogo.
-    da = _descargar_subset_con_slices(
-        url_base, entrada, bbox, sesion, timeout, None, (None,), None, errores
-    )
-    if da is not None:
-        return da
-
-    # 3. Si los índices estáticos fallaron (p. ej. lat descendente 89.75 → -89.75 o lon 0..360 en el servidor),
-    #    descubrir los vectores 1-D `lat` y `lon` reales del servidor OPeNDAP y reintentar con índices exactos.
-    if coords_cacheadas is None:
-        coords_descubiertas = _descubrir_coordenadas_opendap(url_base, entrada, sesion, timeout)
-        if coords_descubiertas is not None:
-            lat_s, lon_ss = segmentos_indices_bbox_opendap(coords_descubiertas[0], coords_descubiertas[1], bbox)
-            da = _descargar_subset_con_slices(
-                url_base, entrada, bbox, sesion, timeout, lat_s, lon_ss, coords_descubiertas, errores
+    def _descargar_con_slices(
+        protocolo: Literal["dap4", "dap2"],
+        lat_s: tuple[int, int] | None,
+        lon_ss: list[tuple[int, int]],
+    ) -> xr.DataArray:
+        if len(lon_ss) <= 1:
+            lon_s = lon_ss[0] if lon_ss else None
+            url_sub = construir_url_opendap_subset(
+                url_base, entrada, bbox, protocolo=protocolo, lat_slice=lat_s, lon_slice=lon_s
             )
-            if da is not None:
-                return da
+            resp = sesion.get(url_sub, timeout=timeout)
+            if resp.status_code != 200 or not resp.content:
+                raise RuntimeError(f"{protocolo} HTTP {resp.status_code}")
+            return abrir_bytes_netcdf_en_memoria(resp.content, entrada, bbox=bbox)
 
-    # 4. Alternativa sin disco: descarga del gránulo por HTTPS directamente en memoria RAM
+        sub_das: list[xr.DataArray] = []
+        for seg_lon in lon_ss:
+            url_seg = construir_url_opendap_subset(
+                url_base, entrada, bbox, protocolo=protocolo, lat_slice=lat_s, lon_slice=seg_lon
+            )
+            resp = sesion.get(url_seg, timeout=timeout)
+            if resp.status_code != 200 or not resp.content:
+                raise RuntimeError(f"{protocolo} HTTP {resp.status_code}")
+            sub_das.append(abrir_bytes_netcdf_en_memoria(resp.content, entrada, bbox=None))
+        da_unido = xr.concat(sub_das, dim="lon").sortby("lon")
+        return recortar_bbox(da_unido, bbox)
+
+    for protocolo in ("dap4", "dap2"):
+        try:
+            if coords_reales is not None:
+                lat_s, lon_ss = segmentos_indices_bbox_opendap(coords_reales[0], coords_reales[1], bbox)
+                return _descargar_con_slices(protocolo, lat_s, lon_ss)
+
+            try:
+                return _descargar_con_slices(protocolo, None, [])
+            except ValueError as exc_bbox:
+                coords_reales = _descubrir_coordenadas_opendap(url_base, entrada, sesion, timeout)
+                if coords_reales is None:
+                    raise exc_bbox
+                lat_s, lon_ss = segmentos_indices_bbox_opendap(coords_reales[0], coords_reales[1], bbox)
+                return _descargar_con_slices(protocolo, lat_s, lon_ss)
+        except Exception as exc:  # noqa: BLE001
+            errores.append(f"{protocolo}: {exc}")
+
+    # Alternativa sin disco: descarga del gránulo por HTTPS directamente en memoria RAM
     enlaces_https = (
         granulo_o_url.data_links(access="external")
         if not isinstance(granulo_o_url, str) and hasattr(granulo_o_url, "data_links")
@@ -839,18 +747,14 @@ def consultar_opendap(
     trabajadores = min(obtener_ajustes().opendap_workers, total)
     partes: list[xr.DataArray] = []
 
-    if trabajadores <= 1 or total == 1:
+    if trabajadores <= 1:
         for i, g in enumerate(resultados, start=1):
             partes.append(leer_granulo_opendap(g, entrada, bbox, sesion=sesion))
             avisar(i, total, f"OPeNDAP en memoria {i}/{total}")
     else:
-        # Leer el primer gránulo primero para descubrir y cachear las coordenadas (lat/lon) reales del servidor
-        # antes de lanzar el resto de gránulos en paralelo.
-        partes.append(leer_granulo_opendap(resultados[0], entrada, bbox, sesion=sesion))
-        avisar(1, total, f"OPeNDAP en memoria 1/{total}")
         with ThreadPoolExecutor(max_workers=trabajadores, thread_name_prefix="opendap-ram") as pool:
-            futuros = [pool.submit(leer_granulo_opendap, g, entrada, bbox, sesion) for g in resultados[1:]]
-            for i, fut in enumerate(futuros, start=2):
+            futuros = [pool.submit(leer_granulo_opendap, g, entrada, bbox, sesion) for g in resultados]
+            for i, fut in enumerate(futuros, start=1):
                 partes.append(fut.result())
                 avisar(i, total, f"OPeNDAP en memoria {i}/{total}")
 

@@ -22,6 +22,15 @@ from core.motor.datos import (
     obtener_variable,
     validar_periodo,
 )
+from core.motor.down_to_earth import (
+    INFO_VARIABLES_DTE,
+    ORDEN_VARIABLES_DTE,
+    PARES_PRIORITARIOS_DTE,
+    PERIODO_DTE_DEFECTO,
+    analizar_cuatro_variables_dte,
+    generar_csv_anual_dte,
+    generar_csv_mensual_dte,
+)
 from core.motor.escaner import (
     comparar_dos_caras,
     escanear_region,
@@ -264,12 +273,16 @@ def _cubo_sintetico(
     meses = fechas.month.values
 
     unidad = entrada["unidad_final"]
-    if unidad == "mm/mes":
+    if variable == "evapotranspiracion":
+        base, amp, pend, sigma = 45.0, 18.0, signo * 0.035, 4.2
+    elif unidad == "mm/mes":
         base, amp, pend, sigma = 85.0, 35.0, signo * 0.06, 8.0
     elif unidad == "mm/dia":
         base, amp, pend, sigma = 2.8, 1.2, signo * 0.002, 0.28
     elif unidad == "degC":
-        base, amp, pend, sigma = 24.0, 5.0, 0.003, 0.45
+        base, amp, pend, sigma = 24.0, 5.0, 0.006, 0.45
+    elif unidad == "m3/m3":
+        base, amp, pend, sigma = 0.22, 0.055, signo * 0.00018, 0.014
     elif unidad == "mm":
         base, amp, pend, sigma = 28.0, 6.0, signo * 0.008, 1.2
     else:
@@ -283,11 +296,25 @@ def _cubo_sintetico(
     for i in range(1, n_t):
         ruido[i] = phi * ruido[i - 1] + eta[i]
 
+    # Pulso hídrico intermensual común por región para reproducir covariación física en modo demo
+    rng_reg = np.random.default_rng(_semilla_estable("pulso_hidrico_dte", reg.id))
+    pulso = rng_reg.normal(0.0, 1.0, size=n_t)
+    if variable in ("lluvia_gpcp", "lluvia_imerg_mes"):
+        ruido = ruido + (0.55 * sigma * pulso)[:, None, None]
+    elif variable == "humedad_suelo":
+        ruido = ruido + (0.60 * sigma * pulso)[:, None, None]
+    elif variable == "evapotranspiracion":
+        ruido = ruido + (0.50 * sigma * pulso)[:, None, None]
+    elif variable == "temp_aire":
+        ruido = ruido - (0.45 * sigma * pulso)[:, None, None]
+
     grad_lat = np.linspace(-0.08, 0.08, lats.size)[None, :, None] * base
     grad_lon = np.linspace(-0.05, 0.05, lons.size)[None, None, :] * base
     valores = base + estacional[:, None, None] + (pend * t_idx)[:, None, None] + grad_lat + grad_lon + ruido
     if unidad in ("mm/mes", "mm/dia", "mm"):
         valores = np.clip(valores, 0.0, None)
+    elif unidad == "m3/m3":
+        valores = np.clip(valores, 0.01, 0.60)
 
     return xr.DataArray(
         valores,
@@ -872,3 +899,167 @@ def consultar_mapa_tendencias(
             "n_indicio": int((validos & (ver == 1.0)).sum()),
         },
     }
+
+
+# ----------------------------------------------------------------------------------------------- Down to Earth (4 variables, OLS+HAC+Holm y lectura conjunta)
+def consultar_catalogo_dte() -> dict[str, Any]:
+    """Catálogo focalizado de la guía 'Down to Earth': 4 variables (P, T, SM, ET), 3 colecciones y método."""
+    catalogo = obtener_catalogo()
+    datasets = obtener_datasets()
+    regiones = [r.a_dict() for r in cargar_regiones().values()]
+
+    variables_dte: list[dict[str, Any]] = []
+    for codigo in ORDEN_VARIABLES_DTE:
+        meta_dte = INFO_VARIABLES_DTE[codigo]
+        vid = meta_dte["id"]
+        ent = catalogo[vid]
+        variables_dte.append({
+            "code": codigo,
+            "id": vid,
+            "name": meta_dte["nombre"],
+            "question": meta_dte["pregunta"],
+            "rationale": meta_dte["por_que_elegirla"],
+            "collection": meta_dte["coleccion"],
+            "short_name": ent["short_name"],
+            "version": ent.get("version"),
+            "collection_concept_id": ent.get("collection_concept_id"),
+            "field": meta_dte["campo"],
+            "raw_unit": ent["unidad_original"],
+            "monthly_unit": meta_dte["unidad_mensual"],
+            "annual_unit": meta_dte["unidad_anual"],
+            "slope_unit": meta_dte["unidad_decada"],
+            "monthly_conversion": meta_dte["conversion_texto"],
+            "annual_aggregation": meta_dte["agregacion_anual"],
+            "resolution": ent.get("resolucion"),
+            "url_summary": ent.get("url_summary"),
+        })
+
+    colecciones_dte = [
+        datasets[did]
+        for did in ("gpcp", "merra2", "gldas")
+        if did in datasets
+    ]
+
+    return {
+        "project": "Down to Earth — Cuatro variables, dos formas de analizarlas",
+        "period_default": list(PERIODO_DTE_DEFECTO),
+        "months_expected": 288,
+        "years_expected": 24,
+        "collections": colecciones_dte,
+        "variables": variables_dte,
+        "method": {
+            "trend": "OLS lineal con constante sobre años completos (t = anio - anio_inicial)",
+            "uncertainty": "HAC / Newey-West (maxlags=1, kernel='bartlett', use_correction=True)",
+            "test": "Wald bilateral normal (use_t=False), H0: b = 0 vs H1: b != 0, alpha = 0.05",
+            "multiple_testing": "Holm sobre la familia fija de 4 tendencias [P, T, SM, ET]",
+            "sensitivity": "Revisión automática de rezagos HAC maxlags = 1, 2 y 3",
+            "joint_analysis": (
+                "Pearson descriptivo r sobre anomalías mensuales estandarizadas (z) sin tendencia lineal "
+                "para los 3 pares prioritarios: P-SM, T-SM y P-ET (sin p-valores ni significancia)"
+            ),
+            "priority_pairs": [p["pair"] for p in PARES_PRIORITARIOS_DTE],
+        },
+        "regions": regiones,
+    }
+
+
+def _obtener_cubos_cuatro_variables_dte(
+    reg: RegionResuelta,
+    inicio: str,
+    fin: str,
+    *,
+    mascara: Literal["tierra"] | None = None,
+    descargar: bool = False,
+    sintetico: bool = False,
+    fallback_sintetico: bool = True,
+) -> tuple[dict[str, xr.DataArray], str]:
+    """Obtiene los cubos 3-D de P, T, SM y ET en su propia grilla nativa sin remuestrear entre sí."""
+    catalogo = obtener_catalogo()
+    cubos: dict[str, xr.DataArray] = {}
+    fuentes: set[str] = set()
+
+    for codigo in ORDEN_VARIABLES_DTE:
+        vid = INFO_VARIABLES_DTE[codigo]["id"]
+        entrada = catalogo[vid]
+        if sintetico:
+            da = _cubo_sintetico(vid, entrada, reg, inicio, fin)
+            fuente = "sintetico"
+        else:
+            try:
+                da, fuente = _obtener_cubo(
+                    vid, reg, inicio, fin, descargar=descargar, sintetico=False
+                )
+            except DatosNoDisponibles:
+                if not fallback_sintetico or descargar:
+                    raise
+                da = _cubo_sintetico(vid, entrada, reg, inicio, fin)
+                fuente = "sintetico"
+        if mascara == "tierra":
+            da = aplicar_mascara(da, "tierra")
+        cubos[codigo] = da
+        fuentes.add(fuente)
+
+    fuente_final = "sintetico" if "sintetico" in fuentes else "opendap_memoria"
+    return cubos, fuente_final
+
+
+def consultar_demo_dte(
+    *,
+    region: str | None = "sahel",
+    bbox: Sequence[float] | None = None,
+    inicio: str = PERIODO_DTE_DEFECTO[0],
+    fin: str = PERIODO_DTE_DEFECTO[1],
+    alfa: float = 0.05,
+    mascara: Literal["tierra"] | None = None,
+    descargar: bool = False,
+    sintetico: bool = False,
+    fallback_sintetico: bool = True,
+) -> dict[str, Any]:
+    """Ejecuta el análisis completo 'Down to Earth' (secciones 01 a 06) para P, T, SM y ET."""
+    validar_periodo(inicio, fin)
+    reg = resolver_region(region, bbox)
+    cubos, fuente = _obtener_cubos_cuatro_variables_dte(
+        reg,
+        inicio,
+        fin,
+        mascara=mascara,
+        descargar=descargar,
+        sintetico=sintetico,
+        fallback_sintetico=fallback_sintetico,
+    )
+    return analizar_cuatro_variables_dte(
+        cubos,
+        region_meta=reg.a_dict(),
+        inicio=inicio,
+        fin=fin,
+        alfa=alfa,
+        fuente_datos=fuente,
+    )
+
+
+def exportar_csv_dte(
+    frecuencia: Literal["mensual", "anual"],
+    *,
+    region: str | None = "sahel",
+    bbox: Sequence[float] | None = None,
+    inicio: str = PERIODO_DTE_DEFECTO[0],
+    fin: str = PERIODO_DTE_DEFECTO[1],
+    mascara: Literal["tierra"] | None = None,
+    descargar: bool = False,
+    sintetico: bool = False,
+    fallback_sintetico: bool = True,
+) -> str:
+    """Genera en memoria RAM el CSV mensual o anual de las 4 variables (P, T, SM, ET)."""
+    resultado = consultar_demo_dte(
+        region=region,
+        bbox=bbox,
+        inicio=inicio,
+        fin=fin,
+        mascara=mascara,
+        descargar=descargar,
+        sintetico=sintetico,
+        fallback_sintetico=fallback_sintetico,
+    )
+    if frecuencia == "anual":
+        return generar_csv_anual_dte(resultado)
+    return generar_csv_mensual_dte(resultado)
