@@ -41,13 +41,14 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     UV_PYTHON_INSTALL_DIR=/opt/python \
-    PATH="/app/.venv/bin:/usr/local/bin:/usr/bin:/bin" \
+    PATH="/app/.venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" \
     HOME=/home/appuser \
     UVICORN_WORKERS=2
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     curl \
+    passwd \
     libhdf5-103-1 \
     libhdf5-hl-100 \
     libnetcdf19 \
