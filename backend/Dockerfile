@@ -49,6 +49,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     curl \
     passwd \
+    libexpat1 \
+    libglib2.0-0 \
+    libstdc++6 \
+    zlib1g \
     libhdf5-103-1 \
     libhdf5-hl-100 \
     libnetcdf19 \
@@ -66,7 +70,8 @@ COPY --chown=appuser:appuser pytest.ini ./pytest.ini
 COPY --chown=appuser:appuser tests ./tests
 COPY --chown=appuser:appuser entrypoint.sh /usr/local/bin/entrypoint.sh
 
-RUN chmod +x /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh \
+    && python -c "import netCDF4, h5netcdf, rasterio, rasterio.features, geopandas, regionmask, statsmodels; print('Native C extensions OK')"
 
 USER appuser
 
