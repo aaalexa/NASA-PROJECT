@@ -9,7 +9,8 @@ import {
   SunIcon,
   UserCircleIcon,
 } from "@heroicons/react/24/outline";
-import CobeGlobePulse from "@/components/globe/CobeGlobePulse";
+// Swap back to CobeGlobePulse to restore the previous globe.
+import GlobeGlExplorer from "@/components/globe/GlobeGlExplorer";
 import { VoiceController } from "@/components/hud/VoiceController";
 import { ExperienceModal } from "@/components/onboarding/ExperienceModal";
 import { GuidedFlow, GuidedStage } from "@/components/guided/GuidedFlow";
@@ -318,7 +319,7 @@ export default function HomePage() {
 
   return (
     <main className="relative h-screen w-screen overflow-hidden bg-background text-foreground">
-      <CobeGlobePulse trianglePoints={points} />
+      <GlobeGlExplorer trianglePoints={points} />
 
       {/* Header */}
       <header className="pointer-events-none fixed left-4 right-4 top-4 z-30 flex items-center justify-between gap-3">
