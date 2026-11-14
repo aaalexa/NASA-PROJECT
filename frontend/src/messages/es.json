@@ -1,0 +1,87 @@
+{
+  "system": {
+    "name": "NASA EARTH DETECTIVE",
+    "subline": "Observatorio de Deteccion de Tendencias y Cambio Climatico",
+    "badge": "NASA SPACE APPS 2026",
+    "mission": "CIENCIAS DE LA TIERRA",
+    "demoMode": "MODO OPERATIVO"
+  },
+  "nav": {
+    "step1": "Region",
+    "step2": "Periodo",
+    "step3": "Variables",
+    "step4": "Analisis"
+  },
+  "header": {
+    "title": "NASA Earth Trend Detective",
+    "subtitle": "Selecciona una region mediante comando de voz o busqueda geocodificada",
+    "searchPlaceholder": "Di o escribe una region (ej. Cuenca del Amazonas, Nicaragua...)",
+    "demoButton": "Ejemplo: Nicaragua",
+    "clearButton": "Reiniciar",
+    "langToggle": "EN",
+    "userLocPrefix": "OBSERVADOR"
+  },
+  "voice": {
+    "speak": "Activar Microfono",
+    "listening": "Escuchando region...",
+    "processing": "Interpretando coordenadas con Gemini...",
+    "stop": "Detener escucha",
+    "unsupported": "Reconocimiento de voz no soportado en este navegador. Usa Chrome o Edge, o escribe la region.",
+    "error": "No se pudo acceder al microfono. Verifica los permisos de entrada de audio."
+  },
+  "regionStep": {
+    "title": "Delimitar Region de Estudio",
+    "description": "Indica por voz o escribe la zona geografica que deseas investigar para generar el poligono geodesico triangular.",
+    "searchButton": "Localizar",
+    "hint": "Comando de voz: puedes decir por ejemplo 'Cuenca del Amazonas', 'Desierto del Sahara' o 'Nicaragua'.",
+    "suggestedTitle": "Regiones Cientificas de Referencia",
+    "detectedCoordinates": "Coordenadas del Poligono",
+    "vertex": "Vertice"
+  },
+  "periodStep": {
+    "title": "Seleccionar Serie Temporal",
+    "description": "Las tendencias climaticas requieren analizar series multianuales para desacoplar la estacionalidad del cambio genuino.",
+    "preset5": "Ultimos 5 anos",
+    "preset10": "Ultimos 10 anos",
+    "presetArchive": "Serie Historica (2001 - 2024)",
+    "customRange": "Rango Personalizado",
+    "from": "Desde",
+    "to": "Hasta",
+    "durationNote": "Analisis recomendado: minimo 5 anos para significancia estadistica mediante prueba Mann-Kendall."
+  },
+  "variablesStep": {
+    "title": "Variables Satelitales NASA",
+    "description": "Selecciona las variables ambientales para calcular la tasa de cambio y verificar su significancia cientifica.",
+    "selectedCount": "seleccionadas",
+    "minWarning": "Selecciona al menos una variable para ejecutar el analisis",
+    "varPrecip": "Precipitacion Acumulada",
+    "varPrecipDesc": "Mide lluvia y nieve acumulada (mision GPM IMERG). Esencial para detectar sequias y patrones hidrologicos.",
+    "varTemp": "Temperatura Superficial (LST)",
+    "varTempDesc": "Mide calor radiante de la superficie terrestre (MODIS Terra/Aqua). Evalua estres termico y olas de calor.",
+    "varNdvi": "Indice de Vegetacion (NDVI)",
+    "varNdviDesc": "Indice espectral de vigor y densidad del dosel vegetal (MODIS). Revela deforestacion y resiliencia verde.",
+    "varMoisture": "Humedad del Suelo",
+    "varMoistureDesc": "Estima el contenido volumetrico de agua en el suelo (modelo GLDAS). Crucial para riesgo de incendios y agricultura."
+  },
+  "resultsStep": {
+    "title": "Informe de Tendencia y Significancia",
+    "description": "Evaluacion de serie de tiempo basada en minimos cuadrados, pendiente Sen y prueba de significancia Mann-Kendall.",
+    "slopeLabel": "Tasa de Cambio Decadal",
+    "confidenceLabel": "Nivel de Significancia",
+    "statusSignificant": "TENDENCIA SIGNIFICATIVA (p < 0.05)",
+    "statusModerate": "TENDENCIA MODERADA",
+    "statusStable": "SIN CAMBIO SIGNIFICATIVO",
+    "methodology": "Metodologia: Desestacionalizacion temporal + Prueba Mann-Kendall con 95% de confianza.",
+    "sendBackend": "Despachar Telemetria al Backend",
+    "sending": "Despachando paquete GeoJSON...",
+    "backendDone": "Paquete GeoJSON y telemetria enviados correctamente (consulta la consola F12)."
+  },
+  "globe": {
+    "eyebrow": "MONITOR ORBITAL 3D",
+    "status": "Telemetria en tiempo real",
+    "activePolygon": "TRIANGULO GEOJSON",
+    "waiting": "Esperando delimitacion de coordenadas",
+    "resolution": "RESOLUCION: 16k MUESTRAS",
+    "satellite": "COBE WEBGL ENGINE"
+  }
+}

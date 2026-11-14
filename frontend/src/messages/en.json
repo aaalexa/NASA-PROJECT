@@ -1,0 +1,87 @@
+{
+  "system": {
+    "name": "NASA EARTH DETECTIVE",
+    "subline": "Trend Detection & Environmental Change Observatory",
+    "badge": "NASA SPACE APPS 2026",
+    "mission": "EARTH SCIENCE",
+    "demoMode": "OPERATIONAL MODE"
+  },
+  "nav": {
+    "step1": "Region",
+    "step2": "Period",
+    "step3": "Variables",
+    "step4": "Analysis"
+  },
+  "header": {
+    "title": "NASA Earth Trend Detective",
+    "subtitle": "Select a region via voice command or geocoded query",
+    "searchPlaceholder": "Speak or type a region (e.g. Amazon Basin, Nicaragua...)",
+    "demoButton": "Preset: Nicaragua",
+    "clearButton": "Reset",
+    "langToggle": "ES",
+    "userLocPrefix": "OBSERVER"
+  },
+  "voice": {
+    "speak": "Enable Microphone",
+    "listening": "Listening for region...",
+    "processing": "Interpreting coordinates with Gemini...",
+    "stop": "Stop listening",
+    "unsupported": "Speech recognition is not supported in this browser. Use Chrome or Edge, or type your query.",
+    "error": "Could not access microphone. Please check audio input permissions."
+  },
+  "regionStep": {
+    "title": "Define Study Region",
+    "description": "Speak or type the geographic area to investigate to compute the geodetic triangle polygon.",
+    "searchButton": "Locate",
+    "hint": "Voice command: you can say 'Amazon Basin', 'Sahara Desert' or 'Nicaragua'.",
+    "suggestedTitle": "Scientific Reference Regions",
+    "detectedCoordinates": "Polygon Coordinates",
+    "vertex": "Vertex"
+  },
+  "periodStep": {
+    "title": "Select Time Series Window",
+    "description": "Climate trends require multi-year analysis to decouple regular seasonal cycles from genuine long-term change.",
+    "preset5": "Last 5 Years",
+    "preset10": "Last 10 Years",
+    "presetArchive": "Historical Record (2001 - 2024)",
+    "customRange": "Custom Range",
+    "from": "From",
+    "to": "To",
+    "durationNote": "Recommended window: at least 5 years for statistical significance via Mann-Kendall test."
+  },
+  "variablesStep": {
+    "title": "NASA Satellite Variables",
+    "description": "Select environmental variables to calculate rate of change and evaluate scientific significance.",
+    "selectedCount": "selected",
+    "minWarning": "Select at least one variable to execute trend analysis",
+    "varPrecip": "Accumulated Precipitation",
+    "varPrecipDesc": "Quantifies rainfall and snowpack (GPM IMERG mission). Critical for drought and hydrological cycle shifts.",
+    "varTemp": "Land Surface Temperature (LST)",
+    "varTempDesc": "Measures radiant thermal emission from ground (MODIS Terra/Aqua). Evaluates heat stress and ecosystem anomalies.",
+    "varNdvi": "Normalized Difference Vegetation (NDVI)",
+    "varNdviDesc": "Spectral density of healthy plant canopy (MODIS). Highlights deforestation and vegetation vitality.",
+    "varMoisture": "Soil Moisture",
+    "varMoistureDesc": "Estimates volumetric water content in soil strata (GLDAS model). Crucial for wildfire and agricultural vulnerability."
+  },
+  "resultsStep": {
+    "title": "Trend & Significance Report",
+    "description": "Time series evaluation using linear regression, Sen slope estimator, and Mann-Kendall significance test.",
+    "slopeLabel": "Decadal Change Rate",
+    "confidenceLabel": "Significance Level",
+    "statusSignificant": "SIGNIFICANT TREND (p < 0.05)",
+    "statusModerate": "MODERATE TREND",
+    "statusStable": "NO SIGNIFICANT CHANGE",
+    "methodology": "Methodology: Seasonal decomposition + Mann-Kendall test at 95% confidence interval.",
+    "sendBackend": "Dispatch Telemetry to Backend",
+    "sending": "Dispatching GeoJSON payload...",
+    "backendDone": "GeoJSON polygon and telemetry successfully sent (inspect F12 console)."
+  },
+  "globe": {
+    "eyebrow": "3D ORBITAL MONITOR",
+    "status": "Real-time telemetry",
+    "activePolygon": "GEOJSON TRIANGLE",
+    "waiting": "Awaiting coordinate definition",
+    "resolution": "RESOLUTION: 16k SAMPLES",
+    "satellite": "COBE WEBGL ENGINE"
+  }
+}
