@@ -4,12 +4,14 @@ import { useEffect, useState } from "react";
 import { MicrophoneIcon, StopIcon, ArrowPathIcon } from "@heroicons/react/24/solid";
 import { useTranslation } from "@/context/LanguageContext";
 import { useVoiceInput } from "@/hooks/useVoiceInput";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 interface VoiceControllerProps {
   onTranscript: (text: string) => void;
   /** Called when recording begins, e.g. to silence the voice guide. */
   onBeforeListen?: () => void;
-  /** Contextual hint shown above the button ("Say: I'm new or I have experience"). */
+  /** Contextual hint shown above the button. */
   hint?: string;
   className?: string;
 }
@@ -30,7 +32,6 @@ export function VoiceController({ onTranscript, onBeforeListen, hint, className 
     },
   });
 
-  // The "heard" caption fades after a few seconds.
   useEffect(() => {
     if (!heard) return;
     const id = setTimeout(() => setHeard(""), 6000);
@@ -43,26 +44,21 @@ export function VoiceController({ onTranscript, onBeforeListen, hint, className 
 
   return (
     <div className={`fixed bottom-6 left-1/2 z-[60] flex -translate-x-1/2 flex-col items-center gap-2 select-none ${className ?? ""}`}>
-      <div aria-live="polite" className="flex min-h-[22px] max-w-[88vw] flex-col items-center gap-1.5 text-center">
+      <div aria-live="polite" className="flex min-h-[26px] max-w-[88vw] flex-col items-center gap-1.5 text-center">
         {error ? (
-          <button
-            type="button"
-            onClick={clearError}
-            className="panel px-3 py-1.5 text-xs text-brand-red"
-            title="OK"
-          >
+          <Button variant="destructive" size="sm" className="h-auto max-w-full whitespace-normal px-4 py-1.5 text-xs" onClick={clearError}>
             {t(`voice.${error}`)}
-          </button>
+          </Button>
         ) : heard ? (
-          <span className="panel px-3 py-1.5 text-xs text-foreground">
-            <span className="eyebrow mr-2">{t("voice.heard")}</span>“{heard}”
-          </span>
+          <Badge variant="secondary" className="h-auto max-w-full whitespace-normal px-3 py-1">
+            <span className="text-muted-foreground">{t("voice.heard")}</span> “{heard}”
+          </Badge>
         ) : hint && !listening && !processing ? (
-          <span className="text-xs text-muted-foreground">{hint}</span>
+          <span className="hidden text-xs text-muted-foreground sm:inline">{hint}</span>
         ) : null}
       </div>
 
-      <div className="relative flex h-16 w-16 items-center justify-center">
+      <div className="relative flex size-[72px] items-center justify-center">
         {listening && (
           <span
             aria-hidden
@@ -75,30 +71,18 @@ export function VoiceController({ onTranscript, onBeforeListen, hint, className 
           />
         )}
         {listening && (
-          <span
-            aria-hidden
-            className="absolute inset-0 rounded-full border border-brand-red"
-            style={{ animation: "voice-ring 1.6s ease-out infinite" }}
-          />
+          <span aria-hidden className="absolute inset-0 rounded-full border border-brand-red" style={{ animation: "voice-ring 1.6s ease-out infinite" }} />
         )}
-        <button
-          type="button"
+        <Button
+          size="icon-lg"
           onClick={toggle}
           disabled={processing}
           aria-label={listening ? t("voice.stop") : t("voice.speak")}
           aria-pressed={listening}
-          className={`relative flex h-14 w-14 cursor-pointer items-center justify-center rounded-full text-white transition-colors disabled:cursor-wait ${
-            listening ? "bg-brand-red" : "bg-primary hover:brightness-110"
-          }`}
+          className={`relative ${listening ? "bg-brand-red text-white hover:bg-brand-red" : ""}`}
         >
-          {processing ? (
-            <ArrowPathIcon className="h-6 w-6 animate-spin" />
-          ) : listening ? (
-            <StopIcon className="h-5 w-5" />
-          ) : (
-            <MicrophoneIcon className="h-6 w-6" />
-          )}
-        </button>
+          {processing ? <ArrowPathIcon className="size-6 animate-spin" /> : listening ? <StopIcon className="size-5" /> : <MicrophoneIcon className="size-6" />}
+        </Button>
       </div>
 
       <span className="eyebrow">{label}</span>

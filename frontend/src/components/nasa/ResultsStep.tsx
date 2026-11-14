@@ -4,7 +4,11 @@ import { useState } from "react";
 import { DateRange, GeoPoint, RegionAnalysisPayload, VariableId } from "@/types/geo";
 import { useTranslation } from "@/context/LanguageContext";
 import { VARIABLES } from "@/lib/catalog";
-import { ArrowTrendingDownIcon, ArrowTrendingUpIcon } from "@heroicons/react/24/outline";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ArrowTrendingDownIcon, ArrowTrendingUpIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 
 interface ResultsStepProps {
   regionData: RegionAnalysisPayload;
@@ -69,7 +73,7 @@ export function ResultsStep({ regionData, range, selectedVariables, userLocation
         <p className="mt-1.5 text-sm text-muted-foreground">{t("resultsStep.description")}</p>
       </div>
 
-      <div className="flex items-start justify-between gap-3 border-l-2 border-primary/70 pl-3">
+      <div className="flex items-start justify-between gap-3 rounded-2xl bg-muted p-4">
         <div className="min-w-0">
           <p className="eyebrow">{t("resultsStep.region")}</p>
           <p className="mt-1 truncate text-sm font-bold">{regionData.regionName}</p>
@@ -78,23 +82,24 @@ export function ResultsStep({ regionData, range, selectedVariables, userLocation
           </p>
         </div>
         {!readOnly && (
-          <button type="button" onClick={onEditCriteria} className="shrink-0 cursor-pointer text-xs underline underline-offset-4 hover:text-primary">
+          <Button variant="ghost" size="sm" onClick={onEditCriteria} className="shrink-0">
             {t("resultsStep.edit")}
-          </button>
+          </Button>
         )}
       </div>
 
-      <ul className="max-h-[38vh] space-y-2 overflow-y-auto pr-1">
+      <ul className="space-y-2">
         {selectedVariables.map((id) => {
           const s = ILLUSTRATIVE[id];
           const up = s.slope > 0;
           const significant = s.pHolm <= 0.05;
           const Arrow = up ? ArrowTrendingUpIcon : ArrowTrendingDownIcon;
           return (
-            <li key={id} className="border border-border p-3" style={{ borderRadius: 16 }}>
+            <li key={id}>
+              <Card size="sm" className="gap-0 px-3">
               <div className="flex items-start justify-between gap-3">
                 <span className="text-sm font-bold">{VARIABLES[id].name[language]}</span>
-                <span className={`flex items-center gap-1 text-sm font-bold tabular-nums ${up ? "text-brand-red" : "text-primary"}`}>
+                <span className={`flex items-center gap-1 text-sm font-bold tabular-nums ${up ? "text-brand-red" : "text-brand-blue"}`}>
                   <Arrow className="h-4 w-4" />
                   {sign(s.slope, s.decimals)} {s.unit}
                 </span>
@@ -108,10 +113,10 @@ export function ResultsStep({ regionData, range, selectedVariables, userLocation
                   {t("resultsStep.pAdj")} {s.pHolm}
                 </span>
               </div>
-              <p className={`mt-1.5 flex items-center gap-1.5 text-xs font-medium ${significant ? "text-brand-red" : "text-muted-foreground"}`}>
-                <span className={`inline-block h-1.5 w-1.5 ${significant ? "bg-brand-red" : "bg-muted-foreground"}`} />
+              <Badge variant="outline" className={`mt-2 w-fit ${significant ? "border-brand-red/50 text-brand-red" : "border-brand-olive/60 text-brand-olive"}`}>
                 {significant ? t("resultsStep.significant") : t("resultsStep.insufficient")}
-              </p>
+              </Badge>
+              </Card>
             </li>
           );
         })}
@@ -121,38 +126,43 @@ export function ResultsStep({ regionData, range, selectedVariables, userLocation
         {t("resultsStep.illustrative")} {t("resultsStep.limits")}
       </p>
 
-      <details className="text-xs">
-        <summary className="eyebrow cursor-pointer">{t("resultsStep.vertices")}</summary>
-        <div className="mt-2 grid grid-cols-3 gap-2 tabular-nums">
-          {regionData.triangleVertices.map((p: GeoPoint, i: number) => (
-            <div key={i} className="border border-border p-2" style={{ borderRadius: 16 }}>
-              <span className="font-bold text-brand-red">P{i + 1}</span>
-              <span className="block text-muted-foreground">
-                {p.lat.toFixed(2)}°, {p.lng.toFixed(2)}°
-              </span>
-            </div>
-          ))}
-        </div>
-      </details>
+      <Collapsible>
+        <CollapsibleTrigger render={<Button variant="ghost" size="sm" className="-ml-2 gap-1.5" />}>
+          {t("resultsStep.vertices")}
+          <ChevronDownIcon className="size-3.5" />
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <div className="mt-2 grid grid-cols-3 gap-2 text-xs tabular-nums">
+            {regionData.triangleVertices.map((p: GeoPoint, i: number) => (
+              <Card key={i} size="sm" className="gap-0 px-2">
+                <span className="font-bold text-brand-red">P{i + 1}</span>
+                <span className="block text-muted-foreground">
+                  {p.lat.toFixed(2)}°, {p.lng.toFixed(2)}°
+                </span>
+              </Card>
+            ))}
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
 
       {feedback && (
-        <p role="status" className={`text-xs ${feedback.ok ? "text-primary" : "text-brand-red"}`}>
+        <p role="status" className={`text-xs ${feedback.ok ? "text-brand-blue" : "text-brand-red"}`}>
           {feedback.text}
         </p>
       )}
 
       {!readOnly && (
         <div className="space-y-2">
-          <button type="button" className="btn btn-primary w-full" disabled={isSending} onClick={handleSendBackend}>
+          <Button className="w-full" disabled={isSending} onClick={handleSendBackend}>
             {isSending ? t("resultsStep.sending") : t("resultsStep.send")}
-          </button>
+          </Button>
           <div className="flex gap-2">
-            <button type="button" className="btn btn-line flex-1" onClick={onEditCriteria}>
+            <Button variant="outline" className="flex-1" onClick={onEditCriteria}>
               {t("resultsStep.modify")}
-            </button>
-            <button type="button" className="btn btn-red flex-1" onClick={onRestart}>
+            </Button>
+            <Button variant="destructive" className="flex-1" onClick={onRestart}>
               {t("resultsStep.restart")}
-            </button>
+            </Button>
           </div>
         </div>
       )}

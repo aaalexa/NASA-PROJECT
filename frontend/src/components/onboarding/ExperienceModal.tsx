@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 import { AcademicCapIcon, BeakerIcon } from "@heroicons/react/24/outline";
 import { useTranslation } from "@/context/LanguageContext";
 import { classifyExperience } from "@/lib/intent";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ChoiceButton } from "@/components/ui/choice-button";
+import { Badge } from "@/components/ui/badge";
 import type { Experience } from "@/types/geo";
 
 interface ExperienceModalProps {
@@ -30,43 +33,39 @@ export function ExperienceModal({ onChoose, registerVoice, speak }: ExperienceMo
     return () => registerVoice(null);
   });
 
+  // The dialog is non-modal so the floating microphone stays usable; it cannot be dismissed.
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="exp-title"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 px-4 pb-32 backdrop-blur-sm animate-in fade-in duration-300"
-    >
-      <div className="panel w-full max-w-xl p-6 sm:p-8 animate-in fade-in zoom-in-95 duration-300">
-        <p className="eyebrow mb-3 flex items-center gap-2">
-          <span className="rounded-full inline-block h-2 w-2 bg-brand-red" />
-          {t("onboarding.eyebrow")}
-        </p>
-        <h1 id="exp-title" className="title text-2xl sm:text-3xl">
-          {t("onboarding.title")}
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">{t("onboarding.subtitle")}</p>
+    <Dialog open modal={false}>
+      <DialogContent showCloseButton={false} className="top-[44%] gap-6 p-8 sm:max-w-xl">
+        <DialogHeader className="gap-3">
+          <Badge variant="secondary" className="w-fit">
+            {t("onboarding.eyebrow")}
+          </Badge>
+          <DialogTitle className="title text-3xl">{t("onboarding.title")}</DialogTitle>
+          <DialogDescription className="text-sm">{t("onboarding.subtitle")}</DialogDescription>
+        </DialogHeader>
 
-        <div className="mt-6 grid gap-3 sm:grid-cols-2">
-          <button type="button" className="choice" onClick={() => onChoose("novice")}>
-            <AcademicCapIcon className="mb-4 h-6 w-6 text-primary" />
-            <span className="block text-base font-bold">{t("onboarding.newTitle")}</span>
-            <span className="mt-1 block text-sm text-muted-foreground">{t("onboarding.newDesc")}</span>
-          </button>
-          <button type="button" className="choice" onClick={() => onChoose("expert")}>
-            <BeakerIcon className="mb-4 h-6 w-6 text-brand-red" />
-            <span className="block text-base font-bold">{t("onboarding.expertTitle")}</span>
-            <span className="mt-1 block text-sm text-muted-foreground">{t("onboarding.expertDesc")}</span>
-          </button>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <ChoiceButton className="flex-col gap-3 p-5" onClick={() => onChoose("novice")}>
+            <AcademicCapIcon className="size-6 text-brand-blue" />
+            <span>
+              <span className="block text-base font-bold">{t("onboarding.newTitle")}</span>
+              <span className="mt-1 block text-sm text-muted-foreground">{t("onboarding.newDesc")}</span>
+            </span>
+          </ChoiceButton>
+          <ChoiceButton className="flex-col gap-3 p-5" onClick={() => onChoose("expert")}>
+            <BeakerIcon className="size-6 text-brand-red" />
+            <span>
+              <span className="block text-base font-bold">{t("onboarding.expertTitle")}</span>
+              <span className="mt-1 block text-sm text-muted-foreground">{t("onboarding.expertDesc")}</span>
+            </span>
+          </ChoiceButton>
         </div>
 
-        <p
-          aria-live="polite"
-          className={`mt-5 text-xs ${misheard ? "text-brand-red" : "text-muted-foreground"}`}
-        >
+        <p aria-live="polite" className={`text-xs ${misheard ? "text-brand-red" : "text-muted-foreground"}`}>
           {misheard ? t("onboarding.notUnderstood") : t("onboarding.voiceHint")}
         </p>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -27,7 +27,7 @@ function interpolateEdge(p1: GeoPoint, p2: GeoPoint, steps = 12): Marker[] {
         p1.lng + (p2.lng - p1.lng) * t,
       ],
       size: 0.012,
-      color: [0.145, 0.388, 0.921], // Azul NASA (#2563eb)
+      color: [0.4, 0.608, 0.737], // steel blue
     });
   }
   return edgeMarkers;
@@ -87,17 +87,17 @@ export default function CobeGlobePulse({ trianglePoints, className }: CobeGlobeP
             {
               from: [trianglePoints[0].lat, trianglePoints[0].lng],
               to: [trianglePoints[1].lat, trianglePoints[1].lng],
-              color: [0.145, 0.388, 0.921],
+              color: [0.4, 0.608, 0.737],
             },
             {
               from: [trianglePoints[1].lat, trianglePoints[1].lng],
               to: [trianglePoints[2].lat, trianglePoints[2].lng],
-              color: [0.145, 0.388, 0.921],
+              color: [0.4, 0.608, 0.737],
             },
             {
               from: [trianglePoints[2].lat, trianglePoints[2].lng],
               to: [trianglePoints[0].lat, trianglePoints[0].lng],
-              color: [0.145, 0.388, 0.921],
+              color: [0.4, 0.608, 0.737],
             },
           ]
         : [];
@@ -114,9 +114,9 @@ export default function CobeGlobePulse({ trianglePoints, className }: CobeGlobeP
         mapSamples: 42000,
         mapBrightness: isDark ? 3.2 : 1.6,
         mapBaseBrightness: 0,
-        baseColor: isDark ? [0.06, 0.07, 0.1] : [0.93, 0.95, 0.98],
-        markerColor: [0.937, 0.267, 0.267], // Rojo Alerta (#ef4444)
-        glowColor: isDark ? [0.1, 0.16, 0.35] : [0.8, 0.86, 0.98], // halo suave
+        baseColor: isDark ? [0.0, 0.1, 0.16] : [0.9, 0.94, 0.97],
+        markerColor: [0.757, 0.071, 0.122], // brick red
+        glowColor: isDark ? [0.0, 0.19, 0.29] : [0.4, 0.608, 0.737],
         markers: [],
         arcs,
         arcWidth: 0.35,
@@ -147,7 +147,7 @@ export default function CobeGlobePulse({ trianglePoints, className }: CobeGlobeP
           ...(trianglePoints || []).map((p) => ({
             location: [p.lat, p.lng] as [number, number],
             size: pulse,
-            color: [0.937, 0.267, 0.267] as [number, number, number],
+            color: [0.757, 0.071, 0.122] as [number, number, number],
           })),
           ...edgeMarkers,
         ];
@@ -185,7 +185,7 @@ export default function CobeGlobePulse({ trianglePoints, className }: CobeGlobeP
         className || ""
       }`}
     >
-      <div className="relative w-full max-w-[800px] aspect-square flex items-center justify-center">
+      <div className="relative flex aspect-square w-full max-w-[800px] items-center justify-center max-sm:-translate-y-[24%] max-sm:scale-125">
         <canvas
           ref={canvasRef}
           onPointerDown={(e) => {

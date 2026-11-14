@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { LanguageProvider } from "@/context/LanguageContext";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/context/ThemeContext";
 
 export const metadata: Metadata = {
@@ -17,7 +18,9 @@ export default function RootLayout({
     <html lang="es" className="dark" suppressHydrationWarning>
       <body className="font-sans bg-background text-foreground antialiased selection:bg-primary selection:text-white">
         <ThemeProvider>
-          <LanguageProvider>{children}</LanguageProvider>
+          <LanguageProvider>
+            <TooltipProvider>{children}</TooltipProvider>
+          </LanguageProvider>
         </ThemeProvider>
       </body>
     </html>

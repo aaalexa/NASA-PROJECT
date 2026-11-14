@@ -2,6 +2,8 @@
 
 import { WorkflowStep } from "@/types/geo";
 import { useTranslation } from "@/context/LanguageContext";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 
 interface StepNavigationProps {
   activeStep: WorkflowStep;
@@ -25,32 +27,27 @@ export function StepNavigation({ activeStep, onSelectStep, hasRegion, hasVariabl
   ];
 
   return (
-    <nav aria-label="Workflow" className="panel flex items-center gap-1 p-1">
+    <Card size="sm" className="flex-row gap-1 rounded-full p-1" aria-label="Workflow" role="navigation">
       {steps.map((step, index) => {
         const isActive = activeStep === step.id;
         const isPast = index < activeIndex;
         return (
-          <button
+          <Button
             key={step.id}
-            type="button"
+            variant={isActive ? "default" : "ghost"}
+            size="sm"
             disabled={!step.enabled || readOnly}
             aria-current={isActive ? "step" : undefined}
             onClick={() => onSelectStep(step.id)}
-            className={`flex h-8 items-center gap-2 rounded-full px-3 text-xs font-medium transition-colors disabled:cursor-default ${
-              isActive
-                ? "bg-foreground text-background"
-                : step.enabled
-                ? "cursor-pointer text-foreground hover:bg-muted"
-                : "text-muted-foreground/50"
-            }`}
+            className="h-8 gap-2 px-3 text-xs disabled:opacity-100 disabled:text-muted-foreground/60"
           >
-            <span className={`tabular-nums ${isActive ? "text-brand-red" : isPast ? "text-primary" : "text-muted-foreground"}`}>
+            <span className={`tabular-nums ${isActive ? "opacity-70" : isPast ? "text-brand-blue" : ""}`}>
               {String(index + 1).padStart(2, "0")}
             </span>
             <span className="hidden sm:inline">{step.label}</span>
-          </button>
+          </Button>
         );
       })}
-    </nav>
+    </Card>
   );
 }

@@ -22,6 +22,14 @@ import { PREDEFINED_REGIONS } from "@/components/nasa/PredefinedRegions";
 import { PERIODS } from "@/lib/catalog";
 import { DEMOS, DemoDef, DemoStep } from "@/lib/demos";
 import { useSpeak } from "@/hooks/useSpeak";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useTranslation } from "@/context/LanguageContext";
 import { useTheme } from "@/context/ThemeContext";
 import type {
@@ -58,7 +66,7 @@ function buildPayload(name: string, description: string, v: [GeoPoint, GeoPoint,
 }
 
 export default function HomePage() {
-  const { language, toggleLanguage, t } = useTranslation();
+  const { language, setLanguage, t } = useTranslation();
   const { theme, toggleTheme } = useTheme();
   const speech = useSpeak(language);
 
@@ -286,7 +294,7 @@ export default function HomePage() {
   const currentStepDef = demo ? demo.def.steps[demo.index] : null;
 
   const voiceHint =
-    phase === "onboarding" ? undefined : phase === "expert" ? t("regionStep.hint") : hint;
+    phase === "guided" ? hint : undefined;
 
   return (
     <main className="relative h-screen w-screen overflow-hidden bg-background text-foreground">
@@ -295,130 +303,159 @@ export default function HomePage() {
       {/* Header */}
       <header className="pointer-events-none fixed left-4 right-4 top-4 z-30 flex items-center justify-between gap-3">
         <div className="pointer-events-auto flex items-center gap-2.5">
-          <span className="h-3 w-3 rounded-full bg-brand-red" aria-hidden />
+          <span className="size-3 rounded-full bg-brand-red" aria-hidden />
           <span className="text-sm font-bold tracking-tight">{t("system.name")}</span>
-          <span className="eyebrow hidden md:inline">{t("system.badge")}</span>
+          <Badge variant="secondary" className="hidden xl:inline-flex">
+            {t("system.badge")}
+          </Badge>
         </div>
 
         {showNav && (
-          <div className="pointer-events-auto absolute left-1/2 hidden -translate-x-1/2 sm:block">
+          <div className="pointer-events-auto absolute left-1/2 hidden -translate-x-1/2 lg:block">
             <StepNavigation activeStep={activeStep} onSelectStep={setActiveStep} hasRegion={points.length === 3} hasVariables={selectedVariables.length > 0} readOnly={demo !== null} />
           </div>
         )}
 
         <div className="pointer-events-auto flex items-center gap-2">
           {phase !== "onboarding" && (
-            <button type="button" className="icon-btn !w-auto gap-1.5 px-3 text-xs font-medium" onClick={changeMode}>
-              <UserCircleIcon className="h-4 w-4" />
-              <span className="hidden md:inline">{t("header.changeMode")}</span>
-            </button>
+            <Button variant="outline" size="sm" className="h-9 gap-1.5 bg-card/90 backdrop-blur" onClick={changeMode}>
+              <UserCircleIcon className="size-4" />
+              <span className="hidden lg:inline">{t("header.changeMode")}</span>
+            </Button>
           )}
           {phase === "guided" && (
-            <button
-              type="button"
-              className="icon-btn"
-              onClick={() => speech.setEnabled(!speech.enabled)}
-              aria-pressed={speech.enabled}
-              title={speech.enabled ? t("header.voiceGuideOn") : t("header.voiceGuideOff")}
-              aria-label={speech.enabled ? t("header.voiceGuideOn") : t("header.voiceGuideOff")}
-            >
-              {speech.enabled ? <SpeakerWaveIcon className="h-4 w-4 text-primary" /> : <SpeakerXMarkIcon className="h-4 w-4" />}
-            </button>
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="bg-card/90 backdrop-blur"
+                    onClick={() => speech.setEnabled(!speech.enabled)}
+                    aria-pressed={speech.enabled}
+                    aria-label={speech.enabled ? t("header.voiceGuideOn") : t("header.voiceGuideOff")}
+                  />
+                }
+              >
+                {speech.enabled ? <SpeakerWaveIcon className="size-4 text-brand-blue" /> : <SpeakerXMarkIcon className="size-4" />}
+              </TooltipTrigger>
+              <TooltipContent>{speech.enabled ? t("header.voiceGuideOn") : t("header.voiceGuideOff")}</TooltipContent>
+            </Tooltip>
           )}
-          <button type="button" className="icon-btn text-xs font-bold" onClick={toggleLanguage} aria-label="Language">
-            {t("header.langToggle")}
-          </button>
-          <button
-            type="button"
-            className="icon-btn"
-            onClick={toggleTheme}
-            title={theme === "dark" ? t("header.themeToLight") : t("header.themeToDark")}
-            aria-label={theme === "dark" ? t("header.themeToLight") : t("header.themeToDark")}
+          <ToggleGroup
+            value={[language]}
+            onValueChange={(v) => v[0] && setLanguage(v[0] as "es" | "en")}
+            variant="outline"
+            spacing={0}
+            className="rounded-full bg-card/90 backdrop-blur"
+            aria-label="Language"
           >
-            {theme === "dark" ? <SunIcon className="h-4 w-4" /> : <MoonIcon className="h-4 w-4" />}
-          </button>
+            <ToggleGroupItem value="es" className="rounded-full px-3 text-xs font-bold">
+              ES
+            </ToggleGroupItem>
+            <ToggleGroupItem value="en" className="rounded-full px-3 text-xs font-bold">
+              EN
+            </ToggleGroupItem>
+          </ToggleGroup>
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="bg-card/90 backdrop-blur"
+                  onClick={toggleTheme}
+                  aria-label={theme === "dark" ? t("header.themeToLight") : t("header.themeToDark")}
+                />
+              }
+            >
+              {theme === "dark" ? <SunIcon className="size-4" /> : <MoonIcon className="size-4" />}
+            </TooltipTrigger>
+            <TooltipContent>{theme === "dark" ? t("header.themeToLight") : t("header.themeToDark")}</TooltipContent>
+          </Tooltip>
           {points.length > 0 && phase !== "onboarding" && (
-            <button type="button" className="icon-btn text-brand-red" onClick={resetAll} title={t("header.clearButton")} aria-label={t("header.clearButton")}>
-              <ArrowPathIcon className="h-4 w-4" />
-            </button>
+            <Tooltip>
+              <TooltipTrigger
+                render={<Button variant="outline" size="icon" className="bg-card/90 text-brand-red backdrop-blur" onClick={resetAll} aria-label={t("header.clearButton")} />}
+              >
+                <ArrowPathIcon className="size-4" />
+              </TooltipTrigger>
+              <TooltipContent>{t("header.clearButton")}</TooltipContent>
+            </Tooltip>
           )}
         </div>
       </header>
 
       {/* Work panel */}
       {phase !== "onboarding" && (
-        <section className="panel fixed left-4 top-[68px] z-20 max-h-[calc(100dvh-15rem)] w-[calc(100vw-2rem)] max-w-[400px] overflow-y-auto p-5 sm:max-h-[calc(100dvh-6.5rem)]">
-          {phase === "expert" && renderStep()}
+        <Card className="fixed inset-x-4 bottom-[132px] z-20 gap-0 bg-card/95 py-0 backdrop-blur sm:inset-x-auto sm:bottom-auto sm:left-4 sm:top-[68px] sm:w-[400px]">
+          <ScrollArea className="[&_[data-slot=scroll-area-viewport]]:max-h-[46dvh] sm:[&_[data-slot=scroll-area-viewport]]:max-h-[calc(100dvh-7.5rem)]">
+            <div className="p-5">
+              {phase === "expert" && renderStep()}
 
-          {phase === "guided" && demo && currentStepDef && (
-            <div className="space-y-4">
-              <div>
-                <div className="flex items-center justify-between">
-                  <p className="eyebrow flex items-center gap-2">
-                    <span className="rounded-full inline-block h-2 w-2 bg-brand-red" />
-                    {t("demo.label")} · {demo.def.title[language]}
-                  </p>
-                  <button type="button" className="text-xs underline underline-offset-4 hover:text-brand-red" onClick={stopDemo}>
-                    {t("demo.stop")}
-                  </button>
-                </div>
-                {!demo.finished ? (
-                  <>
-                    <p className="mt-3 text-sm font-medium leading-relaxed" aria-live="polite">
-                      {currentStepDef.caption[language]}
-                    </p>
-                    <div className="mt-3 h-0.5 bg-border" aria-hidden>
-                      <div
-                        key={`${demo.def.id}-${demo.index}`}
-                        className="h-full origin-left bg-brand-red"
-                        style={{ animation: `demo-progress ${currentStepDef.duration}ms linear forwards` }}
-                      />
+              {phase === "guided" && demo && currentStepDef && (
+                <div className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <Badge variant="secondary" className="max-w-[75%] truncate">
+                        {t("demo.label")} · {demo.def.title[language]}
+                      </Badge>
+                      <Button variant="ghost" size="sm" onClick={stopDemo}>
+                        {t("demo.stop")}
+                      </Button>
                     </div>
-                  </>
-                ) : (
-                  <div className="mt-3 space-y-3">
-                    <p className="text-sm font-bold">{t("demo.done")}</p>
-                    <div className="flex gap-2">
-                      <button type="button" className="btn btn-primary flex-1" onClick={tryItYourself}>
-                        {t("demo.tryIt")}
-                      </button>
-                      <button type="button" className="btn btn-line flex-1" onClick={stopDemo}>
-                        {t("demo.another")}
-                      </button>
-                    </div>
+                    {!demo.finished ? (
+                      <>
+                        <p className="text-sm font-medium leading-relaxed" aria-live="polite">
+                          {currentStepDef.caption[language]}
+                        </p>
+                        <Progress value={((demo.index + 1) / demo.def.steps.length) * 100} aria-label={t("demo.label")} />
+                      </>
+                    ) : (
+                      <div className="space-y-3">
+                        <p className="text-sm font-bold">{t("demo.done")}</p>
+                        <div className="flex gap-2">
+                          <Button className="flex-1" onClick={tryItYourself}>
+                            {t("demo.tryIt")}
+                          </Button>
+                          <Button variant="outline" className="flex-1" onClick={stopDemo}>
+                            {t("demo.another")}
+                          </Button>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-              <div className="border-t border-border pt-4">
-                <div inert className="select-none">
-                  {renderStep(true)}
+                  <Separator />
+                  <div inert className="select-none">
+                    {renderStep(true)}
+                  </div>
+                  <p className="text-xs text-muted-foreground">{t("demo.note")}</p>
                 </div>
-                <p className="mt-3 text-xs text-muted-foreground">{t("demo.note")}</p>
-              </div>
+              )}
+
+              {phase === "guided" && !demo && activeStep === "results" && renderStep()}
+
+              {phase === "guided" && !demo && activeStep !== "results" && (
+                <GuidedFlow
+                  key={guidedKey}
+                  initialStage={guidedStart}
+                  regionData={regionData}
+                  isSearching={isSearching}
+                  onSelectPredefined={selectPredefined}
+                  onSearchRegion={searchRegion}
+                  onSetRange={setDateRange}
+                  selectedVariables={selectedVariables}
+                  onSetVariables={setSelectedVariables}
+                  onFinish={() => setActiveStep("results")}
+                  onStartDemo={startDemo}
+                  registerVoice={registerVoice}
+                  speak={speech.speak}
+                  onHint={setHint}
+                />
+              )}
             </div>
-          )}
-
-          {phase === "guided" && !demo && activeStep === "results" && renderStep()}
-
-          {phase === "guided" && !demo && activeStep !== "results" && (
-            <GuidedFlow
-              key={guidedKey}
-              initialStage={guidedStart}
-              regionData={regionData}
-              isSearching={isSearching}
-              onSelectPredefined={selectPredefined}
-              onSearchRegion={searchRegion}
-              onSetRange={setDateRange}
-              selectedVariables={selectedVariables}
-              onSetVariables={setSelectedVariables}
-              onFinish={() => setActiveStep("results")}
-              onStartDemo={startDemo}
-              registerVoice={registerVoice}
-              speak={speech.speak}
-              onHint={setHint}
-            />
-          )}
-        </section>
+          </ScrollArea>
+        </Card>
       )}
 
       {/* Coordinates of the active region */}
@@ -426,7 +463,7 @@ export default function HomePage() {
         <div className="pointer-events-none fixed right-4 top-[68px] z-10 hidden text-right text-xs tabular-nums text-muted-foreground sm:block">
           <span className="font-bold text-brand-red">{Math.abs(centerLat).toFixed(2)}° {centerLat >= 0 ? "N" : "S"}</span>
           {"  "}
-          <span className="font-bold text-primary">{Math.abs(centerLng).toFixed(2)}° {centerLng >= 0 ? "E" : "W"}</span>
+          <span className="font-bold text-brand-blue">{Math.abs(centerLng).toFixed(2)}° {centerLng >= 0 ? "E" : "W"}</span>
         </div>
       )}
 

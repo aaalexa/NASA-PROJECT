@@ -4,6 +4,9 @@ import { useState } from "react";
 import { PredefinedRegion, RegionAnalysisPayload } from "@/types/geo";
 import { useTranslation } from "@/context/LanguageContext";
 import { PREDEFINED_REGIONS } from "./PredefinedRegions";
+import { Button } from "@/components/ui/button";
+import { ChoiceButton } from "@/components/ui/choice-button";
+import { Input } from "@/components/ui/input";
 import { ArrowRightIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
 interface RegionStepProps {
@@ -34,18 +37,18 @@ export function RegionStep({ regionData, onSelectPredefined, onSearchManual, isS
 
       <form onSubmit={handleSubmit} className="flex gap-2">
         <div className="relative flex-1">
-          <MagnifyingGlassIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <input
-            className="field pl-9"
+          <MagnifyingGlassIcon className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            className="pl-10"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t("header.searchPlaceholder")}
             aria-label={t("regionStep.title")}
           />
         </div>
-        <button type="submit" className="btn btn-primary" disabled={isSearching || !query.trim()}>
+        <Button type="submit" disabled={isSearching || !query.trim()} className="h-10">
           {isSearching ? "…" : t("regionStep.searchButton")}
-        </button>
+        </Button>
       </form>
       {notFound && (
         <p role="alert" className="-mt-3 text-xs text-brand-red">
@@ -57,34 +60,33 @@ export function RegionStep({ regionData, onSelectPredefined, onSearchManual, isS
         <p className="eyebrow">{t("regionStep.suggestedTitle")}</p>
         <div className="grid grid-cols-2 gap-2">
           {PREDEFINED_REGIONS.map((reg) => (
-            <button
+            <ChoiceButton
               key={reg.id}
-              type="button"
-              className="choice !px-3 !py-2"
-              data-selected={regionData?.regionName === reg.name[language]}
+              selected={regionData?.regionName === reg.name[language]}
+              className="flex-col gap-0.5 !px-3 !py-2"
               onClick={() => {
                 setNotFound(false);
                 onSelectPredefined(reg);
               }}
             >
               <span className="line-clamp-2 text-xs font-medium leading-snug">{reg.name[language]}</span>
-              <span className="mt-0.5 block text-[11px] text-muted-foreground">{reg.area[language]}</span>
-            </button>
+              <span className="text-[11px] text-muted-foreground">{reg.area[language]}</span>
+            </ChoiceButton>
           ))}
         </div>
       </div>
 
       {regionData && (
-        <div className="space-y-3 border-l-2 border-primary/70 pl-3">
+        <div className="space-y-3 rounded-2xl bg-muted p-4">
           <div>
             <p className="eyebrow">{t("regionStep.delimited")}</p>
             <p className="mt-1 text-sm font-bold">{regionData.regionName}</p>
             <p className="mt-0.5 text-xs text-muted-foreground">{regionData.description}</p>
           </div>
-          <button type="button" className="btn btn-primary w-full" onClick={onContinue}>
+          <Button className="w-full" onClick={onContinue}>
             {t("regionStep.continue")}
-            <ArrowRightIcon className="h-4 w-4" />
-          </button>
+            <ArrowRightIcon className="size-4" />
+          </Button>
         </div>
       )}
 

@@ -1,25 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  ArrowLeftIcon,
-  ArrowRightIcon,
-  CheckIcon,
-  PlayIcon,
-  MagnifyingGlassIcon,
-} from "@heroicons/react/24/outline";
+import { ArrowLeftIcon, ArrowRightIcon, MagnifyingGlassIcon, PlayIcon } from "@heroicons/react/24/outline";
 import { useTranslation } from "@/context/LanguageContext";
 import { ALL_VARIABLES, PERIODS, TOPICS, VARIABLES } from "@/lib/catalog";
 import { DEMOS } from "@/lib/demos";
 import { classifyPeriod, classifyTopic } from "@/lib/intent";
 import { PREDEFINED_REGIONS } from "@/components/nasa/PredefinedRegions";
-import type {
-  DateRange,
-  PredefinedRegion,
-  RegionAnalysisPayload,
-  TopicId,
-  VariableId,
-} from "@/types/geo";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ChoiceButton } from "@/components/ui/choice-button";
+import { Input } from "@/components/ui/input";
+import { Progress } from "@/components/ui/progress";
+import { Separator } from "@/components/ui/separator";
+import type { DateRange, PredefinedRegion, RegionAnalysisPayload, TopicId, VariableId } from "@/types/geo";
 
 export type GuidedStage = "intro" | "topic" | "region" | "period" | "suggest";
 const STAGES: GuidedStage[] = ["topic", "region", "period", "suggest"];
@@ -106,6 +101,12 @@ export function GuidedFlow({
     go("suggest");
   };
 
+  async function submitRegion(text: string) {
+    setNotice(null);
+    const ok = await onSearchRegion(text);
+    if (!ok) setNotice(t("guided.regionNotFound"));
+  }
+
   // Spoken answers are routed by the current stage (the parent calls the registered handler).
   useEffect(() => {
     registerVoice((text: string) => {
@@ -124,13 +125,7 @@ export function GuidedFlow({
     return () => registerVoice(null);
   });
 
-  async function submitRegion(text: string) {
-    setNotice(null);
-    const ok = await onSearchRegion(text);
-    if (!ok) setNotice(t("guided.regionNotFound"));
-  }
-
-  // Fetch SI-ranked variables when we reach the suggestion stage.
+  // Fetch AI-ranked variables when we reach the suggestion stage.
   const guideKey = `${topic}|${regionData?.regionName}|${language}`;
   const loadingGuide = stage === "suggest" && guide?.key !== guideKey;
 
@@ -181,16 +176,11 @@ export function GuidedFlow({
   return (
     <div className="space-y-5 animate-in fade-in duration-300">
       {stage !== "intro" && (
-        <div>
-          <div className="mb-2 flex gap-1" aria-hidden>
-            {STAGES.map((s, i) => (
-              <span key={s} className={`h-0.5 flex-1 ${i <= stageIndex ? "bg-primary" : "bg-border"}`} />
-            ))}
-          </div>
-          <p className="eyebrow">
+        <Progress value={((stageIndex + 1) / STAGES.length) * 100} aria-label={t("guided.stepOf")}>
+          <p className="eyebrow w-full">
             {t("guided.stepOf").replace("{n}", String(stageIndex + 1)).replace("{total}", String(STAGES.length))}
           </p>
-        </div>
+        </Progress>
       )}
 
       {stage === "intro" && (
@@ -199,23 +189,25 @@ export function GuidedFlow({
             <h2 className="title text-xl">{t("guided.introTitle")}</h2>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t("guided.introDesc")}</p>
           </div>
-          <button type="button" className="btn btn-primary w-full" onClick={() => go("topic")}>
+          <Button size="lg" className="w-full" onClick={() => go("topic")}>
             {t("guided.start")}
-            <ArrowRightIcon className="h-4 w-4" />
-          </button>
+            <ArrowRightIcon className="size-4" />
+          </Button>
 
-          <div className="space-y-2 border-t border-border pt-4">
+          <Separator />
+
+          <div className="space-y-2">
             <p className="eyebrow">{t("guided.watchTitle")}</p>
             {DEMOS.map((d) => (
-              <button key={d.id} type="button" className="choice flex items-start gap-3" onClick={() => onStartDemo(d.id)}>
-                <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-red text-white">
-                  <PlayIcon className="h-3 w-3" />
+              <ChoiceButton key={d.id} onClick={() => onStartDemo(d.id)}>
+                <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-brand-red text-white">
+                  <PlayIcon className="size-3" />
                 </span>
                 <span>
                   <span className="block text-sm font-bold">{d.title[language]}</span>
                   <span className="mt-0.5 block text-xs text-muted-foreground">{d.blurb[language]}</span>
                 </span>
-              </button>
+              </ChoiceButton>
             ))}
           </div>
         </>
@@ -226,10 +218,10 @@ export function GuidedFlow({
           <h2 className="title text-xl">{t("guided.q1")}</h2>
           <div className="space-y-2">
             {TOPICS.map((tp) => (
-              <button key={tp.id} type="button" className="choice" data-selected={topic === tp.id} onClick={() => chooseTopic(tp.id)}>
-                <span className="block text-sm font-bold">{tp.name[language]}</span>
-                <span className="mt-0.5 block text-xs text-muted-foreground">{tp.desc[language]}</span>
-              </button>
+              <ChoiceButton key={tp.id} selected={topic === tp.id} className="flex-col gap-0.5" onClick={() => chooseTopic(tp.id)}>
+                <span className="text-sm font-bold">{tp.name[language]}</span>
+                <span className="text-xs text-muted-foreground">{tp.desc[language]}</span>
+              </ChoiceButton>
             ))}
           </div>
         </>
@@ -246,39 +238,38 @@ export function GuidedFlow({
             className="flex gap-2"
           >
             <div className="relative flex-1">
-              <MagnifyingGlassIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <input
-                className="field pl-9"
+              <MagnifyingGlassIcon className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                className="pl-10"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder={t("header.searchPlaceholder")}
                 aria-label={t("guided.q2")}
               />
             </div>
-            <button type="submit" className="btn btn-primary" disabled={isSearching || !query.trim()}>
+            <Button type="submit" className="h-10" disabled={isSearching || !query.trim()}>
               {isSearching ? "…" : t("regionStep.searchButton")}
-            </button>
+            </Button>
           </form>
 
           <div className="grid grid-cols-2 gap-2">
             {PREDEFINED_REGIONS.slice(0, 6).map((reg) => (
-              <button
+              <ChoiceButton
                 key={reg.id}
-                type="button"
-                className="choice !px-3 !py-2"
-                data-selected={regionData?.regionName === reg.name[language]}
+                selected={regionData?.regionName === reg.name[language]}
+                className="!px-3 !py-2"
                 onClick={() => {
                   setNotice(null);
                   onSelectPredefined(reg);
                 }}
               >
                 <span className="line-clamp-2 text-xs font-medium leading-snug">{reg.name[language]}</span>
-              </button>
+              </ChoiceButton>
             ))}
           </div>
 
           {regionData && (
-            <div className="border-l-2 border-primary/70 pl-3">
+            <div className="rounded-2xl bg-muted p-4">
               <p className="eyebrow">{t("guided.region")}</p>
               <p className="mt-1 text-sm font-bold">{regionData.regionName}</p>
               <p className="mt-0.5 text-xs text-muted-foreground">{regionData.description}</p>
@@ -292,10 +283,10 @@ export function GuidedFlow({
           <h2 className="title text-xl">{t("guided.q3")}</h2>
           <div className="space-y-2">
             {PERIODS.map((p) => (
-              <button key={p.id} type="button" className="choice" onClick={() => choosePeriod(p.id)}>
-                <span className="block text-sm font-bold">{p.label[language]}</span>
-                <span className="mt-0.5 block text-xs text-muted-foreground">{p.desc[language]}</span>
-              </button>
+              <ChoiceButton key={p.id} className="flex-col gap-0.5" onClick={() => choosePeriod(p.id)}>
+                <span className="text-sm font-bold">{p.label[language]}</span>
+                <span className="text-xs text-muted-foreground">{p.desc[language]}</span>
+              </ChoiceButton>
             ))}
           </div>
         </>
@@ -312,10 +303,9 @@ export function GuidedFlow({
 
           {guide && !loadingGuide && (
             <>
-              <p className="eyebrow flex items-center gap-2">
-                <span className={`inline-block h-2 w-2 ${guide.source === "gemini" ? "bg-brand-red" : "bg-muted-foreground"}`} />
+              <Badge variant={guide.source === "gemini" ? "default" : "secondary"} className="w-fit">
                 {guide.source === "gemini" ? t("guided.ai") : t("guided.local")}
-              </p>
+              </Badge>
               {guide.summary && <p className="text-sm leading-relaxed">{guide.summary}</p>}
               <div className="space-y-2">
                 {guide.ranked
@@ -324,21 +314,15 @@ export function GuidedFlow({
                     const info = VARIABLES[r.id];
                     const on = selectedVariables.includes(r.id);
                     return (
-                      <button key={r.id} type="button" className="choice flex items-start gap-3" data-selected={on} onClick={() => toggle(r.id)} aria-pressed={on}>
-                        <span
-                          className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${
-                            on ? "border-primary bg-primary text-white" : "border-border"
-                          }`}
-                        >
-                          {on && <CheckIcon className="h-3.5 w-3.5" />}
-                        </span>
+                      <ChoiceButton key={r.id} selected={on} aria-pressed={on} onClick={() => toggle(r.id)}>
+                        <Checkbox checked={on} tabIndex={-1} className="pointer-events-none mt-0.5" aria-hidden />
                         <span>
                           <span className="block text-sm font-bold">
                             {info.name[language]} <span className="font-normal text-muted-foreground">· {info.product}</span>
                           </span>
                           <span className="mt-0.5 block text-xs leading-snug text-muted-foreground">{r.reason}</span>
                         </span>
-                      </button>
+                      </ChoiceButton>
                     );
                   })}
               </div>
@@ -356,21 +340,21 @@ export function GuidedFlow({
 
       {stage !== "intro" && (
         <div className="flex gap-2 pt-1">
-          <button type="button" className="btn btn-line" onClick={back}>
-            <ArrowLeftIcon className="h-4 w-4" />
+          <Button variant="outline" onClick={back}>
+            <ArrowLeftIcon className="size-4" />
             {t("guided.back")}
-          </button>
+          </Button>
           {stage === "region" && (
-            <button type="button" className="btn btn-primary flex-1" disabled={!regionData} onClick={() => go("period")}>
+            <Button className="flex-1" disabled={!regionData} onClick={() => go("period")}>
               {t("guided.continue")}
-              <ArrowRightIcon className="h-4 w-4" />
-            </button>
+              <ArrowRightIcon className="size-4" />
+            </Button>
           )}
           {stage === "suggest" && (
-            <button type="button" className="btn btn-primary flex-1" disabled={selectedVariables.length === 0 || loadingGuide} onClick={onFinish}>
+            <Button className="flex-1" disabled={selectedVariables.length === 0 || loadingGuide} onClick={onFinish}>
               {t("guided.run")}
-              <ArrowRightIcon className="h-4 w-4" />
-            </button>
+              <ArrowRightIcon className="size-4" />
+            </Button>
           )}
         </div>
       )}

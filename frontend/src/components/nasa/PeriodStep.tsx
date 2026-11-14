@@ -3,6 +3,11 @@
 import { DateRange } from "@/types/geo";
 import { useTranslation } from "@/context/LanguageContext";
 import { PERIODS } from "@/lib/catalog";
+import { Button } from "@/components/ui/button";
+import { ChoiceButton } from "@/components/ui/choice-button";
+import { DatePicker } from "@/components/ui/date-picker";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/24/outline";
 
 interface PeriodStepProps {
@@ -25,52 +30,55 @@ export function PeriodStep({ range, onChangeRange, onBack, onContinue }: PeriodS
       <div className="space-y-2">
         <p className="eyebrow">{t("periodStep.presets")}</p>
         {PERIODS.map((p) => (
-          <button
+          <ChoiceButton
             key={p.id}
-            type="button"
-            className="choice"
-            data-selected={range.preset === p.id}
+            selected={range.preset === p.id}
+            className="flex-col gap-0.5"
             onClick={() => onChangeRange({ start: p.start, end: p.end, preset: p.id })}
           >
-            <span className="block text-sm font-bold">{p.label[language]}</span>
-            <span className="mt-0.5 block text-xs text-muted-foreground">{p.desc[language]}</span>
-          </button>
+            <span className="text-sm font-bold">{p.label[language]}</span>
+            <span className="text-xs text-muted-foreground">{p.desc[language]}</span>
+          </ChoiceButton>
         ))}
       </div>
+
+      <Separator />
 
       <div className="space-y-2">
         <p className="eyebrow">{t("periodStep.dates")}</p>
         <div className="grid grid-cols-2 gap-2">
-          <label className="block text-xs text-muted-foreground">
-            {t("periodStep.from")}
-            <input
-              type="date"
-              className="field mt-1"
+          <div className="space-y-1.5">
+            <Label className="text-xs text-muted-foreground">{t("periodStep.from")}</Label>
+            <DatePicker
               value={range.start}
-              onChange={(e) => onChangeRange({ ...range, start: e.target.value, preset: "custom" })}
+              language={language}
+              label={t("periodStep.from")}
+              max={range.end}
+              onChange={(iso) => onChangeRange({ ...range, start: iso, preset: "custom" })}
             />
-          </label>
-          <label className="block text-xs text-muted-foreground">
-            {t("periodStep.to")}
-            <input
-              type="date"
-              className="field mt-1"
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs text-muted-foreground">{t("periodStep.to")}</Label>
+            <DatePicker
               value={range.end}
-              onChange={(e) => onChangeRange({ ...range, end: e.target.value, preset: "custom" })}
+              language={language}
+              label={t("periodStep.to")}
+              min={range.start}
+              onChange={(iso) => onChangeRange({ ...range, end: iso, preset: "custom" })}
             />
-          </label>
+          </div>
         </div>
       </div>
 
       <div className="flex gap-2 pt-1">
-        <button type="button" className="btn btn-line" onClick={onBack}>
-          <ArrowLeftIcon className="h-4 w-4" />
+        <Button variant="outline" onClick={onBack}>
+          <ArrowLeftIcon className="size-4" />
           {t("periodStep.back")}
-        </button>
-        <button type="button" className="btn btn-primary flex-1" onClick={onContinue}>
+        </Button>
+        <Button className="flex-1" onClick={onContinue}>
           {t("periodStep.next")}
-          <ArrowRightIcon className="h-4 w-4" />
-        </button>
+          <ArrowRightIcon className="size-4" />
+        </Button>
       </div>
     </div>
   );

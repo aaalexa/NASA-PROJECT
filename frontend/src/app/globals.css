@@ -24,6 +24,8 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-brand-red: var(--red);
+  --color-brand-blue: var(--blue);
+  --color-brand-olive: var(--olive);
 
   --radius-sm: calc(var(--radius) - 2px);
   --radius-md: var(--radius);
@@ -31,53 +33,63 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
-/* Palette: black, white, blue, red. Nothing else. */
+/* Moody Trends palette: molten lava, brick red, white, deep space blue, steel blue, palm leaf. */
 :root {
+  --molten-lava: #780000;
+  --brick-red: #c1121f;
+  --deep-space-blue: #003049;
+  --steel-blue: #669bbc;
+  --palm-leaf: #9c914f;
+
   --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
   --background: #ffffff;
-  --foreground: #000000;
+  --foreground: var(--deep-space-blue);
   --card: #ffffff;
-  --card-foreground: #000000;
+  --card-foreground: var(--deep-space-blue);
   --popover: #ffffff;
-  --popover-foreground: #000000;
-  --primary: #1d4ed8;
+  --popover-foreground: var(--deep-space-blue);
+  --primary: var(--deep-space-blue);
   --primary-foreground: #ffffff;
-  --secondary: #f4f4f5;
-  --secondary-foreground: #000000;
-  --muted: #f4f4f5;
-  --muted-foreground: #5f5f66;
-  --accent: #f4f4f5;
-  --accent-foreground: #000000;
-  --destructive: #dc2626;
+  --secondary: color-mix(in srgb, var(--steel-blue) 16%, #fff);
+  --secondary-foreground: var(--deep-space-blue);
+  --muted: color-mix(in srgb, var(--steel-blue) 12%, #fff);
+  --muted-foreground: color-mix(in srgb, var(--deep-space-blue) 62%, #fff);
+  --accent: color-mix(in srgb, var(--steel-blue) 22%, #fff);
+  --accent-foreground: var(--deep-space-blue);
+  --destructive: var(--brick-red);
   --destructive-foreground: #ffffff;
-  --border: #e2e2e5;
-  --input: #d4d4d8;
-  --ring: #1d4ed8;
-  --red: #dc2626;
-  --radius: 14px;
+  --border: color-mix(in srgb, var(--steel-blue) 38%, #fff);
+  --input: color-mix(in srgb, var(--steel-blue) 45%, #fff);
+  --ring: var(--steel-blue);
+  --red: var(--brick-red);
+  --blue: var(--steel-blue);
+  --olive: var(--palm-leaf);
+  --radius: 16px;
 }
 
 .dark {
-  --background: #000000;
+  --background: color-mix(in srgb, var(--deep-space-blue) 50%, #000);
   --foreground: #ffffff;
-  --card: #0a0a0b;
+  --card: color-mix(in srgb, var(--deep-space-blue) 78%, #000);
   --card-foreground: #ffffff;
-  --popover: #0a0a0b;
+  --popover: color-mix(in srgb, var(--deep-space-blue) 85%, #000);
   --popover-foreground: #ffffff;
-  --primary: #3b82f6;
-  --primary-foreground: #ffffff;
-  --secondary: #141416;
+  --primary: var(--steel-blue);
+  --primary-foreground: var(--deep-space-blue);
+  --secondary: color-mix(in srgb, var(--steel-blue) 18%, var(--deep-space-blue));
   --secondary-foreground: #ffffff;
-  --muted: #141416;
-  --muted-foreground: #9a9aa2;
-  --accent: #141416;
+  --muted: color-mix(in srgb, var(--steel-blue) 14%, var(--deep-space-blue));
+  --muted-foreground: color-mix(in srgb, var(--steel-blue) 82%, #fff);
+  --accent: color-mix(in srgb, var(--steel-blue) 24%, var(--deep-space-blue));
   --accent-foreground: #ffffff;
-  --destructive: #ef4444;
+  --destructive: color-mix(in srgb, var(--brick-red) 75%, #fff);
   --destructive-foreground: #ffffff;
-  --border: #26262a;
-  --input: #2e2e33;
-  --ring: #3b82f6;
-  --red: #ef4444;
+  --border: color-mix(in srgb, var(--steel-blue) 28%, var(--deep-space-blue));
+  --input: color-mix(in srgb, var(--steel-blue) 34%, var(--deep-space-blue));
+  --ring: var(--steel-blue);
+  --red: color-mix(in srgb, var(--brick-red) 72%, #fff);
+  --blue: var(--steel-blue);
+  --olive: color-mix(in srgb, var(--palm-leaf) 85%, #fff);
 }
 
 body {
@@ -88,14 +100,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ---------- Shared building blocks ---------- */
-
-.panel {
-  background: color-mix(in srgb, var(--card) 94%, transparent);
-  border: 1px solid var(--border);
-  border-radius: 22px;
-  backdrop-filter: blur(10px);
-}
+/* ---------- Text helpers ---------- */
 
 .eyebrow {
   font-size: 12px;
@@ -109,107 +114,6 @@ body {
   line-height: 1.15;
 }
 
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  height: 38px;
-  padding: 0 18px;
-  font-size: 13px;
-  font-weight: 500;
-  border-radius: 9999px;
-  border: 1px solid transparent;
-  cursor: pointer;
-  transition: background-color 0.15s, border-color 0.15s, color 0.15s, opacity 0.15s;
-  white-space: nowrap;
-}
-.btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-.btn-primary {
-  background: var(--primary);
-  color: #fff;
-}
-.btn-primary:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--primary) 85%, #000);
-}
-.btn-line {
-  background: transparent;
-  color: var(--foreground);
-  border-color: var(--border);
-}
-.btn-line:hover:not(:disabled) {
-  border-color: var(--foreground);
-}
-.btn-red {
-  background: transparent;
-  color: var(--red);
-  border-color: color-mix(in srgb, var(--red) 45%, transparent);
-}
-.btn-red:hover:not(:disabled) {
-  background: var(--red);
-  color: #fff;
-}
-
-.choice {
-  display: block;
-  width: 100%;
-  text-align: left;
-  padding: 12px 14px;
-  background: transparent;
-  color: var(--foreground);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  cursor: pointer;
-  transition: border-color 0.15s, background-color 0.15s;
-}
-.choice:hover {
-  border-color: var(--foreground);
-}
-.choice[data-selected="true"] {
-  border-color: var(--primary);
-  box-shadow: inset 0 0 0 1px var(--primary);
-}
-
-.field {
-  width: 100%;
-  height: 40px;
-  padding: 0 14px;
-  font-size: 13px;
-  color: var(--foreground);
-  background: var(--background);
-  border: 1px solid var(--border);
-  border-radius: 9999px;
-  outline: none;
-  transition: border-color 0.15s;
-}
-.field:focus {
-  border-color: var(--primary);
-}
-.field::placeholder {
-  color: var(--muted-foreground);
-}
-
-.icon-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 9999px;
-  border: 1px solid var(--border);
-  background: color-mix(in srgb, var(--card) 94%, transparent);
-  color: var(--foreground);
-  cursor: pointer;
-  backdrop-filter: blur(10px);
-  transition: border-color 0.15s;
-}
-.icon-btn:hover {
-  border-color: var(--foreground);
-}
-
 *:focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
@@ -218,10 +122,6 @@ body {
 @keyframes voice-ring {
   0% { transform: scale(1); opacity: 0.45; }
   100% { transform: scale(1.9); opacity: 0; }
-}
-@keyframes demo-progress {
-  from { transform: scaleX(0); }
-  to { transform: scaleX(1); }
 }
 
 @media (prefers-reduced-motion: reduce) {
