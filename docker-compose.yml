@@ -1,0 +1,58 @@
+services:
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: runtime
+    image: nasa-down-to-earth-api:latest
+    container_name: nasa-down-to-earth-api
+    restart: unless-stopped
+    environment:
+      NASA_CORS_ORIGINS: ${NASA_CORS_ORIGINS:-https://moody-trends.earth,https://www.moody-trends.earth,https://api.moody-trends.earth,http://localhost:3000,http://localhost:5173}
+      NASA_CACHE_MEMORIA_MAX: ${NASA_CACHE_MEMORIA_MAX:-128}
+      NASA_OPENDAP_WORKERS: ${NASA_OPENDAP_WORKERS:-6}
+      NASA_OPENDAP_TIMEOUT: ${NASA_OPENDAP_TIMEOUT:-60}
+      NASA_MAX_DESCARGAS: ${NASA_MAX_DESCARGAS:-2}
+      NASA_MAX_PIXELES: ${NASA_MAX_PIXELES:-20000}
+      UVICORN_WORKERS: ${UVICORN_WORKERS:-2}
+      EARTHDATA_USERNAME: ${EARTHDATA_USERNAME:-}
+      EARTHDATA_PASSWORD: ${EARTHDATA_PASSWORD:-}
+    ports:
+      - "127.0.0.1:8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8000/api/v1/salud"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    networks:
+      - red_api
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: nasa-down-to-earth-caddy
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      API_DOMAIN: ${API_DOMAIN:-api.moody-trends.earth}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - red_api
+
+volumes:
+  caddy_data:
+  caddy_config:
+
+networks:
+  red_api:
+    driver: bridge
+

@@ -1,0 +1,175 @@
+# Regiones predefinidas para la API. bbox = [oeste, sur, este, norte] en grados WGS84, lon en [-180, 180).
+# Enfocadas en México, Centroamérica y Latinoamérica (más regiones globales de referencia).
+regiones:
+  # ============================================================================
+  # MÉXICO
+  # ============================================================================
+  - id: noreste_mexico
+    nombre: Noreste de México
+    zona: mexico
+    pais: México
+    descripcion: Coahuila, Nuevo León y Tamaulipas (cuenca del Río Bravo y Sierra Madre Oriental).
+    bbox: [-106.0, 22.0, -97.0, 30.0]
+
+  - id: noroeste_mexico_sonora_sinaloa
+    nombre: Noroeste de México (Sonora, Sinaloa y Chihuahua)
+    zona: mexico
+    pais: México
+    descripcion: Región del monzón norteamericano, Desierto de Sonora, valles agrícolas de Sinaloa y Sierra Madre Occidental.
+    bbox: [-115.0, 23.0, -106.0, 32.5]
+
+  - id: peninsula_baja_california
+    nombre: Península de Baja California
+    zona: mexico
+    pais: México
+    descripcion: Baja California y Baja California Sur, zona árida con influencia de frentes invernales y ciclones del Pacífico.
+    bbox: [-117.0, 22.8, -109.4, 32.5]
+
+  - id: altiplano_central_bajio
+    nombre: Altiplano Central y El Bajío (Centro de México)
+    zona: mexico
+    pais: México
+    descripcion: Valle de México, Querétaro, Guanajuato, Michoacán, Jalisco, Hidalgo, Tlaxcala, Morelos y Puebla.
+    bbox: [-104.5, 18.5, -97.5, 22.5]
+
+  - id: golfo_centro_veracruz
+    nombre: Cuenca del Golfo Centro (Veracruz y Huasteca)
+    zona: mexico
+    pais: México
+    descripcion: Vertiente húmeda del Golfo de México (Veracruz, Huasteca potosina, hidalguense y norte de Puebla).
+    bbox: [-99.0, 17.2, -95.0, 22.5]
+
+  - id: pacifico_sur_mexico
+    nombre: Pacífico Sur de México (Guerrero y Oaxaca)
+    zona: mexico
+    pais: México
+    descripcion: Sierra Madre del Sur y costa pacífica de Guerrero y Oaxaca, altamente expuesta a ciclones tropicales y sequía intraestival.
+    bbox: [-102.2, 15.6, -94.0, 18.8]
+
+  - id: sureste_mexico
+    nombre: Sureste de México (Chiapas, Tabasco y Yucatán)
+    zona: mexico
+    pais: México
+    descripcion: Chiapas, Tabasco y la península de Yucatán (cuencas Grijalva-Usumacinta y selva maya).
+    bbox: [-94.5, 14.5, -86.5, 21.7]
+
+  - id: peninsula_yucatan
+    nombre: Península de Yucatán
+    zona: mexico
+    pais: México
+    descripcion: Plataforma kárstica de Yucatán, Campeche y Quintana Roo.
+    bbox: [-91.5, 17.8, -86.7, 21.6]
+
+  # ============================================================================
+  # CENTROAMÉRICA
+  # ============================================================================
+  - id: corredor_seco_centroamericano
+    nombre: Corredor Seco Centroamericano
+    zona: centroamerica
+    pais: Guatemala, El Salvador, Honduras y Nicaragua
+    descripcion: Franja pacífica y valles interiores desde Chiapas/Guatemala hasta el noroeste de Costa Rica, crítica por canícula y El Niño.
+    bbox: [-92.2, 11.5, -85.0, 16.0]
+
+  - id: guatemala_belice
+    nombre: Guatemala y Belice
+    zona: centroamerica
+    pais: Guatemala y Belice
+    descripcion: Altiplano volcánico guatemalteco, Petén, Belice y costa del Pacífico.
+    bbox: [-92.3, 13.7, -87.8, 18.5]
+
+  - id: el_salvador_honduras
+    nombre: El Salvador y Honduras
+    zona: centroamerica
+    pais: El Salvador y Honduras
+    descripcion: Cuencas del río Lempa, Ulúa, Choluteca y Mosquitia hondureña.
+    bbox: [-90.2, 13.0, -83.1, 16.5]
+
+  - id: nicaragua
+    nombre: Nicaragua (Depresión Lacustre y Caribe)
+    zona: centroamerica
+    pais: Nicaragua
+    descripcion: Lagos Xolotlán y Cocibolca, cordillera central y llanura autónoma del Caribe nicaragüense.
+    bbox: [-87.7, 10.7, -83.1, 15.0]
+
+  - id: costa_rica_panama
+    nombre: Costa Rica y Panamá
+    zona: centroamerica
+    pais: Costa Rica y Panamá
+    descripcion: Cordillera de Talamanca, Guanacaste, Cuenca del Canal de Panamá y Darién.
+    bbox: [-85.9, 7.2, -77.2, 11.2]
+
+  - id: istmo_centroamericano_completo
+    nombre: Centroamérica Completa (Istmo)
+    zona: centroamerica
+    pais: Belice, Guatemala, El Salvador, Honduras, Nicaragua, Costa Rica y Panamá
+    descripcion: Cobertura integral del istmo centroamericano desde la frontera con México hasta el tapón del Darién.
+    bbox: [-92.3, 7.2, -77.2, 18.5]
+
+  # ============================================================================
+  # CARIBE Y SUDAMÉRICA (LATINOAMÉRICA)
+  # ============================================================================
+  - id: caribe_antillas_mayores
+    nombre: Caribe (Antillas Mayores)
+    zona: caribe
+    pais: Cuba, Jamaica, Haití, República Dominicana y Puerto Rico
+    descripcion: Arco insular de las Antillas Mayores entre el Mar Caribe y el Atlántico occidental.
+    bbox: [-85.0, 17.5, -65.0, 23.2]
+
+  - id: andes_norte_colombia_venezuela
+    nombre: Andes del Norte y Llanos (Colombia y Venezuela)
+    zona: sudamerica
+    pais: Colombia y Venezuela
+    descripcion: Cuencas del Magdalena-Cauca, Orinoquía occidental y cordilleras andinas del norte.
+    bbox: [-78.0, 1.0, -67.0, 11.5]
+
+  - id: andes_centrales_peru_bolivia
+    nombre: Andes Centrales y Altiplano (Ecuador, Perú y Bolivia)
+    zona: sudamerica
+    pais: Ecuador, Perú y Bolivia
+    descripcion: Cordillera de los Andes, cuenca del Titicaca y vertiente amazónica andina.
+    bbox: [-81.0, -20.0, -64.0, 0.0]
+
+  - id: amazonia
+    nombre: Amazonía
+    zona: sudamerica
+    pais: Brasil, Perú, Colombia y Bolivia
+    descripcion: Cuenca central del Amazonas.
+    bbox: [-75.0, -15.0, -45.0, 5.0]
+
+  - id: nordeste_brasil_sertao
+    nombre: Nordeste de Brasil (Sertão)
+    zona: sudamerica
+    pais: Brasil
+    descripcion: Polígono semiárido del Nordeste brasileño, sujeto a sequías plurianuales recurrentes.
+    bbox: [-46.0, -16.0, -35.0, -3.0]
+
+  - id: cuenca_plata_pampa
+    nombre: Cuenca del Plata y Pampa Húmeda
+    zona: sudamerica
+    pais: Argentina, Uruguay, Paraguay y Brasil
+    descripcion: Cuencas del Paraná-Paraguay-Uruguay y llanura pampeana agrícola.
+    bbox: [-65.0, -38.0, -52.0, -22.0]
+
+  - id: chile_central_cuyo
+    nombre: Chile Central y Cuyo
+    zona: sudamerica
+    pais: Chile y Argentina
+    descripcion: Zona mediterránea de Chile central y Cuyo argentino, afectada por la megasequía andina.
+    bbox: [-73.5, -39.0, -68.0, -30.0]
+
+  # ============================================================================
+  # REGIONES GLOBALES DE REFERENCIA
+  # ============================================================================
+  - id: sahel
+    nombre: Sahel
+    zona: referencia_global
+    pais: África Occidental y Central (Senegal a Sudán)
+    descripcion: Franja semiárida al sur del Sahara, de Senegal a Sudán.
+    bbox: [-20.0, 10.0, 40.0, 20.0]
+
+  - id: india_monzon
+    nombre: India (monzón)
+    zona: referencia_global
+    pais: India
+    descripcion: Centro de la India, zona núcleo del monzón de verano.
+    bbox: [72.0, 16.0, 88.0, 28.0]
