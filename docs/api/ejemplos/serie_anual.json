@@ -1,0 +1,306 @@
+{
+  "request": "GET /api/v1/series/lluvia_gpcp?region=noreste_mexico&anual=suma&sintetico=true",
+  "status": 200,
+  "response": {
+    "variable": "lluvia_gpcp",
+    "nombre_simple": "Precipitación (P)",
+    "definicion_simple": "Cuánta lluvia cayó en el mes, combinando satélites y pluviómetros.",
+    "grupo": "lluvia",
+    "dataset": "GPCP Precipitation Level 3 Monthly 0.5-Degree V3.3",
+    "short_name": "GPCPMON",
+    "unidad": "mm/anio",
+    "frecuencia_serie": "anual",
+    "region": {
+      "id": "noreste_mexico",
+      "nombre": "Noreste de México",
+      "descripcion": "Coahuila, Nuevo León y Tamaulipas (cuenca del Río Bravo y Sierra Madre Oriental).",
+      "zona": "mexico",
+      "pais": "México",
+      "es_latinoamerica": true,
+      "bbox": [
+        -106.0,
+        22.0,
+        -97.0,
+        30.0
+      ],
+      "predefinida": true,
+      "coordenadas": {
+        "oeste": -106.0,
+        "sur": 22.0,
+        "este": -97.0,
+        "norte": 30.0,
+        "lon_min": -106.0,
+        "lat_min": 22.0,
+        "lon_max": -97.0,
+        "lat_max": 30.0,
+        "centro": {
+          "lat": 26.0,
+          "lon": -101.5
+        },
+        "extension_grados": {
+          "ancho_lon": 9.0,
+          "alto_lat": 8.0
+        },
+        "esquinas": {
+          "suroeste": {
+            "lat": 22.0,
+            "lon": -106.0
+          },
+          "sureste": {
+            "lat": 22.0,
+            "lon": -97.0
+          },
+          "noreste": {
+            "lat": 30.0,
+            "lon": -97.0
+          },
+          "noroeste": {
+            "lat": 30.0,
+            "lon": -106.0
+          }
+        },
+        "poligono_geojson": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -106.0,
+                22.0
+              ],
+              [
+                -97.0,
+                22.0
+              ],
+              [
+                -97.0,
+                30.0
+              ],
+              [
+                -106.0,
+                30.0
+              ],
+              [
+                -106.0,
+                22.0
+              ]
+            ]
+          ]
+        }
+      },
+      "mallas_reales": {
+        "gpcp": {
+          "resolucion": "0.5° × 0.5°",
+          "lat_min_real": 22.25,
+          "lat_max_real": 29.75,
+          "lon_min_real": -105.75,
+          "lon_max_real": -97.25,
+          "n_lat": 16,
+          "n_lon": 18,
+          "n_celdas": 288
+        },
+        "merra2": {
+          "resolucion": "0.5° × 0.625°",
+          "lat_min_real": 22.0,
+          "lat_max_real": 30.0,
+          "lon_min_real": -105.625,
+          "lon_max_real": -97.5,
+          "n_lat": 17,
+          "n_lon": 14,
+          "n_celdas": 238
+        },
+        "gldas": {
+          "resolucion": "0.25° × 0.25°",
+          "lat_min_real": 22.125,
+          "lat_max_real": 29.875,
+          "lon_min_real": -105.875,
+          "lon_max_real": -97.125,
+          "n_lat": 32,
+          "n_lon": 36,
+          "n_celdas": 1152
+        },
+        "imerg": {
+          "resolucion": "0.1° × 0.1°",
+          "lat_min_real": 22.05,
+          "lat_max_real": 29.95,
+          "lon_min_real": -105.95,
+          "lon_max_real": -97.05,
+          "n_lat": 80,
+          "n_lon": 90,
+          "n_celdas": 7200
+        }
+      },
+      "shortcut": {
+        "region": "noreste_mexico",
+        "oeste": -106.0,
+        "sur": 22.0,
+        "este": -97.0,
+        "norte": 30.0,
+        "centro_lat": 26.0,
+        "centro_lon": -101.5,
+        "query_region": "?region=noreste_mexico",
+        "query_bbox": "?oeste=-106&sur=22&este=-97&norte=30"
+      }
+    },
+    "periodo": [
+      "2001",
+      "2024"
+    ],
+    "media_climatologia": 914.6511978867475,
+    "climatologia_mensual": null,
+    "calidad": {
+      "aceptada": true,
+      "n_esperados": 288,
+      "n_faltantes": 0,
+      "fraccion_faltante": 0.0,
+      "motivo": null,
+      "meses_poca_cobertura": null
+    },
+    "puntos": [
+      {
+        "fecha": "2001",
+        "t": 2001.0,
+        "valor": 1011.0743218511448,
+        "anomalia": null
+      },
+      {
+        "fecha": "2002",
+        "t": 2002.0,
+        "valor": 997.4045982508715,
+        "anomalia": null
+      },
+      {
+        "fecha": "2003",
+        "t": 2003.0,
+        "valor": 972.1422564286679,
+        "anomalia": null
+      },
+      {
+        "fecha": "2004",
+        "t": 2004.0,
+        "valor": 961.4903797356891,
+        "anomalia": null
+      },
+      {
+        "fecha": "2005",
+        "t": 2005.0,
+        "valor": 985.1161066596356,
+        "anomalia": null
+      },
+      {
+        "fecha": "2006",
+        "t": 2006.0,
+        "valor": 963.8516433791103,
+        "anomalia": null
+      },
+      {
+        "fecha": "2007",
+        "t": 2007.0,
+        "valor": 944.3984381950556,
+        "anomalia": null
+      },
+      {
+        "fecha": "2008",
+        "t": 2008.0,
+        "valor": 960.4150468734313,
+        "anomalia": null
+      },
+      {
+        "fecha": "2009",
+        "t": 2009.0,
+        "valor": 937.1350785294189,
+        "anomalia": null
+      },
+      {
+        "fecha": "2010",
+        "t": 2010.0,
+        "valor": 991.1474648962967,
+        "anomalia": null
+      },
+      {
+        "fecha": "2011",
+        "t": 2011.0,
+        "valor": 926.4048642969323,
+        "anomalia": null
+      },
+      {
+        "fecha": "2012",
+        "t": 2012.0,
+        "valor": 940.8305558052213,
+        "anomalia": null
+      },
+      {
+        "fecha": "2013",
+        "t": 2013.0,
+        "valor": 957.9890422338433,
+        "anomalia": null
+      },
+      {
+        "fecha": "2014",
+        "t": 2014.0,
+        "valor": 905.7099131117558,
+        "anomalia": null
+      },
+      {
+        "fecha": "2015",
+        "t": 2015.0,
+        "valor": 884.0462359266728,
+        "anomalia": null
+      },
+      {
+        "fecha": "2016",
+        "t": 2016.0,
+        "valor": 899.9760925274645,
+        "anomalia": null
+      },
+      {
+        "fecha": "2017",
+        "t": 2017.0,
+        "valor": 859.1305684221913,
+        "anomalia": null
+      },
+      {
+        "fecha": "2018",
+        "t": 2018.0,
+        "valor": 851.5543432305294,
+        "anomalia": null
+      },
+      {
+        "fecha": "2019",
+        "t": 2019.0,
+        "valor": 821.2130443761191,
+        "anomalia": null
+      },
+      {
+        "fecha": "2020",
+        "t": 2020.0,
+        "valor": 866.3808361196495,
+        "anomalia": null
+      },
+      {
+        "fecha": "2021",
+        "t": 2021.0,
+        "valor": 813.4696913003495,
+        "anomalia": null
+      },
+      {
+        "fecha": "2022",
+        "t": 2022.0,
+        "valor": 845.6940665440065,
+        "anomalia": null
+      },
+      {
+        "fecha": "2023",
+        "t": 2023.0,
+        "valor": 835.8409488612101,
+        "anomalia": null
+      },
+      {
+        "fecha": "2024",
+        "t": 2024.0,
+        "valor": 819.2132117266734,
+        "anomalia": null
+      }
+    ],
+    "fuente_datos": "sintetico"
+  }
+}

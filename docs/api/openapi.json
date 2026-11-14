@@ -1,0 +1,4362 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "NASA Space Apps — Las Dos Caras de la Lluvia API (OPeNDAP en Memoria)",
+    "description": "API REST con **OPeNDAP en memoria RAM (0 archivos NetCDF/HDF en disco)** para consultar los datasets de NASA **GPCP mensual (v3.3)**, **MERRA-2 (v5.12.4)** y **GPM IMERG Final (v07)**, calcular anomalías, extremos de lluvia (CDD, R20mm, W, PRCPTOT, SDII), tendencias estadísticas con corrección por autocorrelación (OLS + n efectivo y Mann-Kendall Hamed-Rao) y mapas por píxel para consumo del frontend.",
+    "version": "0.2.0"
+  },
+  "paths": {
+    "/": {
+      "get": {
+        "tags": [
+          "Estado"
+        ],
+        "summary": "Información general de la API",
+        "operationId": "ruta_raiz__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Ruta Raiz  Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/salud": {
+      "get": {
+        "tags": [
+          "Estado"
+        ],
+        "summary": "Estado del servidor, caché en RAM y credenciales OPeNDAP",
+        "operationId": "ruta_salud_api_v1_salud_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Ruta Salud Api V1 Salud Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/catalogo": {
+      "get": {
+        "tags": [
+          "Catálogo y Metadatos"
+        ],
+        "summary": "Catálogo completo para inicializar el frontend",
+        "description": "Devuelve en una sola llamada los datasets de NASA, las variables disponibles, las regiones y los periodos.",
+        "operationId": "ruta_catalogo_completo_api_v1_catalogo_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Ruta Catalogo Completo Api V1 Catalogo Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/down-to-earth/catalogo": {
+      "get": {
+        "tags": [
+          "Catálogo y Metadatos"
+        ],
+        "summary": "Catálogo Down to Earth (4 variables: P, T, SM, ET; 3 colecciones; método OLS+HAC+Holm)",
+        "operationId": "ruta_catalogo_down_to_earth_api_v1_down_to_earth_catalogo_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Ruta Catalogo Down To Earth Api V1 Down To Earth Catalogo Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/catalog": {
+      "get": {
+        "tags": [
+          "Catálogo y Metadatos"
+        ],
+        "summary": "Catálogo Down to Earth (4 variables: P, T, SM, ET; 3 colecciones; método OLS+HAC+Holm)",
+        "operationId": "ruta_catalogo_down_to_earth_api_v1_catalog_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Ruta Catalogo Down To Earth Api V1 Catalog Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/datasets": {
+      "get": {
+        "tags": [
+          "Catálogo y Metadatos"
+        ],
+        "summary": "Lista los datasets de NASA (GPCP, MERRA-2, GPM IMERG) y sus variables",
+        "operationId": "ruta_listar_datasets_api_v1_datasets_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Ruta Listar Datasets Api V1 Datasets Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/datasets/{dataset_id}": {
+      "get": {
+        "tags": [
+          "Catálogo y Metadatos"
+        ],
+        "summary": "Detalle de un dataset de NASA (gpcp, merra2, imerg)",
+        "operationId": "ruta_detalle_dataset_api_v1_datasets__dataset_id__get",
+        "parameters": [
+          {
+            "name": "dataset_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Dataset Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Ruta Detalle Dataset Api V1 Datasets  Dataset Id  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/variables": {
+      "get": {
+        "tags": [
+          "Catálogo y Metadatos"
+        ],
+        "summary": "Lista y filtra las variables del catálogo",
+        "operationId": "ruta_listar_variables_api_v1_variables_get",
+        "parameters": [
+          {
+            "name": "grupo",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filtrar por grupo: lluvia, causa, calculada",
+              "title": "Grupo"
+            },
+            "description": "Filtrar por grupo: lluvia, causa, calculada"
+          },
+          {
+            "name": "fuente",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filtrar por dataset: gpcp, merra2, imerg",
+              "title": "Fuente"
+            },
+            "description": "Filtrar por dataset: gpcp, merra2, imerg"
+          },
+          {
+            "name": "frecuencia",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filtrar por frecuencia: diaria, mensual, anual",
+              "title": "Frecuencia"
+            },
+            "description": "Filtrar por frecuencia: diaria, mensual, anual"
+          },
+          {
+            "name": "solo_analizables",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Omitir variables crudas diarias",
+              "default": false,
+              "title": "Solo Analizables"
+            },
+            "description": "Omitir variables crudas diarias"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Ruta Listar Variables Api V1 Variables Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/variables/{variable_id}": {
+      "get": {
+        "tags": [
+          "Catálogo y Metadatos"
+        ],
+        "summary": "Metadatos, unidad, conversión y caché de una variable",
+        "operationId": "ruta_detalle_variable_api_v1_variables__variable_id__get",
+        "parameters": [
+          {
+            "name": "variable_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Variable Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Ruta Detalle Variable Api V1 Variables  Variable Id  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/regiones": {
+      "get": {
+        "tags": [
+          "Catálogo y Metadatos"
+        ],
+        "summary": "Regiones predefinidas con coordenadas reales (lat/lon), centros de malla NASA y shortcuts",
+        "operationId": "ruta_listar_regiones_api_v1_regiones_get",
+        "parameters": [
+          {
+            "name": "zona",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filtrar por zona: mexico, centroamerica, mexico_centroamerica, caribe, sudamerica, latinoamerica o referencia_global",
+              "title": "Zona"
+            },
+            "description": "Filtrar por zona: mexico, centroamerica, mexico_centroamerica, caribe, sudamerica, latinoamerica o referencia_global"
+          },
+          {
+            "name": "solo_latinoamerica",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Si es True, devuelve únicamente regiones de México, Centroamérica, Caribe y Sudamérica",
+              "default": false,
+              "title": "Solo Latinoamerica"
+            },
+            "description": "Si es True, devuelve únicamente regiones de México, Centroamérica, Caribe y Sudamérica"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Ruta Listar Regiones Api V1 Regiones Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/regiones/calcular-bbox": {
+      "get": {
+        "tags": [
+          "Catálogo y Metadatos"
+        ],
+        "summary": "Calcula la posición real de latitud/longitud, centro, GeoJSON y celdas NASA para cualquier bbox",
+        "operationId": "ruta_calcular_bbox_personalizado_api_v1_regiones_calcular_bbox_get",
+        "parameters": [
+          {
+            "name": "oeste",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "description": "Longitud oeste (mínima) en grados [-180, 180]",
+              "title": "Oeste"
+            },
+            "description": "Longitud oeste (mínima) en grados [-180, 180]"
+          },
+          {
+            "name": "sur",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "description": "Latitud sur (mínima) en grados [-90, 90]",
+              "title": "Sur"
+            },
+            "description": "Latitud sur (mínima) en grados [-90, 90]"
+          },
+          {
+            "name": "este",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "description": "Longitud este (máxima) en grados [-180, 180]",
+              "title": "Este"
+            },
+            "description": "Longitud este (máxima) en grados [-180, 180]"
+          },
+          {
+            "name": "norte",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "description": "Latitud norte (máxima) en grados [-90, 90]",
+              "title": "Norte"
+            },
+            "description": "Latitud norte (máxima) en grados [-90, 90]"
+          },
+          {
+            "name": "nombre",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Nombre opcional para el shortcut",
+              "title": "Nombre"
+            },
+            "description": "Nombre opcional para el shortcut"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Ruta Calcular Bbox Personalizado Api V1 Regiones Calcular Bbox Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/regiones/{region_id}": {
+      "get": {
+        "tags": [
+          "Catálogo y Metadatos"
+        ],
+        "summary": "Detalle de una región predefinida con coordenadas reales y mallas NASA",
+        "operationId": "ruta_detalle_region_api_v1_regiones__region_id__get",
+        "parameters": [
+          {
+            "name": "region_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Region Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Ruta Detalle Region Api V1 Regiones  Region Id  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/series/{variable_id}": {
+      "get": {
+        "tags": [
+          "Series, Tendencias y Mapas"
+        ],
+        "summary": "Serie temporal regional (valores absolutos, anomalías, climatología y calidad)",
+        "operationId": "ruta_consultar_serie_api_v1_series__variable_id__get",
+        "parameters": [
+          {
+            "name": "variable_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Variable Id"
+            }
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Id de región predefinida o slug personalizado",
+              "default": "sahel",
+              "title": "Region"
+            },
+            "description": "Id de región predefinida o slug personalizado"
+          },
+          {
+            "name": "oeste",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Longitud mínima [-180, 180]",
+              "title": "Oeste"
+            },
+            "description": "Longitud mínima [-180, 180]"
+          },
+          {
+            "name": "sur",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Latitud mínima [-90, 90]",
+              "title": "Sur"
+            },
+            "description": "Latitud mínima [-90, 90]"
+          },
+          {
+            "name": "este",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Longitud máxima [-180, 180]",
+              "title": "Este"
+            },
+            "description": "Longitud máxima [-180, 180]"
+          },
+          {
+            "name": "norte",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Latitud máxima [-90, 90]",
+              "title": "Norte"
+            },
+            "description": "Latitud máxima [-90, 90]"
+          },
+          {
+            "name": "inicio",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Inicio del periodo (AAAA-MM)",
+              "default": "2001-01",
+              "title": "Inicio"
+            },
+            "description": "Inicio del periodo (AAAA-MM)"
+          },
+          {
+            "name": "fin",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Fin del periodo (AAAA-MM)",
+              "default": "2024-12",
+              "title": "Fin"
+            },
+            "description": "Fin del periodo (AAAA-MM)"
+          },
+          {
+            "name": "anual",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "suma",
+                    "media",
+                    "media_ponderada_dias"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Agregación anual opcional (suma, media o media_ponderada_dias)",
+              "title": "Anual"
+            },
+            "description": "Agregación anual opcional (suma, media o media_ponderada_dias)"
+          },
+          {
+            "name": "unidad",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Conversión opcional entre mm/dia y mm/mes",
+              "title": "Unidad"
+            },
+            "description": "Conversión opcional entre mm/dia y mm/mes"
+          },
+          {
+            "name": "mascara",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "const": "tierra",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Aplicar máscara de tierra firme",
+              "title": "Mascara"
+            },
+            "description": "Aplicar máscara de tierra firme"
+          },
+          {
+            "name": "descargar",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Descargar de NASA si no está en caché",
+              "default": false,
+              "title": "Descargar"
+            },
+            "description": "Descargar de NASA si no está en caché"
+          },
+          {
+            "name": "sintetico",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Usar datos sintéticos deterministas (modo demo)",
+              "default": false,
+              "title": "Sintetico"
+            },
+            "description": "Usar datos sintéticos deterministas (modo demo)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SerieRespuestaDTO"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tendencias/{variable_id}": {
+      "get": {
+        "tags": [
+          "Series, Tendencias y Mapas"
+        ],
+        "summary": "Cálculo de tendencia, significancia (OLS + Mann-Kendall) y veredicto del motor",
+        "operationId": "ruta_consultar_tendencia_api_v1_tendencias__variable_id__get",
+        "parameters": [
+          {
+            "name": "variable_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Variable Id"
+            }
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Id de región predefinida o slug personalizado",
+              "default": "sahel",
+              "title": "Region"
+            },
+            "description": "Id de región predefinida o slug personalizado"
+          },
+          {
+            "name": "oeste",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Oeste"
+            }
+          },
+          {
+            "name": "sur",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sur"
+            }
+          },
+          {
+            "name": "este",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Este"
+            }
+          },
+          {
+            "name": "norte",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Norte"
+            }
+          },
+          {
+            "name": "inicio",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Inicio del periodo (AAAA-MM)",
+              "default": "2001-01",
+              "title": "Inicio"
+            },
+            "description": "Inicio del periodo (AAAA-MM)"
+          },
+          {
+            "name": "fin",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Fin del periodo (AAAA-MM)",
+              "default": "2024-12",
+              "title": "Fin"
+            },
+            "description": "Fin del periodo (AAAA-MM)"
+          },
+          {
+            "name": "anual",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "suma",
+                    "media",
+                    "media_ponderada_dias"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Agregación anual opcional (suma, media o media_ponderada_dias)",
+              "title": "Anual"
+            },
+            "description": "Agregación anual opcional (suma, media o media_ponderada_dias)"
+          },
+          {
+            "name": "unidad",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Conversión opcional entre mm/dia y mm/mes",
+              "title": "Unidad"
+            },
+            "description": "Conversión opcional entre mm/dia y mm/mes"
+          },
+          {
+            "name": "mascara",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "const": "tierra",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Mascara"
+            }
+          },
+          {
+            "name": "alfa",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "exclusiveMaximum": 0.5,
+              "exclusiveMinimum": 0.0,
+              "description": "Nivel de significancia bilateral",
+              "default": 0.05,
+              "title": "Alfa"
+            },
+            "description": "Nivel de significancia bilateral"
+          },
+          {
+            "name": "incluir_serie",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Incluir los puntos de la serie para graficar",
+              "default": true,
+              "title": "Incluir Serie"
+            },
+            "description": "Incluir los puntos de la serie para graficar"
+          },
+          {
+            "name": "descargar",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Descargar"
+            }
+          },
+          {
+            "name": "sintetico",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Usar datos sintéticos deterministas (modo demo)",
+              "default": false,
+              "title": "Sintetico"
+            },
+            "description": "Usar datos sintéticos deterministas (modo demo)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TendenciaRespuestaDTO"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/indicadores": {
+      "get": {
+        "tags": [
+          "Series, Tendencias y Mapas"
+        ],
+        "summary": "Indicadores anuales de extremos de lluvia (CDD, R20mm, W, PRCPTOT, SDII) con GPM IMERG diario",
+        "operationId": "ruta_consultar_indicadores_api_v1_indicadores_get",
+        "parameters": [
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "sahel",
+              "title": "Region"
+            }
+          },
+          {
+            "name": "oeste",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Oeste"
+            }
+          },
+          {
+            "name": "sur",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sur"
+            }
+          },
+          {
+            "name": "este",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Este"
+            }
+          },
+          {
+            "name": "norte",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Norte"
+            }
+          },
+          {
+            "name": "inicio",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "2001-01",
+              "title": "Inicio"
+            }
+          },
+          {
+            "name": "fin",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "2024-12",
+              "title": "Fin"
+            }
+          },
+          {
+            "name": "cortar_en_anio",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Cortar rachas secas el 31 de diciembre",
+              "default": true,
+              "title": "Cortar En Anio"
+            },
+            "description": "Cortar rachas secas el 31 de diciembre"
+          },
+          {
+            "name": "mascara",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "const": "tierra",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Mascara"
+            }
+          },
+          {
+            "name": "alfa",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "exclusiveMaximum": 0.5,
+              "exclusiveMinimum": 0.0,
+              "default": 0.05,
+              "title": "Alfa"
+            }
+          },
+          {
+            "name": "descargar",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Descargar"
+            }
+          },
+          {
+            "name": "sintetico",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Sintetico"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Ruta Consultar Indicadores Api V1 Indicadores Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/escaner": {
+      "get": {
+        "tags": [
+          "Series, Tendencias y Mapas"
+        ],
+        "summary": "Escáner de todas las variables de una región ordenadas por veredicto y |SNR|",
+        "operationId": "ruta_escaner_get_api_v1_escaner_get",
+        "parameters": [
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "sahel",
+              "title": "Region"
+            }
+          },
+          {
+            "name": "oeste",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Oeste"
+            }
+          },
+          {
+            "name": "sur",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sur"
+            }
+          },
+          {
+            "name": "este",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Este"
+            }
+          },
+          {
+            "name": "norte",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Norte"
+            }
+          },
+          {
+            "name": "inicio",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "2001-01",
+              "title": "Inicio"
+            }
+          },
+          {
+            "name": "fin",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "2024-12",
+              "title": "Fin"
+            }
+          },
+          {
+            "name": "grupo",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filtrar por grupo: lluvia, causa, calculada",
+              "title": "Grupo"
+            },
+            "description": "Filtrar por grupo: lluvia, causa, calculada"
+          },
+          {
+            "name": "fuente",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filtrar por dataset: gpcp, merra2, imerg",
+              "title": "Fuente"
+            },
+            "description": "Filtrar por dataset: gpcp, merra2, imerg"
+          },
+          {
+            "name": "alfa",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "exclusiveMaximum": 0.5,
+              "exclusiveMinimum": 0.0,
+              "default": 0.05,
+              "title": "Alfa"
+            }
+          },
+          {
+            "name": "descargar",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Descargar"
+            }
+          },
+          {
+            "name": "sintetico",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Sintetico"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Ruta Escaner Get Api V1 Escaner Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Series, Tendencias y Mapas"
+        ],
+        "summary": "Escáner regional con selección personalizada de variables o bounding box",
+        "operationId": "ruta_escaner_post_api_v1_escaner_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PeticionEscanerDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Ruta Escaner Post Api V1 Escaner Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/dos-caras": {
+      "get": {
+        "tags": [
+          "Series, Tendencias y Mapas"
+        ],
+        "summary": "Compara 'las dos caras de la lluvia' entre dos regiones o dos variables/indicadores",
+        "operationId": "ruta_dos_caras_get_api_v1_dos_caras_get",
+        "parameters": [
+          {
+            "name": "variable",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "lluvia_gpcp",
+              "title": "Variable"
+            }
+          },
+          {
+            "name": "region_a",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "sahel",
+              "title": "Region A"
+            }
+          },
+          {
+            "name": "region_b",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "sureste_mexico",
+              "title": "Region B"
+            }
+          },
+          {
+            "name": "variable_b",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Variable B"
+            }
+          },
+          {
+            "name": "inicio",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "2001-01",
+              "title": "Inicio"
+            }
+          },
+          {
+            "name": "fin",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "2024-12",
+              "title": "Fin"
+            }
+          },
+          {
+            "name": "alfa",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "exclusiveMaximum": 0.5,
+              "exclusiveMinimum": 0.0,
+              "default": 0.05,
+              "title": "Alfa"
+            }
+          },
+          {
+            "name": "descargar",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Descargar"
+            }
+          },
+          {
+            "name": "sintetico",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Sintetico"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Ruta Dos Caras Get Api V1 Dos Caras Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Series, Tendencias y Mapas"
+        ],
+        "summary": "Compara 'las dos caras' con regiones o bounding boxes personalizados",
+        "operationId": "ruta_dos_caras_post_api_v1_dos_caras_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PeticionDosCarasDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Ruta Dos Caras Post Api V1 Dos Caras Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/mapas/{variable_id}": {
+      "get": {
+        "tags": [
+          "Series, Tendencias y Mapas"
+        ],
+        "summary": "Mapa de tendencias por píxel (pendiente_decada, p_t, p_mk, veredicto) para una región",
+        "operationId": "ruta_mapa_tendencias_api_v1_mapas__variable_id__get",
+        "parameters": [
+          {
+            "name": "variable_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Variable Id"
+            }
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "noreste_mexico",
+              "title": "Region"
+            }
+          },
+          {
+            "name": "oeste",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Oeste"
+            }
+          },
+          {
+            "name": "sur",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sur"
+            }
+          },
+          {
+            "name": "este",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Este"
+            }
+          },
+          {
+            "name": "norte",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Norte"
+            }
+          },
+          {
+            "name": "inicio",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "2001-01",
+              "title": "Inicio"
+            }
+          },
+          {
+            "name": "fin",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "2024-12",
+              "title": "Fin"
+            }
+          },
+          {
+            "name": "mascara",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "const": "tierra",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Mascara"
+            }
+          },
+          {
+            "name": "alfa",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "exclusiveMaximum": 0.5,
+              "exclusiveMinimum": 0.0,
+              "default": 0.05,
+              "title": "Alfa"
+            }
+          },
+          {
+            "name": "descargar",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Descargar"
+            }
+          },
+          {
+            "name": "sintetico",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Sintetico"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Ruta Mapa Tendencias Api V1 Mapas  Variable Id  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/down-to-earth/analisis": {
+      "get": {
+        "tags": [
+          "Series, Tendencias y Mapas",
+          "Down to Earth (4 Variables)"
+        ],
+        "summary": "Análisis completo Down to Earth: 4 variables (P, T, SM, ET), OLS+HAC+Holm y lectura conjunta",
+        "operationId": "ruta_demo_result_dte_api_v1_down_to_earth_analisis_get",
+        "parameters": [
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Id de región predefinida o slug personalizado",
+              "default": "sahel",
+              "title": "Region"
+            },
+            "description": "Id de región predefinida o slug personalizado"
+          },
+          {
+            "name": "oeste",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Longitud mínima [-180, 180]",
+              "title": "Oeste"
+            },
+            "description": "Longitud mínima [-180, 180]"
+          },
+          {
+            "name": "sur",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Latitud mínima [-90, 90]",
+              "title": "Sur"
+            },
+            "description": "Latitud mínima [-90, 90]"
+          },
+          {
+            "name": "este",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Longitud máxima [-180, 180]",
+              "title": "Este"
+            },
+            "description": "Longitud máxima [-180, 180]"
+          },
+          {
+            "name": "norte",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Latitud máxima [-90, 90]",
+              "title": "Norte"
+            },
+            "description": "Latitud máxima [-90, 90]"
+          },
+          {
+            "name": "inicio",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Inicio del periodo (AAAA-MM), por defecto 2001-01",
+              "default": "2001-01",
+              "title": "Inicio"
+            },
+            "description": "Inicio del periodo (AAAA-MM), por defecto 2001-01"
+          },
+          {
+            "name": "fin",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Fin del periodo (AAAA-MM), por defecto 2024-12",
+              "default": "2024-12",
+              "title": "Fin"
+            },
+            "description": "Fin del periodo (AAAA-MM), por defecto 2024-12"
+          },
+          {
+            "name": "alfa",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "exclusiveMaximum": 0.5,
+              "exclusiveMinimum": 0.0,
+              "description": "Umbral de significancia familiar Holm",
+              "default": 0.05,
+              "title": "Alfa"
+            },
+            "description": "Umbral de significancia familiar Holm"
+          },
+          {
+            "name": "mascara",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "const": "tierra",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Aplicar máscara terrestre",
+              "title": "Mascara"
+            },
+            "description": "Aplicar máscara terrestre"
+          },
+          {
+            "name": "descargar",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Descargar en vivo de OPeNDAP NASA si no está en RAM",
+              "default": false,
+              "title": "Descargar"
+            },
+            "description": "Descargar en vivo de OPeNDAP NASA si no está en RAM"
+          },
+          {
+            "name": "sintetico",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Forzar modo sintético determinista",
+              "default": false,
+              "title": "Sintetico"
+            },
+            "description": "Forzar modo sintético determinista"
+          },
+          {
+            "name": "estricto_memoria",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Si es True y no está en RAM ni se pide descargar, devuelve 404 en vez de precalculado demo",
+              "default": false,
+              "title": "Estricto Memoria"
+            },
+            "description": "Si es True y no está en RAM ni se pide descargar, devuelve 404 en vez de precalculado demo"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Ruta Demo Result Dte Api V1 Down To Earth Analisis Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/demo/result": {
+      "get": {
+        "tags": [
+          "Series, Tendencias y Mapas",
+          "Down to Earth (4 Variables)"
+        ],
+        "summary": "Análisis completo Down to Earth: 4 variables (P, T, SM, ET), OLS+HAC+Holm y lectura conjunta",
+        "operationId": "ruta_demo_result_dte_api_v1_demo_result_get",
+        "parameters": [
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Id de región predefinida o slug personalizado",
+              "default": "sahel",
+              "title": "Region"
+            },
+            "description": "Id de región predefinida o slug personalizado"
+          },
+          {
+            "name": "oeste",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Longitud mínima [-180, 180]",
+              "title": "Oeste"
+            },
+            "description": "Longitud mínima [-180, 180]"
+          },
+          {
+            "name": "sur",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Latitud mínima [-90, 90]",
+              "title": "Sur"
+            },
+            "description": "Latitud mínima [-90, 90]"
+          },
+          {
+            "name": "este",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Longitud máxima [-180, 180]",
+              "title": "Este"
+            },
+            "description": "Longitud máxima [-180, 180]"
+          },
+          {
+            "name": "norte",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Latitud máxima [-90, 90]",
+              "title": "Norte"
+            },
+            "description": "Latitud máxima [-90, 90]"
+          },
+          {
+            "name": "inicio",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Inicio del periodo (AAAA-MM), por defecto 2001-01",
+              "default": "2001-01",
+              "title": "Inicio"
+            },
+            "description": "Inicio del periodo (AAAA-MM), por defecto 2001-01"
+          },
+          {
+            "name": "fin",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Fin del periodo (AAAA-MM), por defecto 2024-12",
+              "default": "2024-12",
+              "title": "Fin"
+            },
+            "description": "Fin del periodo (AAAA-MM), por defecto 2024-12"
+          },
+          {
+            "name": "alfa",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "exclusiveMaximum": 0.5,
+              "exclusiveMinimum": 0.0,
+              "description": "Umbral de significancia familiar Holm",
+              "default": 0.05,
+              "title": "Alfa"
+            },
+            "description": "Umbral de significancia familiar Holm"
+          },
+          {
+            "name": "mascara",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "const": "tierra",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Aplicar máscara terrestre",
+              "title": "Mascara"
+            },
+            "description": "Aplicar máscara terrestre"
+          },
+          {
+            "name": "descargar",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Descargar en vivo de OPeNDAP NASA si no está en RAM",
+              "default": false,
+              "title": "Descargar"
+            },
+            "description": "Descargar en vivo de OPeNDAP NASA si no está en RAM"
+          },
+          {
+            "name": "sintetico",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Forzar modo sintético determinista",
+              "default": false,
+              "title": "Sintetico"
+            },
+            "description": "Forzar modo sintético determinista"
+          },
+          {
+            "name": "estricto_memoria",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Si es True y no está en RAM ni se pide descargar, devuelve 404 en vez de precalculado demo",
+              "default": false,
+              "title": "Estricto Memoria"
+            },
+            "description": "Si es True y no está en RAM ni se pide descargar, devuelve 404 en vez de precalculado demo"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Ruta Demo Result Dte Api V1 Demo Result Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/down-to-earth/csv/{frecuencia}": {
+      "get": {
+        "tags": [
+          "Series, Tendencias y Mapas",
+          "Down to Earth (4 Variables)"
+        ],
+        "summary": "Exporta en memoria el CSV mensual (288 meses) o anual (24 años) de P, T, SM y ET",
+        "operationId": "ruta_demo_csv_dte_api_v1_down_to_earth_csv__frecuencia__get",
+        "parameters": [
+          {
+            "name": "frecuencia",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "mensual",
+                "anual"
+              ],
+              "type": "string",
+              "title": "Frecuencia"
+            }
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "sahel",
+              "title": "Region"
+            }
+          },
+          {
+            "name": "oeste",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Oeste"
+            }
+          },
+          {
+            "name": "sur",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sur"
+            }
+          },
+          {
+            "name": "este",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Este"
+            }
+          },
+          {
+            "name": "norte",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Norte"
+            }
+          },
+          {
+            "name": "inicio",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "2001-01",
+              "title": "Inicio"
+            }
+          },
+          {
+            "name": "fin",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "2024-12",
+              "title": "Fin"
+            }
+          },
+          {
+            "name": "mascara",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "const": "tierra",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Mascara"
+            }
+          },
+          {
+            "name": "descargar",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Descargar"
+            }
+          },
+          {
+            "name": "sintetico",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Sintetico"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/demo/csv/{frecuencia}": {
+      "get": {
+        "tags": [
+          "Series, Tendencias y Mapas",
+          "Down to Earth (4 Variables)"
+        ],
+        "summary": "Exporta en memoria el CSV mensual (288 meses) o anual (24 años) de P, T, SM y ET",
+        "operationId": "ruta_demo_csv_dte_api_v1_demo_csv__frecuencia__get",
+        "parameters": [
+          {
+            "name": "frecuencia",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "mensual",
+                "anual"
+              ],
+              "type": "string",
+              "title": "Frecuencia"
+            }
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "sahel",
+              "title": "Region"
+            }
+          },
+          {
+            "name": "oeste",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Oeste"
+            }
+          },
+          {
+            "name": "sur",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sur"
+            }
+          },
+          {
+            "name": "este",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Este"
+            }
+          },
+          {
+            "name": "norte",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Norte"
+            }
+          },
+          {
+            "name": "inicio",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "2001-01",
+              "title": "Inicio"
+            }
+          },
+          {
+            "name": "fin",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "2024-12",
+              "title": "Fin"
+            }
+          },
+          {
+            "name": "mascara",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "const": "tierra",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Mascara"
+            }
+          },
+          {
+            "name": "descargar",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Descargar"
+            }
+          },
+          {
+            "name": "sintetico",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Sintetico"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/opendap/consulta": {
+      "get": {
+        "tags": [
+          "OPeNDAP y Caché en Memoria RAM"
+        ],
+        "summary": "Inspecciona los índices espaciales y las expresiones OPeNDAP (DAP4/DAP2) sin almacenar en disco",
+        "operationId": "ruta_describir_opendap_api_v1_opendap_consulta_get",
+        "parameters": [
+          {
+            "name": "variable",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Id de la variable del catálogo",
+              "default": "lluvia_gpcp",
+              "title": "Variable"
+            },
+            "description": "Id de la variable del catálogo"
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Id de región predefinida o slug",
+              "default": "sahel",
+              "title": "Region"
+            },
+            "description": "Id de región predefinida o slug"
+          },
+          {
+            "name": "oeste",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Oeste"
+            }
+          },
+          {
+            "name": "sur",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sur"
+            }
+          },
+          {
+            "name": "este",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Este"
+            }
+          },
+          {
+            "name": "norte",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Norte"
+            }
+          },
+          {
+            "name": "inicio",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "2001-01",
+              "title": "Inicio"
+            }
+          },
+          {
+            "name": "fin",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "2024-12",
+              "title": "Fin"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Ruta Describir Opendap Api V1 Opendap Consulta Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/cache": {
+      "get": {
+        "tags": [
+          "OPeNDAP y Caché en Memoria RAM"
+        ],
+        "summary": "Inventario de cubos actualmente en la caché LRU de memoria RAM",
+        "operationId": "ruta_inventario_cache_api_v1_cache_get",
+        "parameters": [
+          {
+            "name": "variable",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filtrar por id de variable",
+              "title": "Variable"
+            },
+            "description": "Filtrar por id de variable"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Ruta Inventario Cache Api V1 Cache Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "OPeNDAP y Caché en Memoria RAM"
+        ],
+        "summary": "Vacía la caché LRU en memoria RAM",
+        "operationId": "ruta_limpiar_cache_api_v1_cache_delete",
+        "parameters": [
+          {
+            "name": "variable",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Opcional: limpiar solo una variable",
+              "title": "Variable"
+            },
+            "description": "Opcional: limpiar solo una variable"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Ruta Limpiar Cache Api V1 Cache Delete"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/descargas": {
+      "get": {
+        "tags": [
+          "OPeNDAP y Caché en Memoria RAM"
+        ],
+        "summary": "Lista las tareas OPeNDAP en memoria recientes y en curso",
+        "operationId": "ruta_listar_descargas_api_v1_descargas_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Ruta Listar Descargas Api V1 Descargas Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "OPeNDAP y Caché en Memoria RAM"
+        ],
+        "summary": "Consulta NASA GES DISC vía OPeNDAP y precarga el subconjunto regional en memoria RAM",
+        "operationId": "ruta_lanzar_descarga_api_v1_descargas_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PeticionDescargaDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Ruta Lanzar Descarga Api V1 Descargas Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/opendap/precargar": {
+      "post": {
+        "tags": [
+          "OPeNDAP y Caché en Memoria RAM"
+        ],
+        "summary": "Consulta NASA GES DISC vía OPeNDAP y precarga el subconjunto regional en memoria RAM",
+        "operationId": "ruta_lanzar_descarga_api_v1_opendap_precargar_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PeticionDescargaDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Ruta Lanzar Descarga Api V1 Opendap Precargar Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/descargas/{tarea_id}": {
+      "get": {
+        "tags": [
+          "OPeNDAP y Caché en Memoria RAM"
+        ],
+        "summary": "Estado y progreso de una tarea OPeNDAP en memoria",
+        "operationId": "ruta_estado_descarga_api_v1_descargas__tarea_id__get",
+        "parameters": [
+          {
+            "name": "tarea_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Tarea Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Ruta Estado Descarga Api V1 Descargas  Tarea Id  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/catalog": {
+      "get": {
+        "tags": [
+          "Down to Earth (4 Variables)"
+        ],
+        "summary": "Catálogo Down to Earth (GET /catalog)",
+        "operationId": "ruta_catalogo_down_to_earth_catalog_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Ruta Catalogo Down To Earth Catalog Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/demo/result": {
+      "get": {
+        "tags": [
+          "Down to Earth (4 Variables)"
+        ],
+        "summary": "Resultado completo Down to Earth (GET /demo/result)",
+        "operationId": "ruta_demo_result_dte_demo_result_get",
+        "parameters": [
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Id de región predefinida o slug personalizado",
+              "default": "sahel",
+              "title": "Region"
+            },
+            "description": "Id de región predefinida o slug personalizado"
+          },
+          {
+            "name": "oeste",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Longitud mínima [-180, 180]",
+              "title": "Oeste"
+            },
+            "description": "Longitud mínima [-180, 180]"
+          },
+          {
+            "name": "sur",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Latitud mínima [-90, 90]",
+              "title": "Sur"
+            },
+            "description": "Latitud mínima [-90, 90]"
+          },
+          {
+            "name": "este",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Longitud máxima [-180, 180]",
+              "title": "Este"
+            },
+            "description": "Longitud máxima [-180, 180]"
+          },
+          {
+            "name": "norte",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Latitud máxima [-90, 90]",
+              "title": "Norte"
+            },
+            "description": "Latitud máxima [-90, 90]"
+          },
+          {
+            "name": "inicio",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Inicio del periodo (AAAA-MM), por defecto 2001-01",
+              "default": "2001-01",
+              "title": "Inicio"
+            },
+            "description": "Inicio del periodo (AAAA-MM), por defecto 2001-01"
+          },
+          {
+            "name": "fin",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Fin del periodo (AAAA-MM), por defecto 2024-12",
+              "default": "2024-12",
+              "title": "Fin"
+            },
+            "description": "Fin del periodo (AAAA-MM), por defecto 2024-12"
+          },
+          {
+            "name": "alfa",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "exclusiveMaximum": 0.5,
+              "exclusiveMinimum": 0.0,
+              "description": "Umbral de significancia familiar Holm",
+              "default": 0.05,
+              "title": "Alfa"
+            },
+            "description": "Umbral de significancia familiar Holm"
+          },
+          {
+            "name": "mascara",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "const": "tierra",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Aplicar máscara terrestre",
+              "title": "Mascara"
+            },
+            "description": "Aplicar máscara terrestre"
+          },
+          {
+            "name": "descargar",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Descargar en vivo de OPeNDAP NASA si no está en RAM",
+              "default": false,
+              "title": "Descargar"
+            },
+            "description": "Descargar en vivo de OPeNDAP NASA si no está en RAM"
+          },
+          {
+            "name": "sintetico",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Forzar modo sintético determinista",
+              "default": false,
+              "title": "Sintetico"
+            },
+            "description": "Forzar modo sintético determinista"
+          },
+          {
+            "name": "estricto_memoria",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Si es True y no está en RAM ni se pide descargar, devuelve 404 en vez de precalculado demo",
+              "default": false,
+              "title": "Estricto Memoria"
+            },
+            "description": "Si es True y no está en RAM ni se pide descargar, devuelve 404 en vez de precalculado demo"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Ruta Demo Result Dte Demo Result Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/demo/csv/{frecuencia}": {
+      "get": {
+        "tags": [
+          "Down to Earth (4 Variables)"
+        ],
+        "summary": "Exportación CSV mensual/anual Down to Earth en memoria",
+        "operationId": "ruta_demo_csv_dte_demo_csv__frecuencia__get",
+        "parameters": [
+          {
+            "name": "frecuencia",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "mensual",
+                "anual"
+              ],
+              "type": "string",
+              "title": "Frecuencia"
+            }
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "sahel",
+              "title": "Region"
+            }
+          },
+          {
+            "name": "oeste",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Oeste"
+            }
+          },
+          {
+            "name": "sur",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sur"
+            }
+          },
+          {
+            "name": "este",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Este"
+            }
+          },
+          {
+            "name": "norte",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Norte"
+            }
+          },
+          {
+            "name": "inicio",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "2001-01",
+              "title": "Inicio"
+            }
+          },
+          {
+            "name": "fin",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "2024-12",
+              "title": "Fin"
+            }
+          },
+          {
+            "name": "mascara",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "const": "tierra",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Mascara"
+            }
+          },
+          {
+            "name": "descargar",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Descargar"
+            }
+          },
+          {
+            "name": "sintetico",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Sintetico"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CalidadDTO": {
+        "properties": {
+          "aceptada": {
+            "type": "boolean",
+            "title": "Aceptada"
+          },
+          "n_esperados": {
+            "type": "integer",
+            "title": "N Esperados"
+          },
+          "n_faltantes": {
+            "type": "integer",
+            "title": "N Faltantes"
+          },
+          "fraccion_faltante": {
+            "type": "number",
+            "title": "Fraccion Faltante"
+          },
+          "motivo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motivo"
+          },
+          "meses_poca_cobertura": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Meses Poca Cobertura"
+          }
+        },
+        "type": "object",
+        "required": [
+          "aceptada",
+          "n_esperados",
+          "n_faltantes",
+          "fraccion_faltante"
+        ],
+        "title": "CalidadDTO"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "MesClimatologiaDTO": {
+        "properties": {
+          "mes": {
+            "type": "integer",
+            "maximum": 12.0,
+            "minimum": 1.0,
+            "title": "Mes"
+          },
+          "valor": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Valor"
+          }
+        },
+        "type": "object",
+        "required": [
+          "mes"
+        ],
+        "title": "MesClimatologiaDTO"
+      },
+      "PeticionDescargaDTO": {
+        "properties": {
+          "variable": {
+            "type": "string",
+            "title": "Variable",
+            "description": "Id de la variable del catálogo (ej. 'lluvia_gpcp', 'lluvia_merra2', 'lluvia_imerg_mes')."
+          },
+          "region": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Region",
+            "description": "Id de región predefinida o slug para la caché.",
+            "default": "sahel"
+          },
+          "bbox": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array",
+                "maxItems": 4,
+                "minItems": 4
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bbox"
+          },
+          "inicio": {
+            "type": "string",
+            "title": "Inicio",
+            "description": "Inicio en formato AAAA-MM.",
+            "default": "2001-01"
+          },
+          "fin": {
+            "type": "string",
+            "title": "Fin",
+            "description": "Fin en formato AAAA-MM.",
+            "default": "2024-12"
+          },
+          "forzar": {
+            "type": "boolean",
+            "title": "Forzar",
+            "description": "Si True, vuelve a descargar aunque exista en caché.",
+            "default": false
+          },
+          "sincrono": {
+            "type": "boolean",
+            "title": "Sincrono",
+            "description": "Si True, espera a que termine la descarga antes de responder.",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "variable"
+        ],
+        "title": "PeticionDescargaDTO"
+      },
+      "PeticionDosCarasDTO": {
+        "properties": {
+          "variable": {
+            "type": "string",
+            "title": "Variable",
+            "description": "Variable principal (ej. 'lluvia_gpcp').",
+            "default": "lluvia_gpcp"
+          },
+          "region_a": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Region A",
+            "description": "Primera región a comparar.",
+            "default": "sahel"
+          },
+          "bbox_a": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array",
+                "maxItems": 4,
+                "minItems": 4
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bbox A"
+          },
+          "region_b": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Region B",
+            "description": "Segunda región (o la misma si se compara variable_b).",
+            "default": "sureste_mexico"
+          },
+          "bbox_b": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array",
+                "maxItems": 4,
+                "minItems": 4
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bbox B"
+          },
+          "variable_b": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Variable B",
+            "description": "Segunda variable opcional (ej. 'r20mm_imerg' frente a 'cdd_imerg' en la misma región)."
+          },
+          "inicio": {
+            "type": "string",
+            "title": "Inicio",
+            "default": "2001-01"
+          },
+          "fin": {
+            "type": "string",
+            "title": "Fin",
+            "default": "2024-12"
+          },
+          "alfa": {
+            "type": "number",
+            "exclusiveMaximum": 0.5,
+            "exclusiveMinimum": 0.0,
+            "title": "Alfa",
+            "default": 0.05
+          },
+          "descargar": {
+            "type": "boolean",
+            "title": "Descargar",
+            "default": false
+          },
+          "sintetico": {
+            "type": "boolean",
+            "title": "Sintetico",
+            "default": false
+          }
+        },
+        "type": "object",
+        "title": "PeticionDosCarasDTO"
+      },
+      "PeticionEscanerDTO": {
+        "properties": {
+          "region": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Region",
+            "description": "Id de región predefinida (ej. 'sahel', 'noreste_mexico') o nombre personalizado si se envía bbox.",
+            "default": "sahel"
+          },
+          "bbox": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array",
+                "maxItems": 4,
+                "minItems": 4
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bbox",
+            "description": "Bounding box opcional [oeste, sur, este, norte] en grados."
+          },
+          "inicio": {
+            "type": "string",
+            "title": "Inicio",
+            "description": "Inicio del periodo en formato AAAA-MM.",
+            "default": "2001-01"
+          },
+          "fin": {
+            "type": "string",
+            "title": "Fin",
+            "description": "Fin del periodo en formato AAAA-MM.",
+            "default": "2024-12"
+          },
+          "variables": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Variables",
+            "description": "Lista opcional de ids de variables a escanear; si se omite, escanea todas las analizables."
+          },
+          "grupo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Grupo",
+            "description": "Filtrar por grupo: lluvia, causa o calculada."
+          },
+          "fuente": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fuente",
+            "description": "Filtrar por dataset: gpcp, merra2 o imerg."
+          },
+          "alfa": {
+            "type": "number",
+            "exclusiveMaximum": 0.5,
+            "exclusiveMinimum": 0.0,
+            "title": "Alfa",
+            "default": 0.05
+          },
+          "descargar": {
+            "type": "boolean",
+            "title": "Descargar",
+            "description": "Si True, descarga de NASA lo que no esté en caché.",
+            "default": false
+          },
+          "sintetico": {
+            "type": "boolean",
+            "title": "Sintetico",
+            "description": "Si True, usa datos sintéticos deterministas (modo demo).",
+            "default": false
+          }
+        },
+        "type": "object",
+        "title": "PeticionEscanerDTO"
+      },
+      "PuntoSerieDTO": {
+        "properties": {
+          "fecha": {
+            "type": "string",
+            "title": "Fecha",
+            "description": "'AAAA-MM' para series mensuales o 'AAAA' para series anuales."
+          },
+          "t": {
+            "type": "number",
+            "title": "T",
+            "description": "Eje numérico de tiempo (meses desde el inicio o año)."
+          },
+          "valor": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Valor",
+            "description": "Valor regional en las unidades de la variable."
+          },
+          "anomalia": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Anomalia",
+            "description": "Anomalía respecto a la climatología mensual (si aplica)."
+          }
+        },
+        "type": "object",
+        "required": [
+          "fecha",
+          "t"
+        ],
+        "title": "PuntoSerieDTO"
+      },
+      "RegionDTO": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id",
+            "description": "Identificador slug de la región (ej. 'noreste_mexico', 'corredor_seco_centroamericano')."
+          },
+          "nombre": {
+            "type": "string",
+            "title": "Nombre"
+          },
+          "descripcion": {
+            "type": "string",
+            "title": "Descripcion",
+            "default": ""
+          },
+          "zona": {
+            "type": "string",
+            "title": "Zona",
+            "default": "personalizada"
+          },
+          "pais": {
+            "type": "string",
+            "title": "Pais",
+            "default": ""
+          },
+          "es_latinoamerica": {
+            "type": "boolean",
+            "title": "Es Latinoamerica",
+            "default": false
+          },
+          "bbox": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 4,
+            "minItems": 4,
+            "title": "Bbox",
+            "description": "[oeste, sur, este, norte] en grados."
+          },
+          "predefinida": {
+            "type": "boolean",
+            "title": "Predefinida",
+            "default": true
+          },
+          "coordenadas": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Coordenadas"
+          },
+          "mallas_reales": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mallas Reales"
+          },
+          "shortcut": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shortcut"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "nombre",
+          "bbox"
+        ],
+        "title": "RegionDTO"
+      },
+      "SerieRespuestaDTO": {
+        "properties": {
+          "variable": {
+            "type": "string",
+            "title": "Variable"
+          },
+          "nombre_simple": {
+            "type": "string",
+            "title": "Nombre Simple"
+          },
+          "definicion_simple": {
+            "type": "string",
+            "title": "Definicion Simple"
+          },
+          "grupo": {
+            "type": "string",
+            "title": "Grupo"
+          },
+          "dataset": {
+            "type": "string",
+            "title": "Dataset"
+          },
+          "short_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Short Name"
+          },
+          "unidad": {
+            "type": "string",
+            "title": "Unidad"
+          },
+          "frecuencia_serie": {
+            "type": "string",
+            "enum": [
+              "mensual",
+              "anual"
+            ],
+            "title": "Frecuencia Serie"
+          },
+          "region": {
+            "$ref": "#/components/schemas/RegionDTO"
+          },
+          "periodo": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Periodo"
+          },
+          "media_climatologia": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Media Climatologia"
+          },
+          "climatologia_mensual": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/MesClimatologiaDTO"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Climatologia Mensual"
+          },
+          "calidad": {
+            "$ref": "#/components/schemas/CalidadDTO"
+          },
+          "puntos": {
+            "items": {
+              "$ref": "#/components/schemas/PuntoSerieDTO"
+            },
+            "type": "array",
+            "title": "Puntos"
+          },
+          "fuente_datos": {
+            "type": "string",
+            "enum": [
+              "opendap_memoria",
+              "sintetico"
+            ],
+            "title": "Fuente Datos"
+          }
+        },
+        "type": "object",
+        "required": [
+          "variable",
+          "nombre_simple",
+          "definicion_simple",
+          "grupo",
+          "dataset",
+          "short_name",
+          "unidad",
+          "frecuencia_serie",
+          "region",
+          "periodo",
+          "media_climatologia",
+          "calidad",
+          "puntos",
+          "fuente_datos"
+        ],
+        "title": "SerieRespuestaDTO"
+      },
+      "TendenciaMotorDTO": {
+        "properties": {
+          "variable": {
+            "type": "string",
+            "title": "Variable"
+          },
+          "region": {
+            "type": "string",
+            "title": "Region"
+          },
+          "periodo": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Periodo"
+          },
+          "n": {
+            "type": "integer",
+            "title": "N"
+          },
+          "r1": {
+            "type": "number",
+            "title": "R1"
+          },
+          "n_ef": {
+            "type": "number",
+            "title": "N Ef"
+          },
+          "pendiente_ols_decada": {
+            "type": "number",
+            "title": "Pendiente Ols Decada"
+          },
+          "ic95_decada": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Ic95 Decada"
+          },
+          "p_t": {
+            "type": "number",
+            "title": "P T"
+          },
+          "sen_decada": {
+            "type": "number",
+            "title": "Sen Decada"
+          },
+          "mk_z": {
+            "type": "number",
+            "title": "Mk Z"
+          },
+          "mk_tau": {
+            "type": "number",
+            "title": "Mk Tau"
+          },
+          "p_mk": {
+            "type": "number",
+            "title": "P Mk"
+          },
+          "cambio_pct_decada": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cambio Pct Decada"
+          },
+          "snr": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Snr"
+          },
+          "n_star_anios": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "N Star Anios"
+          },
+          "anios_faltantes": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Anios Faltantes"
+          },
+          "veredicto": {
+            "type": "string",
+            "enum": [
+              "significativo",
+              "indicio",
+              "sin tendencia clara"
+            ],
+            "title": "Veredicto"
+          },
+          "direccion": {
+            "type": "string",
+            "enum": [
+              "sube",
+              "baja",
+              "estable"
+            ],
+            "title": "Direccion"
+          },
+          "metodos": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Metodos"
+          }
+        },
+        "type": "object",
+        "required": [
+          "variable",
+          "region",
+          "periodo",
+          "n",
+          "r1",
+          "n_ef",
+          "pendiente_ols_decada",
+          "ic95_decada",
+          "p_t",
+          "sen_decada",
+          "mk_z",
+          "mk_tau",
+          "p_mk",
+          "cambio_pct_decada",
+          "snr",
+          "n_star_anios",
+          "anios_faltantes",
+          "veredicto",
+          "direccion",
+          "metodos"
+        ],
+        "title": "TendenciaMotorDTO",
+        "description": "Esquema exacto devuelto por motor.tendencias.calcular_tendencia (20 claves)."
+      },
+      "TendenciaRespuestaDTO": {
+        "properties": {
+          "tendencia": {
+            "$ref": "#/components/schemas/TendenciaMotorDTO"
+          },
+          "metadatos": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Metadatos"
+          },
+          "puntos": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/PuntoSerieDTO"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Puntos"
+          },
+          "climatologia_mensual": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/MesClimatologiaDTO"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Climatologia Mensual"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tendencia",
+          "metadatos"
+        ],
+        "title": "TendenciaRespuestaDTO"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}

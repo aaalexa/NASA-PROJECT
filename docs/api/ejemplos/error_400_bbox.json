@@ -1,0 +1,8 @@
+{
+  "request": "GET /api/v1/series/lluvia_gpcp?oeste=-100",
+  "status": 400,
+  "response": {
+    "error": "parametro_invalido",
+    "mensaje": "Si especificas coordenadas de caja, debes enviar las cuatro: oeste, sur, este y norte."
+  }
+}

@@ -1,0 +1,582 @@
+{
+  "request": "GET /api/v1/escaner?region=noreste_mexico&sintetico=true",
+  "status": 200,
+  "response": {
+    "region": {
+      "id": "noreste_mexico",
+      "nombre": "Noreste de México",
+      "descripcion": "Coahuila, Nuevo León y Tamaulipas (cuenca del Río Bravo y Sierra Madre Oriental).",
+      "zona": "mexico",
+      "pais": "México",
+      "es_latinoamerica": true,
+      "bbox": [
+        -106.0,
+        22.0,
+        -97.0,
+        30.0
+      ],
+      "predefinida": true,
+      "coordenadas": {
+        "oeste": -106.0,
+        "sur": 22.0,
+        "este": -97.0,
+        "norte": 30.0,
+        "lon_min": -106.0,
+        "lat_min": 22.0,
+        "lon_max": -97.0,
+        "lat_max": 30.0,
+        "centro": {
+          "lat": 26.0,
+          "lon": -101.5
+        },
+        "extension_grados": {
+          "ancho_lon": 9.0,
+          "alto_lat": 8.0
+        },
+        "esquinas": {
+          "suroeste": {
+            "lat": 22.0,
+            "lon": -106.0
+          },
+          "sureste": {
+            "lat": 22.0,
+            "lon": -97.0
+          },
+          "noreste": {
+            "lat": 30.0,
+            "lon": -97.0
+          },
+          "noroeste": {
+            "lat": 30.0,
+            "lon": -106.0
+          }
+        },
+        "poligono_geojson": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -106.0,
+                22.0
+              ],
+              [
+                -97.0,
+                22.0
+              ],
+              [
+                -97.0,
+                30.0
+              ],
+              [
+                -106.0,
+                30.0
+              ],
+              [
+                -106.0,
+                22.0
+              ]
+            ]
+          ]
+        }
+      },
+      "mallas_reales": {
+        "gpcp": {
+          "resolucion": "0.5° × 0.5°",
+          "lat_min_real": 22.25,
+          "lat_max_real": 29.75,
+          "lon_min_real": -105.75,
+          "lon_max_real": -97.25,
+          "n_lat": 16,
+          "n_lon": 18,
+          "n_celdas": 288
+        },
+        "merra2": {
+          "resolucion": "0.5° × 0.625°",
+          "lat_min_real": 22.0,
+          "lat_max_real": 30.0,
+          "lon_min_real": -105.625,
+          "lon_max_real": -97.5,
+          "n_lat": 17,
+          "n_lon": 14,
+          "n_celdas": 238
+        },
+        "gldas": {
+          "resolucion": "0.25° × 0.25°",
+          "lat_min_real": 22.125,
+          "lat_max_real": 29.875,
+          "lon_min_real": -105.875,
+          "lon_max_real": -97.125,
+          "n_lat": 32,
+          "n_lon": 36,
+          "n_celdas": 1152
+        },
+        "imerg": {
+          "resolucion": "0.1° × 0.1°",
+          "lat_min_real": 22.05,
+          "lat_max_real": 29.95,
+          "lon_min_real": -105.95,
+          "lon_max_real": -97.05,
+          "n_lat": 80,
+          "n_lon": 90,
+          "n_celdas": 7200
+        }
+      },
+      "shortcut": {
+        "region": "noreste_mexico",
+        "oeste": -106.0,
+        "sur": 22.0,
+        "este": -97.0,
+        "norte": 30.0,
+        "centro_lat": 26.0,
+        "centro_lon": -101.5,
+        "query_region": "?region=noreste_mexico",
+        "query_bbox": "?oeste=-106&sur=22&este=-97&norte=30"
+      }
+    },
+    "periodo": [
+      "2001-01",
+      "2024-12"
+    ],
+    "fuente_datos": "sintetico",
+    "resultados": [
+      {
+        "variable": "sdii_imerg",
+        "region": "noreste_mexico",
+        "periodo": [
+          "2001",
+          "2024"
+        ],
+        "n": 24,
+        "r1": 0.17921120344367686,
+        "n_ef": 16.70517635842038,
+        "pendiente_ols_decada": -2.0976929834209876,
+        "ic95_decada": [
+          -2.2910632157402864,
+          -1.9043227511016891
+        ],
+        "p_t": 5.548155074722e-13,
+        "sen_decada": -2.073226922371679,
+        "mk_z": -6.374731572788186,
+        "mk_tau": -0.9347826086956522,
+        "p_mk": 1.8328361051089814e-10,
+        "cambio_pct_decada": -22.432717466145803,
+        "snr": -1.3952218070740403,
+        "n_star_anios": null,
+        "anios_faltantes": null,
+        "veredicto": "significativo",
+        "direccion": "baja",
+        "metodos": [
+          "ols_neff",
+          "mk_hamed_rao",
+          "n_star_no_aplica_anual"
+        ],
+        "nombre_simple": "Fuerza de la lluvia",
+        "definicion_simple": "Cuánto llueve, en promedio, en un día con lluvia.",
+        "grupo": "calculada",
+        "dataset": "calculada a partir de GPM IMERG diario",
+        "unidad": "mm/dia"
+      },
+      {
+        "variable": "prcptot_imerg",
+        "region": "noreste_mexico",
+        "periodo": [
+          "2001",
+          "2024"
+        ],
+        "n": 24,
+        "r1": 0.4241778353804296,
+        "n_ef": 9.703656107790874,
+        "pendiente_ols_decada": -159.9497147702571,
+        "ic95_decada": [
+          -184.82351993476942,
+          -135.07590960574478
+        ],
+        "p_t": 5.817206526710352e-07,
+        "sen_decada": -162.32469989121233,
+        "mk_z": -6.275513960760355,
+        "mk_tau": -0.9202898550724637,
+        "p_mk": 3.4848124386144264e-10,
+        "cambio_pct_decada": -41.61034862373321,
+        "snr": -1.390386872848842,
+        "n_star_anios": null,
+        "anios_faltantes": null,
+        "veredicto": "significativo",
+        "direccion": "baja",
+        "metodos": [
+          "ols_neff",
+          "mk_hamed_rao",
+          "n_star_no_aplica_anual"
+        ],
+        "nombre_simple": "Lluvia total del año",
+        "definicion_simple": "Toda la lluvia que cayó en los días con lluvia del año.",
+        "grupo": "calculada",
+        "dataset": "calculada a partir de GPM IMERG diario",
+        "unidad": "mm/anio"
+      },
+      {
+        "variable": "dias_humedos_imerg",
+        "region": "noreste_mexico",
+        "periodo": [
+          "2001",
+          "2024"
+        ],
+        "n": 24,
+        "r1": 0.14216883855320409,
+        "n_ef": 18.025310426785982,
+        "pendiente_ols_decada": -7.970357948341152,
+        "ic95_decada": [
+          -8.829526369942295,
+          -7.111189526740009
+        ],
+        "p_t": 1.2068809782043672e-12,
+        "sen_decada": -7.8605809889463725,
+        "mk_z": -6.225905154746439,
+        "mk_tau": -0.9130434782608695,
+        "p_mk": 4.787836793695988e-10,
+        "cambio_pct_decada": -19.840418042551565,
+        "snr": -1.3857872233490507,
+        "n_star_anios": null,
+        "anios_faltantes": null,
+        "veredicto": "significativo",
+        "direccion": "baja",
+        "metodos": [
+          "ols_neff",
+          "mk_hamed_rao",
+          "n_star_no_aplica_anual"
+        ],
+        "nombre_simple": "Días con lluvia",
+        "definicion_simple": "Cuántos días del año llovió al menos 1 mm.",
+        "grupo": "calculada",
+        "dataset": "calculada a partir de GPM IMERG diario",
+        "unidad": "dias"
+      },
+      {
+        "variable": "r20mm_imerg",
+        "region": "noreste_mexico",
+        "periodo": [
+          "2001",
+          "2024"
+        ],
+        "n": 24,
+        "r1": 0.2338424023929615,
+        "n_ef": 14.902861424527924,
+        "pendiente_ols_decada": -3.134130340636294,
+        "ic95_decada": [
+          -3.673082370055955,
+          -2.595178311216633
+        ],
+        "p_t": 1.2965420193926027e-08,
+        "sen_decada": -3.1168643538853953,
+        "mk_z": -5.72981709460728,
+        "mk_tau": -0.8405797101449275,
+        "p_mk": 1.0053898158446373e-08,
+        "cambio_pct_decada": -81.98330828648722,
+        "snr": -1.359804039387391,
+        "n_star_anios": null,
+        "anios_faltantes": null,
+        "veredicto": "significativo",
+        "direccion": "baja",
+        "metodos": [
+          "ols_neff",
+          "mk_hamed_rao",
+          "n_star_no_aplica_anual"
+        ],
+        "nombre_simple": "Días de lluvia intensa",
+        "definicion_simple": "Cuántos días del año llovió 20 mm o más.",
+        "grupo": "calculada",
+        "dataset": "calculada a partir de GPM IMERG diario",
+        "unidad": "dias"
+      },
+      {
+        "variable": "vapor_agua",
+        "region": "noreste_mexico",
+        "periodo": [
+          "2001-01",
+          "2024-12"
+        ],
+        "n": 288,
+        "r1": 0.3480701769847145,
+        "n_ef": 139.27745916637923,
+        "pendiente_ols_decada": -0.9639590786869892,
+        "ic95_decada": [
+          -1.0346659386440422,
+          -0.8932522187299361
+        ],
+        "p_t": 1.0767878423884903e-56,
+        "sen_decada": -0.9672507091028403,
+        "mk_z": -15.874963335324455,
+        "mk_tau": -0.7461285327138986,
+        "p_mk": 0.0,
+        "cambio_pct_decada": -3.59753296948196,
+        "snr": -1.3214634276495971,
+        "n_star_anios": 5.895238483156959,
+        "anios_faltantes": 0.0,
+        "veredicto": "significativo",
+        "direccion": "baja",
+        "metodos": [
+          "ols_neff",
+          "mk_hamed_rao"
+        ],
+        "nombre_simple": "Vapor de agua en el aire",
+        "definicion_simple": "Cuánta agua invisible lleva el aire; si toda cayera, formaría una capa de este grosor.",
+        "grupo": "causa",
+        "dataset": "MERRA-2 tavgM_2d_slv_Nx",
+        "unidad": "mm"
+      },
+      {
+        "variable": "temp_aire",
+        "region": "noreste_mexico",
+        "periodo": [
+          "2001-01",
+          "2024-12"
+        ],
+        "n": 288,
+        "r1": 0.14564494964786157,
+        "n_ef": 214.77356887668026,
+        "pendiente_ols_decada": 0.7295619392561626,
+        "ic95_decada": [
+          0.6845712425789939,
+          0.7745526359333312
+        ],
+        "p_t": 3.503058463218092e-83,
+        "sen_decada": 0.7290413382836864,
+        "mk_z": 14.513212458855941,
+        "mk_tau": 0.7376113046844754,
+        "p_mk": 0.0,
+        "cambio_pct_decada": 2.9375425264521757,
+        "snr": 1.310835039519587,
+        "n_star_anios": 5.271384775201798,
+        "anios_faltantes": 0.0,
+        "veredicto": "significativo",
+        "direccion": "sube",
+        "metodos": [
+          "ols_neff",
+          "mk_hamed_rao"
+        ],
+        "nombre_simple": "Temperatura del aire (T)",
+        "definicion_simple": "Qué tan caliente está el aire a 2 metros del suelo (no de la superficie).",
+        "grupo": "causa",
+        "dataset": "MERRA-2 tavgM_2d_slv_Nx",
+        "unidad": "degC"
+      },
+      {
+        "variable": "lluvia_merra2",
+        "region": "noreste_mexico",
+        "periodo": [
+          "2001-01",
+          "2024-12"
+        ],
+        "n": 288,
+        "r1": 0.3397160213436277,
+        "n_ef": 141.9418614269599,
+        "pendiente_ols_decada": -0.2296743741268375,
+        "ic95_decada": [
+          -0.2476503448384544,
+          -0.2116984034152206
+        ],
+        "p_t": 5.480760754398362e-54,
+        "sen_decada": -0.22951971650182196,
+        "mk_z": -14.19563360373605,
+        "mk_tau": -0.7269163763066202,
+        "p_mk": 0.0,
+        "cambio_pct_decada": -9.129346238581558,
+        "snr": -1.3048748162414483,
+        "n_star_anios": 6.157076480397036,
+        "anios_faltantes": 0.0,
+        "veredicto": "significativo",
+        "direccion": "baja",
+        "metodos": [
+          "ols_neff",
+          "mk_hamed_rao"
+        ],
+        "nombre_simple": "Lluvia (MERRA-2)",
+        "definicion_simple": "Cuánta agua cae del cielo cada día, según un modelo que combina muchas observaciones.",
+        "grupo": "lluvia",
+        "dataset": "MERRA-2 tavgM_2d_flx_Nx",
+        "unidad": "mm/dia"
+      },
+      {
+        "variable": "humedad_suelo",
+        "region": "noreste_mexico",
+        "periodo": [
+          "2001-01",
+          "2024-12"
+        ],
+        "n": 288,
+        "r1": 0.03951881469267011,
+        "n_ef": 266.10252499402065,
+        "pendiente_ols_decada": -0.02193324264746936,
+        "ic95_decada": [
+          -0.023479989974995473,
+          -0.02038649531994325
+        ],
+        "p_t": 8.84290934261575e-81,
+        "sen_decada": -0.022160814091504576,
+        "mk_z": -18.11556558983715,
+        "mk_tau": -0.6718447541618273,
+        "p_mk": 0.0,
+        "cambio_pct_decada": -11.327681071592883,
+        "snr": -1.245293789063062,
+        "n_star_anios": 5.7722610548873,
+        "anios_faltantes": 0.0,
+        "veredicto": "significativo",
+        "direccion": "baja",
+        "metodos": [
+          "ols_neff",
+          "mk_hamed_rao"
+        ],
+        "nombre_simple": "Humedad superficial del suelo (SM)",
+        "definicion_simple": "Agua almacenada en la capa superficial de 0 a 10 cm del suelo en proporción de volumen.",
+        "grupo": "agua",
+        "dataset": "GLDAS Noah Land Surface Model L4 monthly 0.25 x 0.25 degree V2.1",
+        "unidad": "m3/m3"
+      },
+      {
+        "variable": "evapotranspiracion",
+        "region": "noreste_mexico",
+        "periodo": [
+          "2001-01",
+          "2024-12"
+        ],
+        "n": 288,
+        "r1": 0.11491885971516953,
+        "n_ef": 228.62952418542082,
+        "pendiente_ols_decada": -4.068778307197912,
+        "ic95_decada": [
+          -4.513004205158032,
+          -3.62455240923779
+        ],
+        "p_t": 9.872812734613992e-46,
+        "sen_decada": -4.0758477497696335,
+        "mk_z": -13.699181967055393,
+        "mk_tau": -0.5759775454897406,
+        "p_mk": 0.0,
+        "cambio_pct_decada": -10.190102157531223,
+        "snr": -1.106487797597615,
+        "n_star_anios": 7.717819060892997,
+        "anios_faltantes": 0.0,
+        "veredicto": "significativo",
+        "direccion": "baja",
+        "metodos": [
+          "ols_neff",
+          "mk_hamed_rao"
+        ],
+        "nombre_simple": "Evapotranspiración real (ET)",
+        "definicion_simple": "Agua que pasa del suelo y las plantas al aire acumulada en el mes (real, no potencial).",
+        "grupo": "agua",
+        "dataset": "GLDAS Noah Land Surface Model L4 monthly 0.25 x 0.25 degree V2.1",
+        "unidad": "mm/mes"
+      },
+      {
+        "variable": "lluvia_gpcp",
+        "region": "noreste_mexico",
+        "periodo": [
+          "2001-01",
+          "2024-12"
+        ],
+        "n": 288,
+        "r1": 0.07950082446400268,
+        "n_ef": 245.57995375871752,
+        "pendiente_ols_decada": -6.920378244476355,
+        "ic95_decada": [
+          -7.810261173994715,
+          -6.030495314957993
+        ],
+        "p_t": 1.5042624902701452e-37,
+        "sen_decada": -7.042411592871291,
+        "mk_z": -11.094699037519721,
+        "mk_tau": -0.5072590011614402,
+        "p_mk": 0.0,
+        "cambio_pct_decada": -9.079366989906777,
+        "snr": -1.0092937220766696,
+        "n_star_anios": 8.611253034649417,
+        "anios_faltantes": 0.0,
+        "veredicto": "significativo",
+        "direccion": "baja",
+        "metodos": [
+          "ols_neff",
+          "mk_hamed_rao"
+        ],
+        "nombre_simple": "Precipitación (P)",
+        "definicion_simple": "Cuánta lluvia cayó en el mes, combinando satélites y pluviómetros.",
+        "grupo": "lluvia",
+        "dataset": "GPCP Precipitation Level 3 Monthly 0.5-Degree V3.3",
+        "unidad": "mm/mes"
+      },
+      {
+        "variable": "lluvia_imerg_mes",
+        "region": "noreste_mexico",
+        "periodo": [
+          "2001-01",
+          "2024-12"
+        ],
+        "n": 288,
+        "r1": 0.05467446368219031,
+        "n_ef": 258.140083821702,
+        "pendiente_ols_decada": -0.23105201693055805,
+        "ic95_decada": [
+          -0.26159306843006264,
+          -0.20051096543105346
+        ],
+        "p_t": 1.414159486851974e-36,
+        "sen_decada": -0.23273232173552752,
+        "mk_z": -21.0181372577575,
+        "mk_tau": -0.492595818815331,
+        "p_mk": 0.0,
+        "cambio_pct_decada": -9.234128376688615,
+        "snr": -0.9817504841996848,
+        "n_star_anios": 8.773559748537712,
+        "anios_faltantes": 0.0,
+        "veredicto": "significativo",
+        "direccion": "baja",
+        "metodos": [
+          "ols_neff",
+          "mk_hamed_rao"
+        ],
+        "nombre_simple": "Lluvia (IMERG mensual)",
+        "definicion_simple": "Lluvia medida por la constelación de satélites GPM, promediada en el mes.",
+        "grupo": "lluvia",
+        "dataset": "GPM IMERG Final Precipitation L3 1 month 0.1 degree V07",
+        "unidad": "mm/dia"
+      },
+      {
+        "variable": "cdd_imerg",
+        "region": "noreste_mexico",
+        "periodo": [
+          "2001",
+          "2024"
+        ],
+        "n": 24,
+        "r1": -0.17844459704507623,
+        "n_ef": 24.0,
+        "pendiente_ols_decada": 6.362331325299388,
+        "ic95_decada": [
+          2.6108075523351406,
+          10.113855098263635
+        ],
+        "p_t": 0.0019424824487075632,
+        "sen_decada": 6.321850179116906,
+        "mk_z": 2.951723957827993,
+        "mk_tau": 0.43478260869565216,
+        "p_mk": 0.003160052923044443,
+        "cambio_pct_decada": 6.164239126846807,
+        "snr": 0.8484257843265157,
+        "n_star_anios": null,
+        "anios_faltantes": null,
+        "veredicto": "significativo",
+        "direccion": "sube",
+        "metodos": [
+          "ols_neff",
+          "mk_hamed_rao",
+          "n_star_no_aplica_anual"
+        ],
+        "nombre_simple": "Racha seca más larga",
+        "definicion_simple": "El mayor número de días seguidos sin lluvia útil (menos de 1 mm) en un año.",
+        "grupo": "calculada",
+        "dataset": "calculada a partir de GPM IMERG diario",
+        "unidad": "dias"
+      }
+    ],
+    "rechazadas": []
+  }
+}

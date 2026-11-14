@@ -1,0 +1,15 @@
+{
+  "request": "GET /api/v1/series/lluvia_gpcp?region=noreste_mexico",
+  "status": 404,
+  "response": {
+    "error": "datos_no_disponibles_en_memoria",
+    "mensaje": "lluvia_gpcp en 'noreste_mexico' (2001-01 → 2024-12) no está en la caché en memoria RAM. Pasa descargar=true para consultarla en vivo por OPeNDAP, envía POST /api/v1/descargas para precargarla en RAM, o usa ?sintetico=true en modo demo.",
+    "variable": "lluvia_gpcp",
+    "region": "noreste_mexico",
+    "periodo": [
+      "2001-01",
+      "2024-12"
+    ],
+    "sugerencia": "Pasa ?descargar=true para consultar en vivo por OPeNDAP en memoria RAM, envía POST /api/v1/opendap/precargar, o añade ?sintetico=true durante el desarrollo del frontend."
+  }
+}

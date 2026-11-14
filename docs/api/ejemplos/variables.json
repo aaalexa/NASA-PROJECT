@@ -1,0 +1,422 @@
+{
+  "request": "GET /api/v1/variables?solo_analizables=true",
+  "status": 200,
+  "response": {
+    "total": 12,
+    "variables": [
+      {
+        "id": "lluvia_gpcp",
+        "codigo_dte": "P",
+        "grupo": "lluvia",
+        "fuente": "gpcp",
+        "nombre_simple": "Precipitación (P)",
+        "definicion_simple": "Cuánta lluvia cayó en el mes, combinando satélites y pluviómetros.",
+        "pregunta": "¿Está llegando más o menos agua?",
+        "por_que_elegirla": "Es el fenómeno principal del proyecto.",
+        "dataset": "GPCP Precipitation Level 3 Monthly 0.5-Degree V3.3",
+        "short_name": "GPCPMON",
+        "version": "3.3",
+        "variable": "sat_gauge_precip",
+        "unidad_original": "mm/dia",
+        "conversion": {
+          "op": "dias_del_mes"
+        },
+        "unidad_final": "mm/mes",
+        "rango_valido": [
+          0,
+          500
+        ],
+        "agregacion_anual": "suma",
+        "metodo_descarga": "opendap",
+        "grilla": {
+          "lat_min": -89.75,
+          "lat_max": 89.75,
+          "dlat": 0.5,
+          "lon_min": -179.75,
+          "lon_max": 179.75,
+          "dlon": 0.5,
+          "orden_dims": [
+            "time",
+            "lat",
+            "lon"
+          ]
+        },
+        "desde": "1983-01",
+        "resolucion": "0.5°",
+        "frecuencia": "mensual",
+        "analizable": true,
+        "archivos_en_cache": 0
+      },
+      {
+        "id": "lluvia_merra2",
+        "grupo": "lluvia",
+        "fuente": "merra2",
+        "nombre_simple": "Lluvia (MERRA-2)",
+        "definicion_simple": "Cuánta agua cae del cielo cada día, según un modelo que combina muchas observaciones.",
+        "dataset": "MERRA-2 tavgM_2d_flx_Nx",
+        "short_name": "M2TMNXFLX",
+        "version": "5.12.4",
+        "variable": "PRECTOTCORR",
+        "unidad_original": "kg m-2 s-1",
+        "conversion": {
+          "op": "factor",
+          "valor": 86400
+        },
+        "unidad_final": "mm/dia",
+        "rango_valido": [
+          0,
+          0.01
+        ],
+        "agregacion_anual": "suma",
+        "metodo_descarga": "opendap",
+        "grilla": {
+          "lat_min": -90.0,
+          "lat_max": 90.0,
+          "dlat": 0.5,
+          "lon_min": -180.0,
+          "lon_max": 179.375,
+          "dlon": 0.625,
+          "orden_dims": [
+            "time",
+            "lat",
+            "lon"
+          ]
+        },
+        "desde": "1980-01",
+        "resolucion": "0.5° x 0.625°",
+        "frecuencia": "mensual",
+        "analizable": true,
+        "archivos_en_cache": 0
+      },
+      {
+        "id": "temp_aire",
+        "codigo_dte": "T",
+        "grupo": "causa",
+        "fuente": "merra2",
+        "nombre_simple": "Temperatura del aire (T)",
+        "definicion_simple": "Qué tan caliente está el aire a 2 metros del suelo (no de la superficie).",
+        "pregunta": "¿La región se está calentando?",
+        "por_que_elegirla": "Permite estudiar si los cambios de lluvia coinciden con más calor.",
+        "dataset": "MERRA-2 tavgM_2d_slv_Nx",
+        "short_name": "M2TMNXSLV",
+        "version": "5.12.4",
+        "variable": "T2M",
+        "unidad_original": "K",
+        "conversion": {
+          "op": "suma",
+          "valor": -273.15
+        },
+        "unidad_final": "degC",
+        "rango_valido": [
+          150,
+          350
+        ],
+        "agregacion_anual": "media_ponderada_dias",
+        "metodo_descarga": "opendap",
+        "grilla": {
+          "lat_min": -90.0,
+          "lat_max": 90.0,
+          "dlat": 0.5,
+          "lon_min": -180.0,
+          "lon_max": 179.375,
+          "dlon": 0.625,
+          "orden_dims": [
+            "time",
+            "lat",
+            "lon"
+          ]
+        },
+        "desde": "1980-01",
+        "resolucion": "0.5° x 0.625°",
+        "frecuencia": "mensual",
+        "analizable": true,
+        "archivos_en_cache": 0
+      },
+      {
+        "id": "vapor_agua",
+        "grupo": "causa",
+        "fuente": "merra2",
+        "nombre_simple": "Vapor de agua en el aire",
+        "definicion_simple": "Cuánta agua invisible lleva el aire; si toda cayera, formaría una capa de este grosor.",
+        "dataset": "MERRA-2 tavgM_2d_slv_Nx",
+        "short_name": "M2TMNXSLV",
+        "version": "5.12.4",
+        "variable": "TQV",
+        "unidad_original": "kg m-2",
+        "conversion": {
+          "op": "ninguna"
+        },
+        "unidad_final": "mm",
+        "rango_valido": [
+          0,
+          100
+        ],
+        "agregacion_anual": "media",
+        "metodo_descarga": "opendap",
+        "grilla": {
+          "lat_min": -90.0,
+          "lat_max": 90.0,
+          "dlat": 0.5,
+          "lon_min": -180.0,
+          "lon_max": 179.375,
+          "dlon": 0.625,
+          "orden_dims": [
+            "time",
+            "lat",
+            "lon"
+          ]
+        },
+        "desde": "1980-01",
+        "resolucion": "0.5° x 0.625°",
+        "frecuencia": "mensual",
+        "analizable": true,
+        "archivos_en_cache": 0
+      },
+      {
+        "id": "humedad_suelo",
+        "codigo_dte": "SM",
+        "grupo": "agua",
+        "fuente": "gldas",
+        "nombre_simple": "Humedad superficial del suelo (SM)",
+        "definicion_simple": "Agua almacenada en la capa superficial de 0 a 10 cm del suelo en proporción de volumen.",
+        "pregunta": "¿El suelo conserva más o menos agua?",
+        "por_que_elegirla": "Muestra una respuesta terrestre a las condiciones de agua y energía.",
+        "dataset": "GLDAS Noah Land Surface Model L4 monthly 0.25 x 0.25 degree V2.1",
+        "short_name": "GLDAS_NOAH025_M",
+        "version": "2.1",
+        "variable": "SoilMoi0_10cm_inst",
+        "unidad_original": "kg m-2",
+        "conversion": {
+          "op": "factor",
+          "valor": 0.01
+        },
+        "unidad_final": "m3/m3",
+        "rango_valido": [
+          0,
+          100
+        ],
+        "agregacion_anual": "media_ponderada_dias",
+        "metodo_descarga": "opendap",
+        "grilla": {
+          "lat_min": -59.875,
+          "lat_max": 89.875,
+          "dlat": 0.25,
+          "lon_min": -179.875,
+          "lon_max": 179.875,
+          "dlon": 0.25,
+          "orden_dims": [
+            "time",
+            "lat",
+            "lon"
+          ]
+        },
+        "desde": "2000-01",
+        "resolucion": "0.25°",
+        "frecuencia": "mensual",
+        "analizable": true,
+        "archivos_en_cache": 0
+      },
+      {
+        "id": "evapotranspiracion",
+        "codigo_dte": "ET",
+        "grupo": "agua",
+        "fuente": "gldas",
+        "nombre_simple": "Evapotranspiración real (ET)",
+        "definicion_simple": "Agua que pasa del suelo y las plantas al aire acumulada en el mes (real, no potencial).",
+        "pregunta": "¿Cuánta agua pasa del suelo y las plantas al aire?",
+        "por_que_elegirla": "Ayuda a interpretar intercambios de agua, junto con lluvia y humedad.",
+        "dataset": "GLDAS Noah Land Surface Model L4 monthly 0.25 x 0.25 degree V2.1",
+        "short_name": "GLDAS_NOAH025_M",
+        "version": "2.1",
+        "variable": "Evap_tavg",
+        "unidad_original": "kg m-2 s-1",
+        "conversion": {
+          "op": "factor_dias_del_mes",
+          "valor": 86400
+        },
+        "unidad_final": "mm/mes",
+        "rango_valido": [
+          -0.001,
+          0.01
+        ],
+        "agregacion_anual": "suma",
+        "metodo_descarga": "opendap",
+        "grilla": {
+          "lat_min": -59.875,
+          "lat_max": 89.875,
+          "dlat": 0.25,
+          "lon_min": -179.875,
+          "lon_max": 179.875,
+          "dlon": 0.25,
+          "orden_dims": [
+            "time",
+            "lat",
+            "lon"
+          ]
+        },
+        "desde": "2000-01",
+        "resolucion": "0.25°",
+        "frecuencia": "mensual",
+        "analizable": true,
+        "archivos_en_cache": 0
+      },
+      {
+        "id": "lluvia_imerg_mes",
+        "grupo": "lluvia",
+        "fuente": "imerg",
+        "nombre_simple": "Lluvia (IMERG mensual)",
+        "definicion_simple": "Lluvia medida por la constelación de satélites GPM, promediada en el mes.",
+        "dataset": "GPM IMERG Final Precipitation L3 1 month 0.1 degree V07",
+        "short_name": "GPM_3IMERGM",
+        "version": "07",
+        "variable": "precipitation",
+        "grupo_hdf": "Grid",
+        "unidad_original": "mm/h",
+        "conversion": {
+          "op": "factor",
+          "valor": 24
+        },
+        "unidad_final": "mm/dia",
+        "rango_valido": [
+          0,
+          40
+        ],
+        "agregacion_anual": "suma",
+        "metodo_descarga": "opendap",
+        "grilla": {
+          "lat_min": -89.95,
+          "lat_max": 89.95,
+          "dlat": 0.1,
+          "lon_min": -179.95,
+          "lon_max": 179.95,
+          "dlon": 0.1,
+          "orden_dims": [
+            "time",
+            "lon",
+            "lat"
+          ]
+        },
+        "desde": "1998-01",
+        "resolucion": "0.1°",
+        "frecuencia": "mensual",
+        "analizable": true,
+        "archivos_en_cache": 0
+      },
+      {
+        "id": "cdd_imerg",
+        "grupo": "calculada",
+        "fuente": "imerg",
+        "nombre_simple": "Racha seca más larga",
+        "definicion_simple": "El mayor número de días seguidos sin lluvia útil (menos de 1 mm) en un año.",
+        "dataset": "calculada a partir de GPM IMERG diario",
+        "short_name": null,
+        "variable": "CDD",
+        "origen": "lluvia_imerg_dia",
+        "indicador": "cdd",
+        "unidad_original": "dias",
+        "conversion": {
+          "op": "ninguna"
+        },
+        "unidad_final": "dias",
+        "agregacion_anual": "media",
+        "desde": "1998",
+        "resolucion": "0.1°",
+        "frecuencia": "anual",
+        "analizable": true,
+        "archivos_en_cache": 0
+      },
+      {
+        "id": "r20mm_imerg",
+        "grupo": "calculada",
+        "fuente": "imerg",
+        "nombre_simple": "Días de lluvia intensa",
+        "definicion_simple": "Cuántos días del año llovió 20 mm o más.",
+        "dataset": "calculada a partir de GPM IMERG diario",
+        "short_name": null,
+        "variable": "R20mm",
+        "origen": "lluvia_imerg_dia",
+        "indicador": "r20mm",
+        "unidad_original": "dias",
+        "conversion": {
+          "op": "ninguna"
+        },
+        "unidad_final": "dias",
+        "agregacion_anual": "media",
+        "desde": "1998",
+        "resolucion": "0.1°",
+        "frecuencia": "anual",
+        "analizable": true,
+        "archivos_en_cache": 0
+      },
+      {
+        "id": "dias_humedos_imerg",
+        "grupo": "calculada",
+        "fuente": "imerg",
+        "nombre_simple": "Días con lluvia",
+        "definicion_simple": "Cuántos días del año llovió al menos 1 mm.",
+        "dataset": "calculada a partir de GPM IMERG diario",
+        "short_name": null,
+        "variable": "W",
+        "origen": "lluvia_imerg_dia",
+        "indicador": "dias_humedos",
+        "unidad_original": "dias",
+        "conversion": {
+          "op": "ninguna"
+        },
+        "unidad_final": "dias",
+        "agregacion_anual": "media",
+        "desde": "1998",
+        "resolucion": "0.1°",
+        "frecuencia": "anual",
+        "analizable": true,
+        "archivos_en_cache": 0
+      },
+      {
+        "id": "prcptot_imerg",
+        "grupo": "calculada",
+        "fuente": "imerg",
+        "nombre_simple": "Lluvia total del año",
+        "definicion_simple": "Toda la lluvia que cayó en los días con lluvia del año.",
+        "dataset": "calculada a partir de GPM IMERG diario",
+        "short_name": null,
+        "variable": "PRCPTOT",
+        "origen": "lluvia_imerg_dia",
+        "indicador": "prcptot",
+        "unidad_original": "mm/anio",
+        "conversion": {
+          "op": "ninguna"
+        },
+        "unidad_final": "mm/anio",
+        "agregacion_anual": "media",
+        "desde": "1998",
+        "resolucion": "0.1°",
+        "frecuencia": "anual",
+        "analizable": true,
+        "archivos_en_cache": 0
+      },
+      {
+        "id": "sdii_imerg",
+        "grupo": "calculada",
+        "fuente": "imerg",
+        "nombre_simple": "Fuerza de la lluvia",
+        "definicion_simple": "Cuánto llueve, en promedio, en un día con lluvia.",
+        "dataset": "calculada a partir de GPM IMERG diario",
+        "short_name": null,
+        "variable": "SDII",
+        "origen": "lluvia_imerg_dia",
+        "indicador": "sdii",
+        "unidad_original": "mm/dia",
+        "conversion": {
+          "op": "ninguna"
+        },
+        "unidad_final": "mm/dia",
+        "agregacion_anual": "media",
+        "desde": "1998",
+        "resolucion": "0.1°",
+        "frecuencia": "anual",
+        "analizable": true,
+        "archivos_en_cache": 0
+      }
+    ]
+  }
+}

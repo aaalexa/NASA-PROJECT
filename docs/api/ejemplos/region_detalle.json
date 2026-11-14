@@ -1,0 +1,135 @@
+{
+  "request": "GET /api/v1/regiones/noreste_mexico",
+  "status": 200,
+  "response": {
+    "id": "noreste_mexico",
+    "nombre": "Noreste de México",
+    "descripcion": "Coahuila, Nuevo León y Tamaulipas (cuenca del Río Bravo y Sierra Madre Oriental).",
+    "zona": "mexico",
+    "pais": "México",
+    "es_latinoamerica": true,
+    "bbox": [
+      -106.0,
+      22.0,
+      -97.0,
+      30.0
+    ],
+    "predefinida": true,
+    "coordenadas": {
+      "oeste": -106.0,
+      "sur": 22.0,
+      "este": -97.0,
+      "norte": 30.0,
+      "lon_min": -106.0,
+      "lat_min": 22.0,
+      "lon_max": -97.0,
+      "lat_max": 30.0,
+      "centro": {
+        "lat": 26.0,
+        "lon": -101.5
+      },
+      "extension_grados": {
+        "ancho_lon": 9.0,
+        "alto_lat": 8.0
+      },
+      "esquinas": {
+        "suroeste": {
+          "lat": 22.0,
+          "lon": -106.0
+        },
+        "sureste": {
+          "lat": 22.0,
+          "lon": -97.0
+        },
+        "noreste": {
+          "lat": 30.0,
+          "lon": -97.0
+        },
+        "noroeste": {
+          "lat": 30.0,
+          "lon": -106.0
+        }
+      },
+      "poligono_geojson": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -106.0,
+              22.0
+            ],
+            [
+              -97.0,
+              22.0
+            ],
+            [
+              -97.0,
+              30.0
+            ],
+            [
+              -106.0,
+              30.0
+            ],
+            [
+              -106.0,
+              22.0
+            ]
+          ]
+        ]
+      }
+    },
+    "mallas_reales": {
+      "gpcp": {
+        "resolucion": "0.5° × 0.5°",
+        "lat_min_real": 22.25,
+        "lat_max_real": 29.75,
+        "lon_min_real": -105.75,
+        "lon_max_real": -97.25,
+        "n_lat": 16,
+        "n_lon": 18,
+        "n_celdas": 288
+      },
+      "merra2": {
+        "resolucion": "0.5° × 0.625°",
+        "lat_min_real": 22.0,
+        "lat_max_real": 30.0,
+        "lon_min_real": -105.625,
+        "lon_max_real": -97.5,
+        "n_lat": 17,
+        "n_lon": 14,
+        "n_celdas": 238
+      },
+      "gldas": {
+        "resolucion": "0.25° × 0.25°",
+        "lat_min_real": 22.125,
+        "lat_max_real": 29.875,
+        "lon_min_real": -105.875,
+        "lon_max_real": -97.125,
+        "n_lat": 32,
+        "n_lon": 36,
+        "n_celdas": 1152
+      },
+      "imerg": {
+        "resolucion": "0.1° × 0.1°",
+        "lat_min_real": 22.05,
+        "lat_max_real": 29.95,
+        "lon_min_real": -105.95,
+        "lon_max_real": -97.05,
+        "n_lat": 80,
+        "n_lon": 90,
+        "n_celdas": 7200
+      }
+    },
+    "shortcut": {
+      "region": "noreste_mexico",
+      "oeste": -106.0,
+      "sur": 22.0,
+      "este": -97.0,
+      "norte": 30.0,
+      "centro_lat": 26.0,
+      "centro_lon": -101.5,
+      "query_region": "?region=noreste_mexico",
+      "query_bbox": "?oeste=-106&sur=22&este=-97&norte=30"
+    }
+  }
+}

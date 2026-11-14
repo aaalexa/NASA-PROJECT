@@ -1,0 +1,333 @@
+{
+  "request": "GET /api/v1/datasets",
+  "status": 200,
+  "response": {
+    "total": 4,
+    "datasets": [
+      {
+        "id": "gpcp",
+        "nombre": "GPCP mensual v3.3",
+        "descripcion": "Global Precipitation Climatology Project. Combina satélites y pluviómetros en una malla global de 0.5°. Es la serie de lluvia más larga y homogénea del proyecto (desde 1983).",
+        "proveedor": "NASA GES DISC",
+        "short_names": [
+          "GPCPMON"
+        ],
+        "version": "3.3",
+        "concept_ids": {
+          "GPCPMON": "C3405935516-GES_DISC"
+        },
+        "desde": "1983-01",
+        "hasta": "2025-12",
+        "resolucion": "0.5°",
+        "frecuencia": "mensual",
+        "protocolo_acceso": "opendap",
+        "opendap_base": "https://data.gesdisc.earthdata.nasa.gov/opendap/GPCP/GPCPMON.3.3",
+        "formato": "OPeNDAP stream en memoria (GPCPMON_L3_AAAAMM_V3.3.nc4)",
+        "url": "https://disc.gsfc.nasa.gov/datasets/GPCPMON_3.3/summary",
+        "notas": "La v3.2 (pedido original) termina en 2023-12; la v3.3 llega a 2025-12 y conserva sat_gauge_precip.",
+        "variables": [
+          {
+            "id": "lluvia_gpcp",
+            "nombre_simple": "Precipitación (P)",
+            "definicion_simple": "Cuánta lluvia cayó en el mes, combinando satélites y pluviómetros.",
+            "grupo": "lluvia",
+            "short_name": "GPCPMON",
+            "variable_archivo": "sat_gauge_precip",
+            "unidad_original": "mm/dia",
+            "unidad_final": "mm/mes",
+            "conversion": {
+              "op": "dias_del_mes"
+            },
+            "frecuencia": "mensual",
+            "desde": "1983-01",
+            "resolucion": "0.5°",
+            "analizable": true
+          }
+        ]
+      },
+      {
+        "id": "merra2",
+        "nombre": "MERRA-2 (reanálisis)",
+        "descripcion": "Modern-Era Retrospective analysis for Research and Applications v2. Modelo atmosférico que asimila observaciones; da lluvia, temperatura y vapor de agua en una malla global de 0.5° × 0.625°.",
+        "proveedor": "NASA GES DISC (GMAO)",
+        "short_names": [
+          "M2TMNXFLX",
+          "M2TMNXSLV"
+        ],
+        "version": "5.12.4",
+        "concept_ids": {
+          "M2TMNXFLX": "C1276812868-GES_DISC",
+          "M2TMNXSLV": "C1276812859-GES_DISC"
+        },
+        "desde": "1980-01",
+        "hasta": null,
+        "resolucion": "0.5° x 0.625°",
+        "frecuencia": "mensual",
+        "protocolo_acceso": "opendap",
+        "opendap_base": "https://goldsmr4.gesdisc.eosdis.nasa.gov/opendap/MERRA2_MONTHLY",
+        "formato": "OPeNDAP stream en memoria (MERRA2_<stream>.tavgM_2d_<flx|slv>_Nx.AAAAMM.nc4)",
+        "url": "https://disc.gsfc.nasa.gov/datasets/M2TMNXFLX_5.12.4/summary",
+        "variables": [
+          {
+            "id": "lluvia_merra2",
+            "nombre_simple": "Lluvia (MERRA-2)",
+            "definicion_simple": "Cuánta agua cae del cielo cada día, según un modelo que combina muchas observaciones.",
+            "grupo": "lluvia",
+            "short_name": "M2TMNXFLX",
+            "variable_archivo": "PRECTOTCORR",
+            "unidad_original": "kg m-2 s-1",
+            "unidad_final": "mm/dia",
+            "conversion": {
+              "op": "factor",
+              "valor": 86400
+            },
+            "frecuencia": "mensual",
+            "desde": "1980-01",
+            "resolucion": "0.5° x 0.625°",
+            "analizable": true
+          },
+          {
+            "id": "temp_aire",
+            "nombre_simple": "Temperatura del aire (T)",
+            "definicion_simple": "Qué tan caliente está el aire a 2 metros del suelo (no de la superficie).",
+            "grupo": "causa",
+            "short_name": "M2TMNXSLV",
+            "variable_archivo": "T2M",
+            "unidad_original": "K",
+            "unidad_final": "degC",
+            "conversion": {
+              "op": "suma",
+              "valor": -273.15
+            },
+            "frecuencia": "mensual",
+            "desde": "1980-01",
+            "resolucion": "0.5° x 0.625°",
+            "analizable": true
+          },
+          {
+            "id": "vapor_agua",
+            "nombre_simple": "Vapor de agua en el aire",
+            "definicion_simple": "Cuánta agua invisible lleva el aire; si toda cayera, formaría una capa de este grosor.",
+            "grupo": "causa",
+            "short_name": "M2TMNXSLV",
+            "variable_archivo": "TQV",
+            "unidad_original": "kg m-2",
+            "unidad_final": "mm",
+            "conversion": {
+              "op": "ninguna"
+            },
+            "frecuencia": "mensual",
+            "desde": "1980-01",
+            "resolucion": "0.5° x 0.625°",
+            "analizable": true
+          }
+        ]
+      },
+      {
+        "id": "gldas",
+        "nombre": "GLDAS Noah mensual v2.1",
+        "descripcion": "Global Land Data Assimilation System (modelo terrestre Noah). Aporta humedad superficial del suelo (0–10 cm) y evapotranspiración real en una malla global terrestre de 0.25°.",
+        "proveedor": "NASA GES DISC (GLDAS)",
+        "short_names": [
+          "GLDAS_NOAH025_M"
+        ],
+        "version": "2.1",
+        "concept_ids": {
+          "GLDAS_NOAH025_M": "C1342986036-GES_DISC"
+        },
+        "desde": "2000-01",
+        "hasta": null,
+        "resolucion": "0.25°",
+        "frecuencia": "mensual",
+        "protocolo_acceso": "opendap",
+        "opendap_base": "https://hydro1.gesdisc.eosdis.nasa.gov/opendap/GLDAS/GLDAS_NOAH025_M.2.1",
+        "formato": "OPeNDAP stream en memoria (GLDAS_NOAH025_M.AAAAMM.021.nc4)",
+        "url": "https://disc.gsfc.nasa.gov/datasets/GLDAS_NOAH025_M_2.1/summary",
+        "notas": "SM representa los primeros 10 cm (no toda la zona de raíces). ET es evapotranspiración real (no potencial). SM y ET comparten modelo y entradas: no son pruebas totalmente independientes.",
+        "variables": [
+          {
+            "id": "humedad_suelo",
+            "nombre_simple": "Humedad superficial del suelo (SM)",
+            "definicion_simple": "Agua almacenada en la capa superficial de 0 a 10 cm del suelo en proporción de volumen.",
+            "grupo": "agua",
+            "short_name": "GLDAS_NOAH025_M",
+            "variable_archivo": "SoilMoi0_10cm_inst",
+            "unidad_original": "kg m-2",
+            "unidad_final": "m3/m3",
+            "conversion": {
+              "op": "factor",
+              "valor": 0.01
+            },
+            "frecuencia": "mensual",
+            "desde": "2000-01",
+            "resolucion": "0.25°",
+            "analizable": true
+          },
+          {
+            "id": "evapotranspiracion",
+            "nombre_simple": "Evapotranspiración real (ET)",
+            "definicion_simple": "Agua que pasa del suelo y las plantas al aire acumulada en el mes (real, no potencial).",
+            "grupo": "agua",
+            "short_name": "GLDAS_NOAH025_M",
+            "variable_archivo": "Evap_tavg",
+            "unidad_original": "kg m-2 s-1",
+            "unidad_final": "mm/mes",
+            "conversion": {
+              "op": "factor_dias_del_mes",
+              "valor": 86400
+            },
+            "frecuencia": "mensual",
+            "desde": "2000-01",
+            "resolucion": "0.25°",
+            "analizable": true
+          }
+        ]
+      },
+      {
+        "id": "imerg",
+        "nombre": "GPM IMERG Final v07",
+        "descripcion": "Integrated Multi-satellitE Retrievals for GPM. Lluvia de la constelación de satélites GPM calibrada con pluviómetros, en una malla de 0.1°. Versión mensual (tendencias) y diaria (rachas secas, lluvias intensas).",
+        "proveedor": "NASA GES DISC (GPM)",
+        "short_names": [
+          "GPM_3IMERGM",
+          "GPM_3IMERGDF"
+        ],
+        "version": "07",
+        "concept_ids": {
+          "GPM_3IMERGM": "C2723754851-GES_DISC",
+          "GPM_3IMERGDF": "C2723754864-GES_DISC"
+        },
+        "desde": "1998-01",
+        "hasta": "2025-09",
+        "resolucion": "0.1°",
+        "frecuencia": "mensual",
+        "protocolo_acceso": "opendap",
+        "opendap_base": "https://gpm1.gesdisc.eosdis.nasa.gov/opendap/GPM_L3",
+        "formato": "OPeNDAP stream en memoria (GPM_3IMERGM / GPM_3IMERGDF)",
+        "url": "https://disc.gsfc.nasa.gov/datasets/GPM_3IMERGM_07/summary",
+        "variables": [
+          {
+            "id": "lluvia_imerg_mes",
+            "nombre_simple": "Lluvia (IMERG mensual)",
+            "definicion_simple": "Lluvia medida por la constelación de satélites GPM, promediada en el mes.",
+            "grupo": "lluvia",
+            "short_name": "GPM_3IMERGM",
+            "variable_archivo": "precipitation",
+            "unidad_original": "mm/h",
+            "unidad_final": "mm/dia",
+            "conversion": {
+              "op": "factor",
+              "valor": 24
+            },
+            "frecuencia": "mensual",
+            "desde": "1998-01",
+            "resolucion": "0.1°",
+            "analizable": true
+          },
+          {
+            "id": "lluvia_imerg_dia",
+            "nombre_simple": "Lluvia diaria (IMERG)",
+            "definicion_simple": "Lluvia de cada día medida por satélites; sirve para contar días secos y tormentas.",
+            "grupo": "lluvia",
+            "short_name": "GPM_3IMERGDF",
+            "variable_archivo": "precipitation",
+            "unidad_original": "mm/dia",
+            "unidad_final": "mm/dia",
+            "conversion": {
+              "op": "ninguna"
+            },
+            "frecuencia": "diaria",
+            "desde": "1998-01",
+            "resolucion": "0.1°",
+            "analizable": false
+          },
+          {
+            "id": "cdd_imerg",
+            "nombre_simple": "Racha seca más larga",
+            "definicion_simple": "El mayor número de días seguidos sin lluvia útil (menos de 1 mm) en un año.",
+            "grupo": "calculada",
+            "short_name": null,
+            "variable_archivo": "CDD",
+            "unidad_original": "dias",
+            "unidad_final": "dias",
+            "conversion": {
+              "op": "ninguna"
+            },
+            "frecuencia": "anual",
+            "desde": "1998",
+            "resolucion": "0.1°",
+            "analizable": true
+          },
+          {
+            "id": "r20mm_imerg",
+            "nombre_simple": "Días de lluvia intensa",
+            "definicion_simple": "Cuántos días del año llovió 20 mm o más.",
+            "grupo": "calculada",
+            "short_name": null,
+            "variable_archivo": "R20mm",
+            "unidad_original": "dias",
+            "unidad_final": "dias",
+            "conversion": {
+              "op": "ninguna"
+            },
+            "frecuencia": "anual",
+            "desde": "1998",
+            "resolucion": "0.1°",
+            "analizable": true
+          },
+          {
+            "id": "dias_humedos_imerg",
+            "nombre_simple": "Días con lluvia",
+            "definicion_simple": "Cuántos días del año llovió al menos 1 mm.",
+            "grupo": "calculada",
+            "short_name": null,
+            "variable_archivo": "W",
+            "unidad_original": "dias",
+            "unidad_final": "dias",
+            "conversion": {
+              "op": "ninguna"
+            },
+            "frecuencia": "anual",
+            "desde": "1998",
+            "resolucion": "0.1°",
+            "analizable": true
+          },
+          {
+            "id": "prcptot_imerg",
+            "nombre_simple": "Lluvia total del año",
+            "definicion_simple": "Toda la lluvia que cayó en los días con lluvia del año.",
+            "grupo": "calculada",
+            "short_name": null,
+            "variable_archivo": "PRCPTOT",
+            "unidad_original": "mm/anio",
+            "unidad_final": "mm/anio",
+            "conversion": {
+              "op": "ninguna"
+            },
+            "frecuencia": "anual",
+            "desde": "1998",
+            "resolucion": "0.1°",
+            "analizable": true
+          },
+          {
+            "id": "sdii_imerg",
+            "nombre_simple": "Fuerza de la lluvia",
+            "definicion_simple": "Cuánto llueve, en promedio, en un día con lluvia.",
+            "grupo": "calculada",
+            "short_name": null,
+            "variable_archivo": "SDII",
+            "unidad_original": "mm/dia",
+            "unidad_final": "mm/dia",
+            "conversion": {
+              "op": "ninguna"
+            },
+            "frecuencia": "anual",
+            "desde": "1998",
+            "resolucion": "0.1°",
+            "analizable": true
+          }
+        ]
+      }
+    ]
+  }
+}

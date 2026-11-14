@@ -1,0 +1,135 @@
+{
+  "request": "GET /api/v1/regiones/calcular-bbox?oeste=-101&sur=22&este=-97&norte=27&nombre=mi_zona",
+  "status": 200,
+  "response": {
+    "id": "mi_zona",
+    "nombre": "mi_zona",
+    "descripcion": "Región personalizada (-101.0, 22.0, -97.0, 27.0)",
+    "zona": "personalizada",
+    "pais": "",
+    "es_latinoamerica": false,
+    "bbox": [
+      -101.0,
+      22.0,
+      -97.0,
+      27.0
+    ],
+    "predefinida": false,
+    "coordenadas": {
+      "oeste": -101.0,
+      "sur": 22.0,
+      "este": -97.0,
+      "norte": 27.0,
+      "lon_min": -101.0,
+      "lat_min": 22.0,
+      "lon_max": -97.0,
+      "lat_max": 27.0,
+      "centro": {
+        "lat": 24.5,
+        "lon": -99.0
+      },
+      "extension_grados": {
+        "ancho_lon": 4.0,
+        "alto_lat": 5.0
+      },
+      "esquinas": {
+        "suroeste": {
+          "lat": 22.0,
+          "lon": -101.0
+        },
+        "sureste": {
+          "lat": 22.0,
+          "lon": -97.0
+        },
+        "noreste": {
+          "lat": 27.0,
+          "lon": -97.0
+        },
+        "noroeste": {
+          "lat": 27.0,
+          "lon": -101.0
+        }
+      },
+      "poligono_geojson": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -101.0,
+              22.0
+            ],
+            [
+              -97.0,
+              22.0
+            ],
+            [
+              -97.0,
+              27.0
+            ],
+            [
+              -101.0,
+              27.0
+            ],
+            [
+              -101.0,
+              22.0
+            ]
+          ]
+        ]
+      }
+    },
+    "mallas_reales": {
+      "gpcp": {
+        "resolucion": "0.5° × 0.5°",
+        "lat_min_real": 22.25,
+        "lat_max_real": 26.75,
+        "lon_min_real": -100.75,
+        "lon_max_real": -97.25,
+        "n_lat": 10,
+        "n_lon": 8,
+        "n_celdas": 80
+      },
+      "merra2": {
+        "resolucion": "0.5° × 0.625°",
+        "lat_min_real": 22.0,
+        "lat_max_real": 27.0,
+        "lon_min_real": -100.625,
+        "lon_max_real": -97.5,
+        "n_lat": 11,
+        "n_lon": 6,
+        "n_celdas": 66
+      },
+      "gldas": {
+        "resolucion": "0.25° × 0.25°",
+        "lat_min_real": 22.125,
+        "lat_max_real": 26.875,
+        "lon_min_real": -100.875,
+        "lon_max_real": -97.125,
+        "n_lat": 20,
+        "n_lon": 16,
+        "n_celdas": 320
+      },
+      "imerg": {
+        "resolucion": "0.1° × 0.1°",
+        "lat_min_real": 22.05,
+        "lat_max_real": 26.95,
+        "lon_min_real": -100.95,
+        "lon_max_real": -97.05,
+        "n_lat": 50,
+        "n_lon": 40,
+        "n_celdas": 2000
+      }
+    },
+    "shortcut": {
+      "region": "mi_zona",
+      "oeste": -101.0,
+      "sur": 22.0,
+      "este": -97.0,
+      "norte": 27.0,
+      "centro_lat": 24.5,
+      "centro_lon": -99.0,
+      "query_region": "?region=mi_zona",
+      "query_bbox": "?oeste=-101&sur=22&este=-97&norte=27"
+    }
+  }
+}

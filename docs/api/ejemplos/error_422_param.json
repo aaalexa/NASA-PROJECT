@@ -1,0 +1,20 @@
+{
+  "request": "GET /api/v1/tendencias/lluvia_gpcp?alfa=0.9&sintetico=true",
+  "status": 422,
+  "response": {
+    "detail": [
+      {
+        "type": "less_than",
+        "loc": [
+          "query",
+          "alfa"
+        ],
+        "msg": "Input should be less than 0.5",
+        "input": "0.9",
+        "ctx": {
+          "lt": 0.5
+        }
+      }
+    ]
+  }
+}

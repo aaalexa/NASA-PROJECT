@@ -1,0 +1,47 @@
+{
+  "request": "GET /api/v1/variables/lluvia_gpcp",
+  "status": 200,
+  "response": {
+    "id": "lluvia_gpcp",
+    "codigo_dte": "P",
+    "grupo": "lluvia",
+    "fuente": "gpcp",
+    "nombre_simple": "Precipitación (P)",
+    "definicion_simple": "Cuánta lluvia cayó en el mes, combinando satélites y pluviómetros.",
+    "pregunta": "¿Está llegando más o menos agua?",
+    "por_que_elegirla": "Es el fenómeno principal del proyecto.",
+    "dataset": "GPCP Precipitation Level 3 Monthly 0.5-Degree V3.3",
+    "short_name": "GPCPMON",
+    "version": "3.3",
+    "variable": "sat_gauge_precip",
+    "unidad_original": "mm/dia",
+    "conversion": {
+      "op": "dias_del_mes"
+    },
+    "unidad_final": "mm/mes",
+    "rango_valido": [
+      0,
+      500
+    ],
+    "agregacion_anual": "suma",
+    "metodo_descarga": "opendap",
+    "grilla": {
+      "lat_min": -89.75,
+      "lat_max": 89.75,
+      "dlat": 0.5,
+      "lon_min": -179.75,
+      "lon_max": 179.75,
+      "dlon": 0.5,
+      "orden_dims": [
+        "time",
+        "lat",
+        "lon"
+      ]
+    },
+    "desde": "1983-01",
+    "resolucion": "0.5°",
+    "frecuencia": "mensual",
+    "analizable": true,
+    "cache": []
+  }
+}

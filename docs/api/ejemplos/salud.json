@@ -1,0 +1,19 @@
+{
+  "request": "GET /api/v1/salud",
+  "status": 200,
+  "response": {
+    "estado": "ok",
+    "modo_acceso": "opendap_memoria",
+    "almacenamiento_disco": false,
+    "n_datasets": 4,
+    "n_variables": 13,
+    "cubos_en_memoria_ram": 0,
+    "kb_en_memoria_ram": 0,
+    "max_cubos_ram": 128,
+    "credenciales_earthdata": {
+      "variables_entorno": false,
+      "netrc": false,
+      "listo": false
+    }
+  }
+}

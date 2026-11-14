@@ -1,0 +1,899 @@
+{
+  "request": "GET /api/v1/indicadores?region=noreste_mexico&sintetico=true",
+  "status": 200,
+  "response": {
+    "region": {
+      "id": "noreste_mexico",
+      "nombre": "Noreste de México",
+      "descripcion": "Coahuila, Nuevo León y Tamaulipas (cuenca del Río Bravo y Sierra Madre Oriental).",
+      "zona": "mexico",
+      "pais": "México",
+      "es_latinoamerica": true,
+      "bbox": [
+        -106.0,
+        22.0,
+        -97.0,
+        30.0
+      ],
+      "predefinida": true,
+      "coordenadas": {
+        "oeste": -106.0,
+        "sur": 22.0,
+        "este": -97.0,
+        "norte": 30.0,
+        "lon_min": -106.0,
+        "lat_min": 22.0,
+        "lon_max": -97.0,
+        "lat_max": 30.0,
+        "centro": {
+          "lat": 26.0,
+          "lon": -101.5
+        },
+        "extension_grados": {
+          "ancho_lon": 9.0,
+          "alto_lat": 8.0
+        },
+        "esquinas": {
+          "suroeste": {
+            "lat": 22.0,
+            "lon": -106.0
+          },
+          "sureste": {
+            "lat": 22.0,
+            "lon": -97.0
+          },
+          "noreste": {
+            "lat": 30.0,
+            "lon": -97.0
+          },
+          "noroeste": {
+            "lat": 30.0,
+            "lon": -106.0
+          }
+        },
+        "poligono_geojson": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -106.0,
+                22.0
+              ],
+              [
+                -97.0,
+                22.0
+              ],
+              [
+                -97.0,
+                30.0
+              ],
+              [
+                -106.0,
+                30.0
+              ],
+              [
+                -106.0,
+                22.0
+              ]
+            ]
+          ]
+        }
+      },
+      "mallas_reales": {
+        "gpcp": {
+          "resolucion": "0.5° × 0.5°",
+          "lat_min_real": 22.25,
+          "lat_max_real": 29.75,
+          "lon_min_real": -105.75,
+          "lon_max_real": -97.25,
+          "n_lat": 16,
+          "n_lon": 18,
+          "n_celdas": 288
+        },
+        "merra2": {
+          "resolucion": "0.5° × 0.625°",
+          "lat_min_real": 22.0,
+          "lat_max_real": 30.0,
+          "lon_min_real": -105.625,
+          "lon_max_real": -97.5,
+          "n_lat": 17,
+          "n_lon": 14,
+          "n_celdas": 238
+        },
+        "gldas": {
+          "resolucion": "0.25° × 0.25°",
+          "lat_min_real": 22.125,
+          "lat_max_real": 29.875,
+          "lon_min_real": -105.875,
+          "lon_max_real": -97.125,
+          "n_lat": 32,
+          "n_lon": 36,
+          "n_celdas": 1152
+        },
+        "imerg": {
+          "resolucion": "0.1° × 0.1°",
+          "lat_min_real": 22.05,
+          "lat_max_real": 29.95,
+          "lon_min_real": -105.95,
+          "lon_max_real": -97.05,
+          "n_lat": 80,
+          "n_lon": 90,
+          "n_celdas": 7200
+        }
+      },
+      "shortcut": {
+        "region": "noreste_mexico",
+        "oeste": -106.0,
+        "sur": 22.0,
+        "este": -97.0,
+        "norte": 30.0,
+        "centro_lat": 26.0,
+        "centro_lon": -101.5,
+        "query_region": "?region=noreste_mexico",
+        "query_bbox": "?oeste=-106&sur=22&este=-97&norte=30"
+      }
+    },
+    "periodo": [
+      "2001",
+      "2024"
+    ],
+    "cortar_en_anio": true,
+    "fuente_datos": "sintetico",
+    "indicadores": {
+      "cdd_imerg": {
+        "id": "cdd_imerg",
+        "indicador": "cdd",
+        "nombre_simple": "Racha seca más larga",
+        "definicion_simple": "El mayor número de días seguidos sin lluvia útil (menos de 1 mm) en un año.",
+        "unidad": "dias",
+        "serie": [
+          {
+            "anio": 2001,
+            "valor": 102.17713989264698
+          },
+          {
+            "anio": 2002,
+            "valor": 93.28173735064429
+          },
+          {
+            "anio": 2003,
+            "valor": 102.39491322339224
+          },
+          {
+            "anio": 2004,
+            "valor": 100.95217569406326
+          },
+          {
+            "anio": 2005,
+            "valor": 95.12277631266278
+          },
+          {
+            "anio": 2006,
+            "valor": 97.15040893481083
+          },
+          {
+            "anio": 2007,
+            "valor": 91.90462390007427
+          },
+          {
+            "anio": 2008,
+            "valor": 104.30400249580113
+          },
+          {
+            "anio": 2009,
+            "valor": 99.11963721656642
+          },
+          {
+            "anio": 2010,
+            "valor": 97.91929703845211
+          },
+          {
+            "anio": 2011,
+            "valor": 100.98595703414654
+          },
+          {
+            "anio": 2012,
+            "valor": 112.2445833407901
+          },
+          {
+            "anio": 2013,
+            "valor": 106.86880518329995
+          },
+          {
+            "anio": 2014,
+            "valor": 93.62802341146705
+          },
+          {
+            "anio": 2015,
+            "valor": 103.18371288956173
+          },
+          {
+            "anio": 2016,
+            "valor": 93.24920566322572
+          },
+          {
+            "anio": 2017,
+            "valor": 110.51823772909997
+          },
+          {
+            "anio": 2018,
+            "valor": 103.22277704379877
+          },
+          {
+            "anio": 2019,
+            "valor": 120.19307083522537
+          },
+          {
+            "anio": 2020,
+            "valor": 107.88015351146316
+          },
+          {
+            "anio": 2021,
+            "valor": 115.00300102275153
+          },
+          {
+            "anio": 2022,
+            "valor": 108.70238369475393
+          },
+          {
+            "anio": 2023,
+            "valor": 104.6202187759364
+          },
+          {
+            "anio": 2024,
+            "valor": 112.49886083262366
+          }
+        ],
+        "tendencia": {
+          "variable": "cdd_imerg",
+          "region": "noreste_mexico",
+          "periodo": [
+            "2001",
+            "2024"
+          ],
+          "n": 24,
+          "r1": -0.17844459704507623,
+          "n_ef": 24.0,
+          "pendiente_ols_decada": 6.362331325299388,
+          "ic95_decada": [
+            2.6108075523351406,
+            10.113855098263635
+          ],
+          "p_t": 0.0019424824487075632,
+          "sen_decada": 6.321850179116906,
+          "mk_z": 2.951723957827993,
+          "mk_tau": 0.43478260869565216,
+          "p_mk": 0.003160052923044443,
+          "cambio_pct_decada": 6.164239126846807,
+          "snr": 0.8484257843265157,
+          "n_star_anios": null,
+          "anios_faltantes": null,
+          "veredicto": "significativo",
+          "direccion": "sube",
+          "metodos": [
+            "ols_neff",
+            "mk_hamed_rao",
+            "n_star_no_aplica_anual"
+          ]
+        }
+      },
+      "r20mm_imerg": {
+        "id": "r20mm_imerg",
+        "indicador": "r20mm",
+        "nombre_simple": "Días de lluvia intensa",
+        "definicion_simple": "Cuántos días del año llovió 20 mm o más.",
+        "unidad": "dias",
+        "serie": [
+          {
+            "anio": 2001,
+            "valor": 8.122340676617322
+          },
+          {
+            "anio": 2002,
+            "valor": 7.238023539632993
+          },
+          {
+            "anio": 2003,
+            "valor": 6.376445578955106
+          },
+          {
+            "anio": 2004,
+            "valor": 7.547251640949558
+          },
+          {
+            "anio": 2005,
+            "valor": 6.568789746355021
+          },
+          {
+            "anio": 2006,
+            "valor": 5.633223745554828
+          },
+          {
+            "anio": 2007,
+            "valor": 5.365447226430162
+          },
+          {
+            "anio": 2008,
+            "valor": 4.995290797966523
+          },
+          {
+            "anio": 2009,
+            "valor": 5.8540649269375695
+          },
+          {
+            "anio": 2010,
+            "valor": 3.7987035566679617
+          },
+          {
+            "anio": 2011,
+            "valor": 3.6148301775823226
+          },
+          {
+            "anio": 2012,
+            "valor": 2.435804172091023
+          },
+          {
+            "anio": 2013,
+            "valor": 3.206141282221059
+          },
+          {
+            "anio": 2014,
+            "valor": 3.878988351397691
+          },
+          {
+            "anio": 2015,
+            "valor": 3.365326873432087
+          },
+          {
+            "anio": 2016,
+            "valor": 2.6856812843876283
+          },
+          {
+            "anio": 2017,
+            "valor": 2.259077698340838
+          },
+          {
+            "anio": 2018,
+            "valor": 1.6200360754655656
+          },
+          {
+            "anio": 2019,
+            "valor": 1.3762124770749147
+          },
+          {
+            "anio": 2020,
+            "valor": 1.071447802385041
+          },
+          {
+            "anio": 2021,
+            "valor": 1.6252369039381707
+          },
+          {
+            "anio": 2022,
+            "valor": 0.7501178182927555
+          },
+          {
+            "anio": 2023,
+            "valor": 1.1764857677540352
+          },
+          {
+            "anio": 2024,
+            "valor": 1.184352256372618
+          }
+        ],
+        "tendencia": {
+          "variable": "r20mm_imerg",
+          "region": "noreste_mexico",
+          "periodo": [
+            "2001",
+            "2024"
+          ],
+          "n": 24,
+          "r1": 0.2338424023929615,
+          "n_ef": 14.902861424527924,
+          "pendiente_ols_decada": -3.134130340636294,
+          "ic95_decada": [
+            -3.673082370055955,
+            -2.595178311216633
+          ],
+          "p_t": 1.2965420193926027e-08,
+          "sen_decada": -3.1168643538853953,
+          "mk_z": -5.72981709460728,
+          "mk_tau": -0.8405797101449275,
+          "p_mk": 1.0053898158446373e-08,
+          "cambio_pct_decada": -81.98330828648722,
+          "snr": -1.359804039387391,
+          "n_star_anios": null,
+          "anios_faltantes": null,
+          "veredicto": "significativo",
+          "direccion": "baja",
+          "metodos": [
+            "ols_neff",
+            "mk_hamed_rao",
+            "n_star_no_aplica_anual"
+          ]
+        }
+      },
+      "dias_humedos_imerg": {
+        "id": "dias_humedos_imerg",
+        "indicador": "dias_humedos",
+        "nombre_simple": "Días con lluvia",
+        "definicion_simple": "Cuántos días del año llovió al menos 1 mm.",
+        "unidad": "dias",
+        "serie": [
+          {
+            "anio": 2001,
+            "valor": 50.44453348496424
+          },
+          {
+            "anio": 2002,
+            "valor": 48.685676214976986
+          },
+          {
+            "anio": 2003,
+            "valor": 46.660389196817334
+          },
+          {
+            "anio": 2004,
+            "valor": 46.619541989946676
+          },
+          {
+            "anio": 2005,
+            "valor": 46.56188869205191
+          },
+          {
+            "anio": 2006,
+            "valor": 46.32533742140542
+          },
+          {
+            "anio": 2007,
+            "valor": 44.278030810222454
+          },
+          {
+            "anio": 2008,
+            "valor": 43.15139189138866
+          },
+          {
+            "anio": 2009,
+            "valor": 44.05194150987519
+          },
+          {
+            "anio": 2010,
+            "valor": 42.98158861346471
+          },
+          {
+            "anio": 2011,
+            "valor": 40.002249630918335
+          },
+          {
+            "anio": 2012,
+            "valor": 38.64616151536138
+          },
+          {
+            "anio": 2013,
+            "valor": 39.589124321779735
+          },
+          {
+            "anio": 2014,
+            "valor": 39.25315221717447
+          },
+          {
+            "anio": 2015,
+            "valor": 39.357626513758426
+          },
+          {
+            "anio": 2016,
+            "valor": 37.426579183528304
+          },
+          {
+            "anio": 2017,
+            "valor": 37.89627324408323
+          },
+          {
+            "anio": 2018,
+            "valor": 34.94220853054438
+          },
+          {
+            "anio": 2019,
+            "valor": 33.062400596133585
+          },
+          {
+            "anio": 2020,
+            "valor": 32.09544396436059
+          },
+          {
+            "anio": 2021,
+            "valor": 34.51817574994978
+          },
+          {
+            "anio": 2022,
+            "valor": 33.92142564554761
+          },
+          {
+            "anio": 2023,
+            "valor": 30.938938570702707
+          },
+          {
+            "anio": 2024,
+            "valor": 32.72580890797516
+          }
+        ],
+        "tendencia": {
+          "variable": "dias_humedos_imerg",
+          "region": "noreste_mexico",
+          "periodo": [
+            "2001",
+            "2024"
+          ],
+          "n": 24,
+          "r1": 0.14216883855320409,
+          "n_ef": 18.025310426785982,
+          "pendiente_ols_decada": -7.970357948341152,
+          "ic95_decada": [
+            -8.829526369942295,
+            -7.111189526740009
+          ],
+          "p_t": 1.2068809782043672e-12,
+          "sen_decada": -7.8605809889463725,
+          "mk_z": -6.225905154746439,
+          "mk_tau": -0.9130434782608695,
+          "p_mk": 4.787836793695988e-10,
+          "cambio_pct_decada": -19.840418042551565,
+          "snr": -1.3857872233490507,
+          "n_star_anios": null,
+          "anios_faltantes": null,
+          "veredicto": "significativo",
+          "direccion": "baja",
+          "metodos": [
+            "ols_neff",
+            "mk_hamed_rao",
+            "n_star_no_aplica_anual"
+          ]
+        }
+      },
+      "prcptot_imerg": {
+        "id": "prcptot_imerg",
+        "indicador": "prcptot",
+        "nombre_simple": "Lluvia total del año",
+        "definicion_simple": "Toda la lluvia que cayó en los días con lluvia del año.",
+        "unidad": "mm/anio",
+        "serie": [
+          {
+            "anio": 2001,
+            "valor": 597.153065639367
+          },
+          {
+            "anio": 2002,
+            "valor": 565.8845161717038
+          },
+          {
+            "anio": 2003,
+            "valor": 524.6667493633203
+          },
+          {
+            "anio": 2004,
+            "valor": 521.8836615859283
+          },
+          {
+            "anio": 2005,
+            "valor": 528.2376061888724
+          },
+          {
+            "anio": 2006,
+            "valor": 501.4689371663256
+          },
+          {
+            "anio": 2007,
+            "valor": 462.60564347509296
+          },
+          {
+            "anio": 2008,
+            "valor": 448.4812994983242
+          },
+          {
+            "anio": 2009,
+            "valor": 458.7032183085904
+          },
+          {
+            "anio": 2010,
+            "valor": 409.48043029613126
+          },
+          {
+            "anio": 2011,
+            "valor": 380.0271939320528
+          },
+          {
+            "anio": 2012,
+            "valor": 333.3134022995913
+          },
+          {
+            "anio": 2013,
+            "valor": 363.7856754680282
+          },
+          {
+            "anio": 2014,
+            "valor": 369.06003436859123
+          },
+          {
+            "anio": 2015,
+            "valor": 353.4879358806553
+          },
+          {
+            "anio": 2016,
+            "valor": 328.85003694478235
+          },
+          {
+            "anio": 2017,
+            "valor": 309.15836095897765
+          },
+          {
+            "anio": 2018,
+            "valor": 283.91080628095074
+          },
+          {
+            "anio": 2019,
+            "valor": 264.821445390658
+          },
+          {
+            "anio": 2020,
+            "valor": 241.20380814890842
+          },
+          {
+            "anio": 2021,
+            "valor": 267.35813141223554
+          },
+          {
+            "anio": 2022,
+            "valor": 252.07024652056595
+          },
+          {
+            "anio": 2023,
+            "valor": 225.167738092731
+          },
+          {
+            "anio": 2024,
+            "valor": 234.7932167821155
+          }
+        ],
+        "tendencia": {
+          "variable": "prcptot_imerg",
+          "region": "noreste_mexico",
+          "periodo": [
+            "2001",
+            "2024"
+          ],
+          "n": 24,
+          "r1": 0.4241778353804296,
+          "n_ef": 9.703656107790874,
+          "pendiente_ols_decada": -159.9497147702571,
+          "ic95_decada": [
+            -184.82351993476942,
+            -135.07590960574478
+          ],
+          "p_t": 5.817206526710352e-07,
+          "sen_decada": -162.32469989121233,
+          "mk_z": -6.275513960760355,
+          "mk_tau": -0.9202898550724637,
+          "p_mk": 3.4848124386144264e-10,
+          "cambio_pct_decada": -41.61034862373321,
+          "snr": -1.390386872848842,
+          "n_star_anios": null,
+          "anios_faltantes": null,
+          "veredicto": "significativo",
+          "direccion": "baja",
+          "metodos": [
+            "ols_neff",
+            "mk_hamed_rao",
+            "n_star_no_aplica_anual"
+          ]
+        }
+      },
+      "sdii_imerg": {
+        "id": "sdii_imerg",
+        "indicador": "sdii",
+        "nombre_simple": "Fuerza de la lluvia",
+        "definicion_simple": "Cuánto llueve, en promedio, en un día con lluvia.",
+        "unidad": "mm/dia",
+        "serie": [
+          {
+            "anio": 2001,
+            "valor": 11.826970829069898
+          },
+          {
+            "anio": 2002,
+            "valor": 11.586287730951057
+          },
+          {
+            "anio": 2003,
+            "valor": 11.22545710651367
+          },
+          {
+            "anio": 2004,
+            "valor": 11.153290343704901
+          },
+          {
+            "anio": 2005,
+            "valor": 11.379275309980072
+          },
+          {
+            "anio": 2006,
+            "valor": 10.844550907633282
+          },
+          {
+            "anio": 2007,
+            "valor": 10.408793995035797
+          },
+          {
+            "anio": 2008,
+            "valor": 10.325924784056717
+          },
+          {
+            "anio": 2009,
+            "valor": 10.336180938151799
+          },
+          {
+            "anio": 2010,
+            "valor": 9.578688165689728
+          },
+          {
+            "anio": 2011,
+            "valor": 9.48785853427114
+          },
+          {
+            "anio": 2012,
+            "valor": 8.674915217660885
+          },
+          {
+            "anio": 2013,
+            "valor": 9.192791306845436
+          },
+          {
+            "anio": 2014,
+            "valor": 9.29679807764951
+          },
+          {
+            "anio": 2015,
+            "valor": 8.977459634720523
+          },
+          {
+            "anio": 2016,
+            "valor": 8.779522267462914
+          },
+          {
+            "anio": 2017,
+            "valor": 8.14919204947549
+          },
+          {
+            "anio": 2018,
+            "valor": 8.123940709307789
+          },
+          {
+            "anio": 2019,
+            "valor": 7.993811408036359
+          },
+          {
+            "anio": 2020,
+            "valor": 7.527619653690069
+          },
+          {
+            "anio": 2021,
+            "valor": 7.710376430921762
+          },
+          {
+            "anio": 2022,
+            "valor": 7.44397492857397
+          },
+          {
+            "anio": 2023,
+            "valor": 7.2368690844620565
+          },
+          {
+            "anio": 2024,
+            "valor": 7.164474786083254
+          }
+        ],
+        "tendencia": {
+          "variable": "sdii_imerg",
+          "region": "noreste_mexico",
+          "periodo": [
+            "2001",
+            "2024"
+          ],
+          "n": 24,
+          "r1": 0.17921120344367686,
+          "n_ef": 16.70517635842038,
+          "pendiente_ols_decada": -2.0976929834209876,
+          "ic95_decada": [
+            -2.2910632157402864,
+            -1.9043227511016891
+          ],
+          "p_t": 5.548155074722e-13,
+          "sen_decada": -2.073226922371679,
+          "mk_z": -6.374731572788186,
+          "mk_tau": -0.9347826086956522,
+          "p_mk": 1.8328361051089814e-10,
+          "cambio_pct_decada": -22.432717466145803,
+          "snr": -1.3952218070740403,
+          "n_star_anios": null,
+          "anios_faltantes": null,
+          "veredicto": "significativo",
+          "direccion": "baja",
+          "metodos": [
+            "ols_neff",
+            "mk_hamed_rao",
+            "n_star_no_aplica_anual"
+          ]
+        }
+      }
+    },
+    "dos_caras_extremos": {
+      "region_a": {
+        "variable": "cdd_imerg",
+        "region": "noreste_mexico",
+        "periodo": [
+          "2001",
+          "2024"
+        ],
+        "n": 24,
+        "r1": -0.17844459704507623,
+        "n_ef": 24.0,
+        "pendiente_ols_decada": 6.362331325299388,
+        "ic95_decada": [
+          2.6108075523351406,
+          10.113855098263635
+        ],
+        "p_t": 0.0019424824487075632,
+        "sen_decada": 6.321850179116906,
+        "mk_z": 2.951723957827993,
+        "mk_tau": 0.43478260869565216,
+        "p_mk": 0.003160052923044443,
+        "cambio_pct_decada": 6.164239126846807,
+        "snr": 0.8484257843265157,
+        "n_star_anios": null,
+        "anios_faltantes": null,
+        "veredicto": "significativo",
+        "direccion": "sube",
+        "metodos": [
+          "ols_neff",
+          "mk_hamed_rao",
+          "n_star_no_aplica_anual"
+        ]
+      },
+      "region_b": {
+        "variable": "r20mm_imerg",
+        "region": "noreste_mexico",
+        "periodo": [
+          "2001",
+          "2024"
+        ],
+        "n": 24,
+        "r1": 0.2338424023929615,
+        "n_ef": 14.902861424527924,
+        "pendiente_ols_decada": -3.134130340636294,
+        "ic95_decada": [
+          -3.673082370055955,
+          -2.595178311216633
+        ],
+        "p_t": 1.2965420193926027e-08,
+        "sen_decada": -3.1168643538853953,
+        "mk_z": -5.72981709460728,
+        "mk_tau": -0.8405797101449275,
+        "p_mk": 1.0053898158446373e-08,
+        "cambio_pct_decada": -81.98330828648722,
+        "snr": -1.359804039387391,
+        "n_star_anios": null,
+        "anios_faltantes": null,
+        "veredicto": "significativo",
+        "direccion": "baja",
+        "metodos": [
+          "ols_neff",
+          "mk_hamed_rao",
+          "n_star_no_aplica_anual"
+        ]
+      },
+      "signo_opuesto": true,
+      "ambas_significativas": true,
+      "dos_caras": true
+    }
+  }
+}

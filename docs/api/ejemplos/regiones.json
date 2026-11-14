@@ -1,0 +1,4044 @@
+{
+  "request": "GET /api/v1/regiones?zona=mexico_centroamerica",
+  "status": 200,
+  "response": {
+    "total": 14,
+    "zonas_disponibles": [
+      "mexico",
+      "centroamerica",
+      "mexico_centroamerica",
+      "caribe",
+      "sudamerica",
+      "latinoamerica",
+      "referencia_global"
+    ],
+    "shortcuts": [
+      {
+        "id": "noreste_mexico",
+        "nombre": "Noreste de México",
+        "zona": "mexico",
+        "pais": "México",
+        "bbox": [
+          -106.0,
+          22.0,
+          -97.0,
+          30.0
+        ],
+        "centro": {
+          "lat": 26.0,
+          "lon": -101.5
+        },
+        "region": "noreste_mexico",
+        "oeste": -106.0,
+        "sur": 22.0,
+        "este": -97.0,
+        "norte": 30.0,
+        "centro_lat": 26.0,
+        "centro_lon": -101.5,
+        "query_region": "?region=noreste_mexico",
+        "query_bbox": "?oeste=-106&sur=22&este=-97&norte=30"
+      },
+      {
+        "id": "noroeste_mexico_sonora_sinaloa",
+        "nombre": "Noroeste de México (Sonora, Sinaloa y Chihuahua)",
+        "zona": "mexico",
+        "pais": "México",
+        "bbox": [
+          -115.0,
+          23.0,
+          -106.0,
+          32.5
+        ],
+        "centro": {
+          "lat": 27.75,
+          "lon": -110.5
+        },
+        "region": "noroeste_mexico_sonora_sinaloa",
+        "oeste": -115.0,
+        "sur": 23.0,
+        "este": -106.0,
+        "norte": 32.5,
+        "centro_lat": 27.75,
+        "centro_lon": -110.5,
+        "query_region": "?region=noroeste_mexico_sonora_sinaloa",
+        "query_bbox": "?oeste=-115&sur=23&este=-106&norte=32.5"
+      },
+      {
+        "id": "peninsula_baja_california",
+        "nombre": "Península de Baja California",
+        "zona": "mexico",
+        "pais": "México",
+        "bbox": [
+          -117.0,
+          22.8,
+          -109.4,
+          32.5
+        ],
+        "centro": {
+          "lat": 27.65,
+          "lon": -113.2
+        },
+        "region": "peninsula_baja_california",
+        "oeste": -117.0,
+        "sur": 22.8,
+        "este": -109.4,
+        "norte": 32.5,
+        "centro_lat": 27.65,
+        "centro_lon": -113.2,
+        "query_region": "?region=peninsula_baja_california",
+        "query_bbox": "?oeste=-117&sur=22.8&este=-109.4&norte=32.5"
+      },
+      {
+        "id": "altiplano_central_bajio",
+        "nombre": "Altiplano Central y El Bajío (Centro de México)",
+        "zona": "mexico",
+        "pais": "México",
+        "bbox": [
+          -104.5,
+          18.5,
+          -97.5,
+          22.5
+        ],
+        "centro": {
+          "lat": 20.5,
+          "lon": -101.0
+        },
+        "region": "altiplano_central_bajio",
+        "oeste": -104.5,
+        "sur": 18.5,
+        "este": -97.5,
+        "norte": 22.5,
+        "centro_lat": 20.5,
+        "centro_lon": -101.0,
+        "query_region": "?region=altiplano_central_bajio",
+        "query_bbox": "?oeste=-104.5&sur=18.5&este=-97.5&norte=22.5"
+      },
+      {
+        "id": "golfo_centro_veracruz",
+        "nombre": "Cuenca del Golfo Centro (Veracruz y Huasteca)",
+        "zona": "mexico",
+        "pais": "México",
+        "bbox": [
+          -99.0,
+          17.2,
+          -95.0,
+          22.5
+        ],
+        "centro": {
+          "lat": 19.85,
+          "lon": -97.0
+        },
+        "region": "golfo_centro_veracruz",
+        "oeste": -99.0,
+        "sur": 17.2,
+        "este": -95.0,
+        "norte": 22.5,
+        "centro_lat": 19.85,
+        "centro_lon": -97.0,
+        "query_region": "?region=golfo_centro_veracruz",
+        "query_bbox": "?oeste=-99&sur=17.2&este=-95&norte=22.5"
+      },
+      {
+        "id": "pacifico_sur_mexico",
+        "nombre": "Pacífico Sur de México (Guerrero y Oaxaca)",
+        "zona": "mexico",
+        "pais": "México",
+        "bbox": [
+          -102.2,
+          15.6,
+          -94.0,
+          18.8
+        ],
+        "centro": {
+          "lat": 17.2,
+          "lon": -98.1
+        },
+        "region": "pacifico_sur_mexico",
+        "oeste": -102.2,
+        "sur": 15.6,
+        "este": -94.0,
+        "norte": 18.8,
+        "centro_lat": 17.2,
+        "centro_lon": -98.1,
+        "query_region": "?region=pacifico_sur_mexico",
+        "query_bbox": "?oeste=-102.2&sur=15.6&este=-94&norte=18.8"
+      },
+      {
+        "id": "sureste_mexico",
+        "nombre": "Sureste de México (Chiapas, Tabasco y Yucatán)",
+        "zona": "mexico",
+        "pais": "México",
+        "bbox": [
+          -94.5,
+          14.5,
+          -86.5,
+          21.7
+        ],
+        "centro": {
+          "lat": 18.1,
+          "lon": -90.5
+        },
+        "region": "sureste_mexico",
+        "oeste": -94.5,
+        "sur": 14.5,
+        "este": -86.5,
+        "norte": 21.7,
+        "centro_lat": 18.1,
+        "centro_lon": -90.5,
+        "query_region": "?region=sureste_mexico",
+        "query_bbox": "?oeste=-94.5&sur=14.5&este=-86.5&norte=21.7"
+      },
+      {
+        "id": "peninsula_yucatan",
+        "nombre": "Península de Yucatán",
+        "zona": "mexico",
+        "pais": "México",
+        "bbox": [
+          -91.5,
+          17.8,
+          -86.7,
+          21.6
+        ],
+        "centro": {
+          "lat": 19.7,
+          "lon": -89.1
+        },
+        "region": "peninsula_yucatan",
+        "oeste": -91.5,
+        "sur": 17.8,
+        "este": -86.7,
+        "norte": 21.6,
+        "centro_lat": 19.7,
+        "centro_lon": -89.1,
+        "query_region": "?region=peninsula_yucatan",
+        "query_bbox": "?oeste=-91.5&sur=17.8&este=-86.7&norte=21.6"
+      },
+      {
+        "id": "corredor_seco_centroamericano",
+        "nombre": "Corredor Seco Centroamericano",
+        "zona": "centroamerica",
+        "pais": "Guatemala, El Salvador, Honduras y Nicaragua",
+        "bbox": [
+          -92.2,
+          11.5,
+          -85.0,
+          16.0
+        ],
+        "centro": {
+          "lat": 13.75,
+          "lon": -88.6
+        },
+        "region": "corredor_seco_centroamericano",
+        "oeste": -92.2,
+        "sur": 11.5,
+        "este": -85.0,
+        "norte": 16.0,
+        "centro_lat": 13.75,
+        "centro_lon": -88.6,
+        "query_region": "?region=corredor_seco_centroamericano",
+        "query_bbox": "?oeste=-92.2&sur=11.5&este=-85&norte=16"
+      },
+      {
+        "id": "guatemala_belice",
+        "nombre": "Guatemala y Belice",
+        "zona": "centroamerica",
+        "pais": "Guatemala y Belice",
+        "bbox": [
+          -92.3,
+          13.7,
+          -87.8,
+          18.5
+        ],
+        "centro": {
+          "lat": 16.1,
+          "lon": -90.05
+        },
+        "region": "guatemala_belice",
+        "oeste": -92.3,
+        "sur": 13.7,
+        "este": -87.8,
+        "norte": 18.5,
+        "centro_lat": 16.1,
+        "centro_lon": -90.05,
+        "query_region": "?region=guatemala_belice",
+        "query_bbox": "?oeste=-92.3&sur=13.7&este=-87.8&norte=18.5"
+      },
+      {
+        "id": "el_salvador_honduras",
+        "nombre": "El Salvador y Honduras",
+        "zona": "centroamerica",
+        "pais": "El Salvador y Honduras",
+        "bbox": [
+          -90.2,
+          13.0,
+          -83.1,
+          16.5
+        ],
+        "centro": {
+          "lat": 14.75,
+          "lon": -86.65
+        },
+        "region": "el_salvador_honduras",
+        "oeste": -90.2,
+        "sur": 13.0,
+        "este": -83.1,
+        "norte": 16.5,
+        "centro_lat": 14.75,
+        "centro_lon": -86.65,
+        "query_region": "?region=el_salvador_honduras",
+        "query_bbox": "?oeste=-90.2&sur=13&este=-83.1&norte=16.5"
+      },
+      {
+        "id": "nicaragua",
+        "nombre": "Nicaragua (Depresión Lacustre y Caribe)",
+        "zona": "centroamerica",
+        "pais": "Nicaragua",
+        "bbox": [
+          -87.7,
+          10.7,
+          -83.1,
+          15.0
+        ],
+        "centro": {
+          "lat": 12.85,
+          "lon": -85.4
+        },
+        "region": "nicaragua",
+        "oeste": -87.7,
+        "sur": 10.7,
+        "este": -83.1,
+        "norte": 15.0,
+        "centro_lat": 12.85,
+        "centro_lon": -85.4,
+        "query_region": "?region=nicaragua",
+        "query_bbox": "?oeste=-87.7&sur=10.7&este=-83.1&norte=15"
+      },
+      {
+        "id": "costa_rica_panama",
+        "nombre": "Costa Rica y Panamá",
+        "zona": "centroamerica",
+        "pais": "Costa Rica y Panamá",
+        "bbox": [
+          -85.9,
+          7.2,
+          -77.2,
+          11.2
+        ],
+        "centro": {
+          "lat": 9.2,
+          "lon": -81.55
+        },
+        "region": "costa_rica_panama",
+        "oeste": -85.9,
+        "sur": 7.2,
+        "este": -77.2,
+        "norte": 11.2,
+        "centro_lat": 9.2,
+        "centro_lon": -81.55,
+        "query_region": "?region=costa_rica_panama",
+        "query_bbox": "?oeste=-85.9&sur=7.2&este=-77.2&norte=11.2"
+      },
+      {
+        "id": "istmo_centroamericano_completo",
+        "nombre": "Centroamérica Completa (Istmo)",
+        "zona": "centroamerica",
+        "pais": "Belice, Guatemala, El Salvador, Honduras, Nicaragua, Costa Rica y Panamá",
+        "bbox": [
+          -92.3,
+          7.2,
+          -77.2,
+          18.5
+        ],
+        "centro": {
+          "lat": 12.85,
+          "lon": -84.75
+        },
+        "region": "istmo_centroamericano_completo",
+        "oeste": -92.3,
+        "sur": 7.2,
+        "este": -77.2,
+        "norte": 18.5,
+        "centro_lat": 12.85,
+        "centro_lon": -84.75,
+        "query_region": "?region=istmo_centroamericano_completo",
+        "query_bbox": "?oeste=-92.3&sur=7.2&este=-77.2&norte=18.5"
+      }
+    ],
+    "por_zona": {
+      "mexico": [
+        {
+          "id": "noreste_mexico",
+          "nombre": "Noreste de México",
+          "descripcion": "Coahuila, Nuevo León y Tamaulipas (cuenca del Río Bravo y Sierra Madre Oriental).",
+          "zona": "mexico",
+          "pais": "México",
+          "es_latinoamerica": true,
+          "bbox": [
+            -106.0,
+            22.0,
+            -97.0,
+            30.0
+          ],
+          "predefinida": true,
+          "coordenadas": {
+            "oeste": -106.0,
+            "sur": 22.0,
+            "este": -97.0,
+            "norte": 30.0,
+            "lon_min": -106.0,
+            "lat_min": 22.0,
+            "lon_max": -97.0,
+            "lat_max": 30.0,
+            "centro": {
+              "lat": 26.0,
+              "lon": -101.5
+            },
+            "extension_grados": {
+              "ancho_lon": 9.0,
+              "alto_lat": 8.0
+            },
+            "esquinas": {
+              "suroeste": {
+                "lat": 22.0,
+                "lon": -106.0
+              },
+              "sureste": {
+                "lat": 22.0,
+                "lon": -97.0
+              },
+              "noreste": {
+                "lat": 30.0,
+                "lon": -97.0
+              },
+              "noroeste": {
+                "lat": 30.0,
+                "lon": -106.0
+              }
+            },
+            "poligono_geojson": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [
+                    -106.0,
+                    22.0
+                  ],
+                  [
+                    -97.0,
+                    22.0
+                  ],
+                  [
+                    -97.0,
+                    30.0
+                  ],
+                  [
+                    -106.0,
+                    30.0
+                  ],
+                  [
+                    -106.0,
+                    22.0
+                  ]
+                ]
+              ]
+            }
+          },
+          "mallas_reales": {
+            "gpcp": {
+              "resolucion": "0.5° × 0.5°",
+              "lat_min_real": 22.25,
+              "lat_max_real": 29.75,
+              "lon_min_real": -105.75,
+              "lon_max_real": -97.25,
+              "n_lat": 16,
+              "n_lon": 18,
+              "n_celdas": 288
+            },
+            "merra2": {
+              "resolucion": "0.5° × 0.625°",
+              "lat_min_real": 22.0,
+              "lat_max_real": 30.0,
+              "lon_min_real": -105.625,
+              "lon_max_real": -97.5,
+              "n_lat": 17,
+              "n_lon": 14,
+              "n_celdas": 238
+            },
+            "gldas": {
+              "resolucion": "0.25° × 0.25°",
+              "lat_min_real": 22.125,
+              "lat_max_real": 29.875,
+              "lon_min_real": -105.875,
+              "lon_max_real": -97.125,
+              "n_lat": 32,
+              "n_lon": 36,
+              "n_celdas": 1152
+            },
+            "imerg": {
+              "resolucion": "0.1° × 0.1°",
+              "lat_min_real": 22.05,
+              "lat_max_real": 29.95,
+              "lon_min_real": -105.95,
+              "lon_max_real": -97.05,
+              "n_lat": 80,
+              "n_lon": 90,
+              "n_celdas": 7200
+            }
+          },
+          "shortcut": {
+            "region": "noreste_mexico",
+            "oeste": -106.0,
+            "sur": 22.0,
+            "este": -97.0,
+            "norte": 30.0,
+            "centro_lat": 26.0,
+            "centro_lon": -101.5,
+            "query_region": "?region=noreste_mexico",
+            "query_bbox": "?oeste=-106&sur=22&este=-97&norte=30"
+          }
+        },
+        {
+          "id": "noroeste_mexico_sonora_sinaloa",
+          "nombre": "Noroeste de México (Sonora, Sinaloa y Chihuahua)",
+          "descripcion": "Región del monzón norteamericano, Desierto de Sonora, valles agrícolas de Sinaloa y Sierra Madre Occidental.",
+          "zona": "mexico",
+          "pais": "México",
+          "es_latinoamerica": true,
+          "bbox": [
+            -115.0,
+            23.0,
+            -106.0,
+            32.5
+          ],
+          "predefinida": true,
+          "coordenadas": {
+            "oeste": -115.0,
+            "sur": 23.0,
+            "este": -106.0,
+            "norte": 32.5,
+            "lon_min": -115.0,
+            "lat_min": 23.0,
+            "lon_max": -106.0,
+            "lat_max": 32.5,
+            "centro": {
+              "lat": 27.75,
+              "lon": -110.5
+            },
+            "extension_grados": {
+              "ancho_lon": 9.0,
+              "alto_lat": 9.5
+            },
+            "esquinas": {
+              "suroeste": {
+                "lat": 23.0,
+                "lon": -115.0
+              },
+              "sureste": {
+                "lat": 23.0,
+                "lon": -106.0
+              },
+              "noreste": {
+                "lat": 32.5,
+                "lon": -106.0
+              },
+              "noroeste": {
+                "lat": 32.5,
+                "lon": -115.0
+              }
+            },
+            "poligono_geojson": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [
+                    -115.0,
+                    23.0
+                  ],
+                  [
+                    -106.0,
+                    23.0
+                  ],
+                  [
+                    -106.0,
+                    32.5
+                  ],
+                  [
+                    -115.0,
+                    32.5
+                  ],
+                  [
+                    -115.0,
+                    23.0
+                  ]
+                ]
+              ]
+            }
+          },
+          "mallas_reales": {
+            "gpcp": {
+              "resolucion": "0.5° × 0.5°",
+              "lat_min_real": 23.25,
+              "lat_max_real": 32.25,
+              "lon_min_real": -114.75,
+              "lon_max_real": -106.25,
+              "n_lat": 19,
+              "n_lon": 18,
+              "n_celdas": 342
+            },
+            "merra2": {
+              "resolucion": "0.5° × 0.625°",
+              "lat_min_real": 23.0,
+              "lat_max_real": 32.5,
+              "lon_min_real": -115.0,
+              "lon_max_real": -106.25,
+              "n_lat": 20,
+              "n_lon": 15,
+              "n_celdas": 300
+            },
+            "gldas": {
+              "resolucion": "0.25° × 0.25°",
+              "lat_min_real": 23.125,
+              "lat_max_real": 32.375,
+              "lon_min_real": -114.875,
+              "lon_max_real": -106.125,
+              "n_lat": 38,
+              "n_lon": 36,
+              "n_celdas": 1368
+            },
+            "imerg": {
+              "resolucion": "0.1° × 0.1°",
+              "lat_min_real": 23.05,
+              "lat_max_real": 32.45,
+              "lon_min_real": -114.95,
+              "lon_max_real": -106.05,
+              "n_lat": 95,
+              "n_lon": 90,
+              "n_celdas": 8550
+            }
+          },
+          "shortcut": {
+            "region": "noroeste_mexico_sonora_sinaloa",
+            "oeste": -115.0,
+            "sur": 23.0,
+            "este": -106.0,
+            "norte": 32.5,
+            "centro_lat": 27.75,
+            "centro_lon": -110.5,
+            "query_region": "?region=noroeste_mexico_sonora_sinaloa",
+            "query_bbox": "?oeste=-115&sur=23&este=-106&norte=32.5"
+          }
+        },
+        {
+          "id": "peninsula_baja_california",
+          "nombre": "Península de Baja California",
+          "descripcion": "Baja California y Baja California Sur, zona árida con influencia de frentes invernales y ciclones del Pacífico.",
+          "zona": "mexico",
+          "pais": "México",
+          "es_latinoamerica": true,
+          "bbox": [
+            -117.0,
+            22.8,
+            -109.4,
+            32.5
+          ],
+          "predefinida": true,
+          "coordenadas": {
+            "oeste": -117.0,
+            "sur": 22.8,
+            "este": -109.4,
+            "norte": 32.5,
+            "lon_min": -117.0,
+            "lat_min": 22.8,
+            "lon_max": -109.4,
+            "lat_max": 32.5,
+            "centro": {
+              "lat": 27.65,
+              "lon": -113.2
+            },
+            "extension_grados": {
+              "ancho_lon": 7.6,
+              "alto_lat": 9.7
+            },
+            "esquinas": {
+              "suroeste": {
+                "lat": 22.8,
+                "lon": -117.0
+              },
+              "sureste": {
+                "lat": 22.8,
+                "lon": -109.4
+              },
+              "noreste": {
+                "lat": 32.5,
+                "lon": -109.4
+              },
+              "noroeste": {
+                "lat": 32.5,
+                "lon": -117.0
+              }
+            },
+            "poligono_geojson": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [
+                    -117.0,
+                    22.8
+                  ],
+                  [
+                    -109.4,
+                    22.8
+                  ],
+                  [
+                    -109.4,
+                    32.5
+                  ],
+                  [
+                    -117.0,
+                    32.5
+                  ],
+                  [
+                    -117.0,
+                    22.8
+                  ]
+                ]
+              ]
+            }
+          },
+          "mallas_reales": {
+            "gpcp": {
+              "resolucion": "0.5° × 0.5°",
+              "lat_min_real": 23.25,
+              "lat_max_real": 32.25,
+              "lon_min_real": -116.75,
+              "lon_max_real": -109.75,
+              "n_lat": 19,
+              "n_lon": 15,
+              "n_celdas": 285
+            },
+            "merra2": {
+              "resolucion": "0.5° × 0.625°",
+              "lat_min_real": 23.0,
+              "lat_max_real": 32.5,
+              "lon_min_real": -116.875,
+              "lon_max_real": -110.0,
+              "n_lat": 20,
+              "n_lon": 12,
+              "n_celdas": 240
+            },
+            "gldas": {
+              "resolucion": "0.25° × 0.25°",
+              "lat_min_real": 22.875,
+              "lat_max_real": 32.375,
+              "lon_min_real": -116.875,
+              "lon_max_real": -109.625,
+              "n_lat": 39,
+              "n_lon": 30,
+              "n_celdas": 1170
+            },
+            "imerg": {
+              "resolucion": "0.1° × 0.1°",
+              "lat_min_real": 22.85,
+              "lat_max_real": 32.45,
+              "lon_min_real": -116.95,
+              "lon_max_real": -109.45,
+              "n_lat": 97,
+              "n_lon": 76,
+              "n_celdas": 7372
+            }
+          },
+          "shortcut": {
+            "region": "peninsula_baja_california",
+            "oeste": -117.0,
+            "sur": 22.8,
+            "este": -109.4,
+            "norte": 32.5,
+            "centro_lat": 27.65,
+            "centro_lon": -113.2,
+            "query_region": "?region=peninsula_baja_california",
+            "query_bbox": "?oeste=-117&sur=22.8&este=-109.4&norte=32.5"
+          }
+        },
+        {
+          "id": "altiplano_central_bajio",
+          "nombre": "Altiplano Central y El Bajío (Centro de México)",
+          "descripcion": "Valle de México, Querétaro, Guanajuato, Michoacán, Jalisco, Hidalgo, Tlaxcala, Morelos y Puebla.",
+          "zona": "mexico",
+          "pais": "México",
+          "es_latinoamerica": true,
+          "bbox": [
+            -104.5,
+            18.5,
+            -97.5,
+            22.5
+          ],
+          "predefinida": true,
+          "coordenadas": {
+            "oeste": -104.5,
+            "sur": 18.5,
+            "este": -97.5,
+            "norte": 22.5,
+            "lon_min": -104.5,
+            "lat_min": 18.5,
+            "lon_max": -97.5,
+            "lat_max": 22.5,
+            "centro": {
+              "lat": 20.5,
+              "lon": -101.0
+            },
+            "extension_grados": {
+              "ancho_lon": 7.0,
+              "alto_lat": 4.0
+            },
+            "esquinas": {
+              "suroeste": {
+                "lat": 18.5,
+                "lon": -104.5
+              },
+              "sureste": {
+                "lat": 18.5,
+                "lon": -97.5
+              },
+              "noreste": {
+                "lat": 22.5,
+                "lon": -97.5
+              },
+              "noroeste": {
+                "lat": 22.5,
+                "lon": -104.5
+              }
+            },
+            "poligono_geojson": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [
+                    -104.5,
+                    18.5
+                  ],
+                  [
+                    -97.5,
+                    18.5
+                  ],
+                  [
+                    -97.5,
+                    22.5
+                  ],
+                  [
+                    -104.5,
+                    22.5
+                  ],
+                  [
+                    -104.5,
+                    18.5
+                  ]
+                ]
+              ]
+            }
+          },
+          "mallas_reales": {
+            "gpcp": {
+              "resolucion": "0.5° × 0.5°",
+              "lat_min_real": 18.75,
+              "lat_max_real": 22.25,
+              "lon_min_real": -104.25,
+              "lon_max_real": -97.75,
+              "n_lat": 8,
+              "n_lon": 14,
+              "n_celdas": 112
+            },
+            "merra2": {
+              "resolucion": "0.5° × 0.625°",
+              "lat_min_real": 18.5,
+              "lat_max_real": 22.5,
+              "lon_min_real": -104.375,
+              "lon_max_real": -97.5,
+              "n_lat": 9,
+              "n_lon": 12,
+              "n_celdas": 108
+            },
+            "gldas": {
+              "resolucion": "0.25° × 0.25°",
+              "lat_min_real": 18.625,
+              "lat_max_real": 22.375,
+              "lon_min_real": -104.375,
+              "lon_max_real": -97.625,
+              "n_lat": 16,
+              "n_lon": 28,
+              "n_celdas": 448
+            },
+            "imerg": {
+              "resolucion": "0.1° × 0.1°",
+              "lat_min_real": 18.55,
+              "lat_max_real": 22.45,
+              "lon_min_real": -104.45,
+              "lon_max_real": -97.55,
+              "n_lat": 40,
+              "n_lon": 70,
+              "n_celdas": 2800
+            }
+          },
+          "shortcut": {
+            "region": "altiplano_central_bajio",
+            "oeste": -104.5,
+            "sur": 18.5,
+            "este": -97.5,
+            "norte": 22.5,
+            "centro_lat": 20.5,
+            "centro_lon": -101.0,
+            "query_region": "?region=altiplano_central_bajio",
+            "query_bbox": "?oeste=-104.5&sur=18.5&este=-97.5&norte=22.5"
+          }
+        },
+        {
+          "id": "golfo_centro_veracruz",
+          "nombre": "Cuenca del Golfo Centro (Veracruz y Huasteca)",
+          "descripcion": "Vertiente húmeda del Golfo de México (Veracruz, Huasteca potosina, hidalguense y norte de Puebla).",
+          "zona": "mexico",
+          "pais": "México",
+          "es_latinoamerica": true,
+          "bbox": [
+            -99.0,
+            17.2,
+            -95.0,
+            22.5
+          ],
+          "predefinida": true,
+          "coordenadas": {
+            "oeste": -99.0,
+            "sur": 17.2,
+            "este": -95.0,
+            "norte": 22.5,
+            "lon_min": -99.0,
+            "lat_min": 17.2,
+            "lon_max": -95.0,
+            "lat_max": 22.5,
+            "centro": {
+              "lat": 19.85,
+              "lon": -97.0
+            },
+            "extension_grados": {
+              "ancho_lon": 4.0,
+              "alto_lat": 5.3
+            },
+            "esquinas": {
+              "suroeste": {
+                "lat": 17.2,
+                "lon": -99.0
+              },
+              "sureste": {
+                "lat": 17.2,
+                "lon": -95.0
+              },
+              "noreste": {
+                "lat": 22.5,
+                "lon": -95.0
+              },
+              "noroeste": {
+                "lat": 22.5,
+                "lon": -99.0
+              }
+            },
+            "poligono_geojson": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [
+                    -99.0,
+                    17.2
+                  ],
+                  [
+                    -95.0,
+                    17.2
+                  ],
+                  [
+                    -95.0,
+                    22.5
+                  ],
+                  [
+                    -99.0,
+                    22.5
+                  ],
+                  [
+                    -99.0,
+                    17.2
+                  ]
+                ]
+              ]
+            }
+          },
+          "mallas_reales": {
+            "gpcp": {
+              "resolucion": "0.5° × 0.5°",
+              "lat_min_real": 17.25,
+              "lat_max_real": 22.25,
+              "lon_min_real": -98.75,
+              "lon_max_real": -95.25,
+              "n_lat": 11,
+              "n_lon": 8,
+              "n_celdas": 88
+            },
+            "merra2": {
+              "resolucion": "0.5° × 0.625°",
+              "lat_min_real": 17.5,
+              "lat_max_real": 22.5,
+              "lon_min_real": -98.75,
+              "lon_max_real": -95.0,
+              "n_lat": 11,
+              "n_lon": 7,
+              "n_celdas": 77
+            },
+            "gldas": {
+              "resolucion": "0.25° × 0.25°",
+              "lat_min_real": 17.375,
+              "lat_max_real": 22.375,
+              "lon_min_real": -98.875,
+              "lon_max_real": -95.125,
+              "n_lat": 21,
+              "n_lon": 16,
+              "n_celdas": 336
+            },
+            "imerg": {
+              "resolucion": "0.1° × 0.1°",
+              "lat_min_real": 17.25,
+              "lat_max_real": 22.45,
+              "lon_min_real": -98.95,
+              "lon_max_real": -95.05,
+              "n_lat": 53,
+              "n_lon": 40,
+              "n_celdas": 2120
+            }
+          },
+          "shortcut": {
+            "region": "golfo_centro_veracruz",
+            "oeste": -99.0,
+            "sur": 17.2,
+            "este": -95.0,
+            "norte": 22.5,
+            "centro_lat": 19.85,
+            "centro_lon": -97.0,
+            "query_region": "?region=golfo_centro_veracruz",
+            "query_bbox": "?oeste=-99&sur=17.2&este=-95&norte=22.5"
+          }
+        },
+        {
+          "id": "pacifico_sur_mexico",
+          "nombre": "Pacífico Sur de México (Guerrero y Oaxaca)",
+          "descripcion": "Sierra Madre del Sur y costa pacífica de Guerrero y Oaxaca, altamente expuesta a ciclones tropicales y sequía intraestival.",
+          "zona": "mexico",
+          "pais": "México",
+          "es_latinoamerica": true,
+          "bbox": [
+            -102.2,
+            15.6,
+            -94.0,
+            18.8
+          ],
+          "predefinida": true,
+          "coordenadas": {
+            "oeste": -102.2,
+            "sur": 15.6,
+            "este": -94.0,
+            "norte": 18.8,
+            "lon_min": -102.2,
+            "lat_min": 15.6,
+            "lon_max": -94.0,
+            "lat_max": 18.8,
+            "centro": {
+              "lat": 17.2,
+              "lon": -98.1
+            },
+            "extension_grados": {
+              "ancho_lon": 8.2,
+              "alto_lat": 3.2
+            },
+            "esquinas": {
+              "suroeste": {
+                "lat": 15.6,
+                "lon": -102.2
+              },
+              "sureste": {
+                "lat": 15.6,
+                "lon": -94.0
+              },
+              "noreste": {
+                "lat": 18.8,
+                "lon": -94.0
+              },
+              "noroeste": {
+                "lat": 18.8,
+                "lon": -102.2
+              }
+            },
+            "poligono_geojson": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [
+                    -102.2,
+                    15.6
+                  ],
+                  [
+                    -94.0,
+                    15.6
+                  ],
+                  [
+                    -94.0,
+                    18.8
+                  ],
+                  [
+                    -102.2,
+                    18.8
+                  ],
+                  [
+                    -102.2,
+                    15.6
+                  ]
+                ]
+              ]
+            }
+          },
+          "mallas_reales": {
+            "gpcp": {
+              "resolucion": "0.5° × 0.5°",
+              "lat_min_real": 15.75,
+              "lat_max_real": 18.75,
+              "lon_min_real": -101.75,
+              "lon_max_real": -94.25,
+              "n_lat": 7,
+              "n_lon": 16,
+              "n_celdas": 112
+            },
+            "merra2": {
+              "resolucion": "0.5° × 0.625°",
+              "lat_min_real": 16.0,
+              "lat_max_real": 18.5,
+              "lon_min_real": -101.875,
+              "lon_max_real": -94.375,
+              "n_lat": 6,
+              "n_lon": 13,
+              "n_celdas": 78
+            },
+            "gldas": {
+              "resolucion": "0.25° × 0.25°",
+              "lat_min_real": 15.625,
+              "lat_max_real": 18.625,
+              "lon_min_real": -102.125,
+              "lon_max_real": -94.125,
+              "n_lat": 13,
+              "n_lon": 33,
+              "n_celdas": 429
+            },
+            "imerg": {
+              "resolucion": "0.1° × 0.1°",
+              "lat_min_real": 15.65,
+              "lat_max_real": 18.75,
+              "lon_min_real": -102.15,
+              "lon_max_real": -94.05,
+              "n_lat": 32,
+              "n_lon": 82,
+              "n_celdas": 2624
+            }
+          },
+          "shortcut": {
+            "region": "pacifico_sur_mexico",
+            "oeste": -102.2,
+            "sur": 15.6,
+            "este": -94.0,
+            "norte": 18.8,
+            "centro_lat": 17.2,
+            "centro_lon": -98.1,
+            "query_region": "?region=pacifico_sur_mexico",
+            "query_bbox": "?oeste=-102.2&sur=15.6&este=-94&norte=18.8"
+          }
+        },
+        {
+          "id": "sureste_mexico",
+          "nombre": "Sureste de México (Chiapas, Tabasco y Yucatán)",
+          "descripcion": "Chiapas, Tabasco y la península de Yucatán (cuencas Grijalva-Usumacinta y selva maya).",
+          "zona": "mexico",
+          "pais": "México",
+          "es_latinoamerica": true,
+          "bbox": [
+            -94.5,
+            14.5,
+            -86.5,
+            21.7
+          ],
+          "predefinida": true,
+          "coordenadas": {
+            "oeste": -94.5,
+            "sur": 14.5,
+            "este": -86.5,
+            "norte": 21.7,
+            "lon_min": -94.5,
+            "lat_min": 14.5,
+            "lon_max": -86.5,
+            "lat_max": 21.7,
+            "centro": {
+              "lat": 18.1,
+              "lon": -90.5
+            },
+            "extension_grados": {
+              "ancho_lon": 8.0,
+              "alto_lat": 7.2
+            },
+            "esquinas": {
+              "suroeste": {
+                "lat": 14.5,
+                "lon": -94.5
+              },
+              "sureste": {
+                "lat": 14.5,
+                "lon": -86.5
+              },
+              "noreste": {
+                "lat": 21.7,
+                "lon": -86.5
+              },
+              "noroeste": {
+                "lat": 21.7,
+                "lon": -94.5
+              }
+            },
+            "poligono_geojson": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [
+                    -94.5,
+                    14.5
+                  ],
+                  [
+                    -86.5,
+                    14.5
+                  ],
+                  [
+                    -86.5,
+                    21.7
+                  ],
+                  [
+                    -94.5,
+                    21.7
+                  ],
+                  [
+                    -94.5,
+                    14.5
+                  ]
+                ]
+              ]
+            }
+          },
+          "mallas_reales": {
+            "gpcp": {
+              "resolucion": "0.5° × 0.5°",
+              "lat_min_real": 14.75,
+              "lat_max_real": 21.25,
+              "lon_min_real": -94.25,
+              "lon_max_real": -86.75,
+              "n_lat": 14,
+              "n_lon": 16,
+              "n_celdas": 224
+            },
+            "merra2": {
+              "resolucion": "0.5° × 0.625°",
+              "lat_min_real": 14.5,
+              "lat_max_real": 21.5,
+              "lon_min_real": -94.375,
+              "lon_max_real": -86.875,
+              "n_lat": 15,
+              "n_lon": 13,
+              "n_celdas": 195
+            },
+            "gldas": {
+              "resolucion": "0.25° × 0.25°",
+              "lat_min_real": 14.625,
+              "lat_max_real": 21.625,
+              "lon_min_real": -94.375,
+              "lon_max_real": -86.625,
+              "n_lat": 29,
+              "n_lon": 32,
+              "n_celdas": 928
+            },
+            "imerg": {
+              "resolucion": "0.1° × 0.1°",
+              "lat_min_real": 14.55,
+              "lat_max_real": 21.65,
+              "lon_min_real": -94.45,
+              "lon_max_real": -86.55,
+              "n_lat": 72,
+              "n_lon": 80,
+              "n_celdas": 5760
+            }
+          },
+          "shortcut": {
+            "region": "sureste_mexico",
+            "oeste": -94.5,
+            "sur": 14.5,
+            "este": -86.5,
+            "norte": 21.7,
+            "centro_lat": 18.1,
+            "centro_lon": -90.5,
+            "query_region": "?region=sureste_mexico",
+            "query_bbox": "?oeste=-94.5&sur=14.5&este=-86.5&norte=21.7"
+          }
+        },
+        {
+          "id": "peninsula_yucatan",
+          "nombre": "Península de Yucatán",
+          "descripcion": "Plataforma kárstica de Yucatán, Campeche y Quintana Roo.",
+          "zona": "mexico",
+          "pais": "México",
+          "es_latinoamerica": true,
+          "bbox": [
+            -91.5,
+            17.8,
+            -86.7,
+            21.6
+          ],
+          "predefinida": true,
+          "coordenadas": {
+            "oeste": -91.5,
+            "sur": 17.8,
+            "este": -86.7,
+            "norte": 21.6,
+            "lon_min": -91.5,
+            "lat_min": 17.8,
+            "lon_max": -86.7,
+            "lat_max": 21.6,
+            "centro": {
+              "lat": 19.7,
+              "lon": -89.1
+            },
+            "extension_grados": {
+              "ancho_lon": 4.8,
+              "alto_lat": 3.8
+            },
+            "esquinas": {
+              "suroeste": {
+                "lat": 17.8,
+                "lon": -91.5
+              },
+              "sureste": {
+                "lat": 17.8,
+                "lon": -86.7
+              },
+              "noreste": {
+                "lat": 21.6,
+                "lon": -86.7
+              },
+              "noroeste": {
+                "lat": 21.6,
+                "lon": -91.5
+              }
+            },
+            "poligono_geojson": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [
+                    -91.5,
+                    17.8
+                  ],
+                  [
+                    -86.7,
+                    17.8
+                  ],
+                  [
+                    -86.7,
+                    21.6
+                  ],
+                  [
+                    -91.5,
+                    21.6
+                  ],
+                  [
+                    -91.5,
+                    17.8
+                  ]
+                ]
+              ]
+            }
+          },
+          "mallas_reales": {
+            "gpcp": {
+              "resolucion": "0.5° × 0.5°",
+              "lat_min_real": 18.25,
+              "lat_max_real": 21.25,
+              "lon_min_real": -91.25,
+              "lon_max_real": -86.75,
+              "n_lat": 7,
+              "n_lon": 10,
+              "n_celdas": 70
+            },
+            "merra2": {
+              "resolucion": "0.5° × 0.625°",
+              "lat_min_real": 18.0,
+              "lat_max_real": 21.5,
+              "lon_min_real": -91.25,
+              "lon_max_real": -86.875,
+              "n_lat": 8,
+              "n_lon": 8,
+              "n_celdas": 64
+            },
+            "gldas": {
+              "resolucion": "0.25° × 0.25°",
+              "lat_min_real": 17.875,
+              "lat_max_real": 21.375,
+              "lon_min_real": -91.375,
+              "lon_max_real": -86.875,
+              "n_lat": 15,
+              "n_lon": 19,
+              "n_celdas": 285
+            },
+            "imerg": {
+              "resolucion": "0.1° × 0.1°",
+              "lat_min_real": 17.85,
+              "lat_max_real": 21.55,
+              "lon_min_real": -91.45,
+              "lon_max_real": -86.75,
+              "n_lat": 38,
+              "n_lon": 48,
+              "n_celdas": 1824
+            }
+          },
+          "shortcut": {
+            "region": "peninsula_yucatan",
+            "oeste": -91.5,
+            "sur": 17.8,
+            "este": -86.7,
+            "norte": 21.6,
+            "centro_lat": 19.7,
+            "centro_lon": -89.1,
+            "query_region": "?region=peninsula_yucatan",
+            "query_bbox": "?oeste=-91.5&sur=17.8&este=-86.7&norte=21.6"
+          }
+        }
+      ],
+      "centroamerica": [
+        {
+          "id": "corredor_seco_centroamericano",
+          "nombre": "Corredor Seco Centroamericano",
+          "descripcion": "Franja pacífica y valles interiores desde Chiapas/Guatemala hasta el noroeste de Costa Rica, crítica por canícula y El Niño.",
+          "zona": "centroamerica",
+          "pais": "Guatemala, El Salvador, Honduras y Nicaragua",
+          "es_latinoamerica": true,
+          "bbox": [
+            -92.2,
+            11.5,
+            -85.0,
+            16.0
+          ],
+          "predefinida": true,
+          "coordenadas": {
+            "oeste": -92.2,
+            "sur": 11.5,
+            "este": -85.0,
+            "norte": 16.0,
+            "lon_min": -92.2,
+            "lat_min": 11.5,
+            "lon_max": -85.0,
+            "lat_max": 16.0,
+            "centro": {
+              "lat": 13.75,
+              "lon": -88.6
+            },
+            "extension_grados": {
+              "ancho_lon": 7.2,
+              "alto_lat": 4.5
+            },
+            "esquinas": {
+              "suroeste": {
+                "lat": 11.5,
+                "lon": -92.2
+              },
+              "sureste": {
+                "lat": 11.5,
+                "lon": -85.0
+              },
+              "noreste": {
+                "lat": 16.0,
+                "lon": -85.0
+              },
+              "noroeste": {
+                "lat": 16.0,
+                "lon": -92.2
+              }
+            },
+            "poligono_geojson": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [
+                    -92.2,
+                    11.5
+                  ],
+                  [
+                    -85.0,
+                    11.5
+                  ],
+                  [
+                    -85.0,
+                    16.0
+                  ],
+                  [
+                    -92.2,
+                    16.0
+                  ],
+                  [
+                    -92.2,
+                    11.5
+                  ]
+                ]
+              ]
+            }
+          },
+          "mallas_reales": {
+            "gpcp": {
+              "resolucion": "0.5° × 0.5°",
+              "lat_min_real": 11.75,
+              "lat_max_real": 15.75,
+              "lon_min_real": -91.75,
+              "lon_max_real": -85.25,
+              "n_lat": 9,
+              "n_lon": 14,
+              "n_celdas": 126
+            },
+            "merra2": {
+              "resolucion": "0.5° × 0.625°",
+              "lat_min_real": 11.5,
+              "lat_max_real": 16.0,
+              "lon_min_real": -91.875,
+              "lon_max_real": -85.0,
+              "n_lat": 10,
+              "n_lon": 12,
+              "n_celdas": 120
+            },
+            "gldas": {
+              "resolucion": "0.25° × 0.25°",
+              "lat_min_real": 11.625,
+              "lat_max_real": 15.875,
+              "lon_min_real": -92.125,
+              "lon_max_real": -85.125,
+              "n_lat": 18,
+              "n_lon": 29,
+              "n_celdas": 522
+            },
+            "imerg": {
+              "resolucion": "0.1° × 0.1°",
+              "lat_min_real": 11.55,
+              "lat_max_real": 15.95,
+              "lon_min_real": -92.15,
+              "lon_max_real": -85.05,
+              "n_lat": 45,
+              "n_lon": 72,
+              "n_celdas": 3240
+            }
+          },
+          "shortcut": {
+            "region": "corredor_seco_centroamericano",
+            "oeste": -92.2,
+            "sur": 11.5,
+            "este": -85.0,
+            "norte": 16.0,
+            "centro_lat": 13.75,
+            "centro_lon": -88.6,
+            "query_region": "?region=corredor_seco_centroamericano",
+            "query_bbox": "?oeste=-92.2&sur=11.5&este=-85&norte=16"
+          }
+        },
+        {
+          "id": "guatemala_belice",
+          "nombre": "Guatemala y Belice",
+          "descripcion": "Altiplano volcánico guatemalteco, Petén, Belice y costa del Pacífico.",
+          "zona": "centroamerica",
+          "pais": "Guatemala y Belice",
+          "es_latinoamerica": true,
+          "bbox": [
+            -92.3,
+            13.7,
+            -87.8,
+            18.5
+          ],
+          "predefinida": true,
+          "coordenadas": {
+            "oeste": -92.3,
+            "sur": 13.7,
+            "este": -87.8,
+            "norte": 18.5,
+            "lon_min": -92.3,
+            "lat_min": 13.7,
+            "lon_max": -87.8,
+            "lat_max": 18.5,
+            "centro": {
+              "lat": 16.1,
+              "lon": -90.05
+            },
+            "extension_grados": {
+              "ancho_lon": 4.5,
+              "alto_lat": 4.8
+            },
+            "esquinas": {
+              "suroeste": {
+                "lat": 13.7,
+                "lon": -92.3
+              },
+              "sureste": {
+                "lat": 13.7,
+                "lon": -87.8
+              },
+              "noreste": {
+                "lat": 18.5,
+                "lon": -87.8
+              },
+              "noroeste": {
+                "lat": 18.5,
+                "lon": -92.3
+              }
+            },
+            "poligono_geojson": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [
+                    -92.3,
+                    13.7
+                  ],
+                  [
+                    -87.8,
+                    13.7
+                  ],
+                  [
+                    -87.8,
+                    18.5
+                  ],
+                  [
+                    -92.3,
+                    18.5
+                  ],
+                  [
+                    -92.3,
+                    13.7
+                  ]
+                ]
+              ]
+            }
+          },
+          "mallas_reales": {
+            "gpcp": {
+              "resolucion": "0.5° × 0.5°",
+              "lat_min_real": 13.75,
+              "lat_max_real": 18.25,
+              "lon_min_real": -92.25,
+              "lon_max_real": -88.25,
+              "n_lat": 10,
+              "n_lon": 9,
+              "n_celdas": 90
+            },
+            "merra2": {
+              "resolucion": "0.5° × 0.625°",
+              "lat_min_real": 14.0,
+              "lat_max_real": 18.5,
+              "lon_min_real": -91.875,
+              "lon_max_real": -88.125,
+              "n_lat": 10,
+              "n_lon": 7,
+              "n_celdas": 70
+            },
+            "gldas": {
+              "resolucion": "0.25° × 0.25°",
+              "lat_min_real": 13.875,
+              "lat_max_real": 18.375,
+              "lon_min_real": -92.125,
+              "lon_max_real": -87.875,
+              "n_lat": 19,
+              "n_lon": 18,
+              "n_celdas": 342
+            },
+            "imerg": {
+              "resolucion": "0.1° × 0.1°",
+              "lat_min_real": 13.75,
+              "lat_max_real": 18.45,
+              "lon_min_real": -92.25,
+              "lon_max_real": -87.85,
+              "n_lat": 48,
+              "n_lon": 45,
+              "n_celdas": 2160
+            }
+          },
+          "shortcut": {
+            "region": "guatemala_belice",
+            "oeste": -92.3,
+            "sur": 13.7,
+            "este": -87.8,
+            "norte": 18.5,
+            "centro_lat": 16.1,
+            "centro_lon": -90.05,
+            "query_region": "?region=guatemala_belice",
+            "query_bbox": "?oeste=-92.3&sur=13.7&este=-87.8&norte=18.5"
+          }
+        },
+        {
+          "id": "el_salvador_honduras",
+          "nombre": "El Salvador y Honduras",
+          "descripcion": "Cuencas del río Lempa, Ulúa, Choluteca y Mosquitia hondureña.",
+          "zona": "centroamerica",
+          "pais": "El Salvador y Honduras",
+          "es_latinoamerica": true,
+          "bbox": [
+            -90.2,
+            13.0,
+            -83.1,
+            16.5
+          ],
+          "predefinida": true,
+          "coordenadas": {
+            "oeste": -90.2,
+            "sur": 13.0,
+            "este": -83.1,
+            "norte": 16.5,
+            "lon_min": -90.2,
+            "lat_min": 13.0,
+            "lon_max": -83.1,
+            "lat_max": 16.5,
+            "centro": {
+              "lat": 14.75,
+              "lon": -86.65
+            },
+            "extension_grados": {
+              "ancho_lon": 7.1,
+              "alto_lat": 3.5
+            },
+            "esquinas": {
+              "suroeste": {
+                "lat": 13.0,
+                "lon": -90.2
+              },
+              "sureste": {
+                "lat": 13.0,
+                "lon": -83.1
+              },
+              "noreste": {
+                "lat": 16.5,
+                "lon": -83.1
+              },
+              "noroeste": {
+                "lat": 16.5,
+                "lon": -90.2
+              }
+            },
+            "poligono_geojson": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [
+                    -90.2,
+                    13.0
+                  ],
+                  [
+                    -83.1,
+                    13.0
+                  ],
+                  [
+                    -83.1,
+                    16.5
+                  ],
+                  [
+                    -90.2,
+                    16.5
+                  ],
+                  [
+                    -90.2,
+                    13.0
+                  ]
+                ]
+              ]
+            }
+          },
+          "mallas_reales": {
+            "gpcp": {
+              "resolucion": "0.5° × 0.5°",
+              "lat_min_real": 13.25,
+              "lat_max_real": 16.25,
+              "lon_min_real": -89.75,
+              "lon_max_real": -83.25,
+              "n_lat": 7,
+              "n_lon": 14,
+              "n_celdas": 98
+            },
+            "merra2": {
+              "resolucion": "0.5° × 0.625°",
+              "lat_min_real": 13.0,
+              "lat_max_real": 16.5,
+              "lon_min_real": -90.0,
+              "lon_max_real": -83.125,
+              "n_lat": 8,
+              "n_lon": 12,
+              "n_celdas": 96
+            },
+            "gldas": {
+              "resolucion": "0.25° × 0.25°",
+              "lat_min_real": 13.125,
+              "lat_max_real": 16.375,
+              "lon_min_real": -90.125,
+              "lon_max_real": -83.125,
+              "n_lat": 14,
+              "n_lon": 29,
+              "n_celdas": 406
+            },
+            "imerg": {
+              "resolucion": "0.1° × 0.1°",
+              "lat_min_real": 13.05,
+              "lat_max_real": 16.45,
+              "lon_min_real": -90.15,
+              "lon_max_real": -83.15,
+              "n_lat": 35,
+              "n_lon": 71,
+              "n_celdas": 2485
+            }
+          },
+          "shortcut": {
+            "region": "el_salvador_honduras",
+            "oeste": -90.2,
+            "sur": 13.0,
+            "este": -83.1,
+            "norte": 16.5,
+            "centro_lat": 14.75,
+            "centro_lon": -86.65,
+            "query_region": "?region=el_salvador_honduras",
+            "query_bbox": "?oeste=-90.2&sur=13&este=-83.1&norte=16.5"
+          }
+        },
+        {
+          "id": "nicaragua",
+          "nombre": "Nicaragua (Depresión Lacustre y Caribe)",
+          "descripcion": "Lagos Xolotlán y Cocibolca, cordillera central y llanura autónoma del Caribe nicaragüense.",
+          "zona": "centroamerica",
+          "pais": "Nicaragua",
+          "es_latinoamerica": true,
+          "bbox": [
+            -87.7,
+            10.7,
+            -83.1,
+            15.0
+          ],
+          "predefinida": true,
+          "coordenadas": {
+            "oeste": -87.7,
+            "sur": 10.7,
+            "este": -83.1,
+            "norte": 15.0,
+            "lon_min": -87.7,
+            "lat_min": 10.7,
+            "lon_max": -83.1,
+            "lat_max": 15.0,
+            "centro": {
+              "lat": 12.85,
+              "lon": -85.4
+            },
+            "extension_grados": {
+              "ancho_lon": 4.6,
+              "alto_lat": 4.3
+            },
+            "esquinas": {
+              "suroeste": {
+                "lat": 10.7,
+                "lon": -87.7
+              },
+              "sureste": {
+                "lat": 10.7,
+                "lon": -83.1
+              },
+              "noreste": {
+                "lat": 15.0,
+                "lon": -83.1
+              },
+              "noroeste": {
+                "lat": 15.0,
+                "lon": -87.7
+              }
+            },
+            "poligono_geojson": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [
+                    -87.7,
+                    10.7
+                  ],
+                  [
+                    -83.1,
+                    10.7
+                  ],
+                  [
+                    -83.1,
+                    15.0
+                  ],
+                  [
+                    -87.7,
+                    15.0
+                  ],
+                  [
+                    -87.7,
+                    10.7
+                  ]
+                ]
+              ]
+            }
+          },
+          "mallas_reales": {
+            "gpcp": {
+              "resolucion": "0.5° × 0.5°",
+              "lat_min_real": 10.75,
+              "lat_max_real": 14.75,
+              "lon_min_real": -87.25,
+              "lon_max_real": -83.25,
+              "n_lat": 9,
+              "n_lon": 9,
+              "n_celdas": 81
+            },
+            "merra2": {
+              "resolucion": "0.5° × 0.625°",
+              "lat_min_real": 11.0,
+              "lat_max_real": 15.0,
+              "lon_min_real": -87.5,
+              "lon_max_real": -83.125,
+              "n_lat": 9,
+              "n_lon": 8,
+              "n_celdas": 72
+            },
+            "gldas": {
+              "resolucion": "0.25° × 0.25°",
+              "lat_min_real": 10.875,
+              "lat_max_real": 14.875,
+              "lon_min_real": -87.625,
+              "lon_max_real": -83.125,
+              "n_lat": 17,
+              "n_lon": 19,
+              "n_celdas": 323
+            },
+            "imerg": {
+              "resolucion": "0.1° × 0.1°",
+              "lat_min_real": 10.75,
+              "lat_max_real": 14.95,
+              "lon_min_real": -87.65,
+              "lon_max_real": -83.15,
+              "n_lat": 43,
+              "n_lon": 46,
+              "n_celdas": 1978
+            }
+          },
+          "shortcut": {
+            "region": "nicaragua",
+            "oeste": -87.7,
+            "sur": 10.7,
+            "este": -83.1,
+            "norte": 15.0,
+            "centro_lat": 12.85,
+            "centro_lon": -85.4,
+            "query_region": "?region=nicaragua",
+            "query_bbox": "?oeste=-87.7&sur=10.7&este=-83.1&norte=15"
+          }
+        },
+        {
+          "id": "costa_rica_panama",
+          "nombre": "Costa Rica y Panamá",
+          "descripcion": "Cordillera de Talamanca, Guanacaste, Cuenca del Canal de Panamá y Darién.",
+          "zona": "centroamerica",
+          "pais": "Costa Rica y Panamá",
+          "es_latinoamerica": true,
+          "bbox": [
+            -85.9,
+            7.2,
+            -77.2,
+            11.2
+          ],
+          "predefinida": true,
+          "coordenadas": {
+            "oeste": -85.9,
+            "sur": 7.2,
+            "este": -77.2,
+            "norte": 11.2,
+            "lon_min": -85.9,
+            "lat_min": 7.2,
+            "lon_max": -77.2,
+            "lat_max": 11.2,
+            "centro": {
+              "lat": 9.2,
+              "lon": -81.55
+            },
+            "extension_grados": {
+              "ancho_lon": 8.7,
+              "alto_lat": 4.0
+            },
+            "esquinas": {
+              "suroeste": {
+                "lat": 7.2,
+                "lon": -85.9
+              },
+              "sureste": {
+                "lat": 7.2,
+                "lon": -77.2
+              },
+              "noreste": {
+                "lat": 11.2,
+                "lon": -77.2
+              },
+              "noroeste": {
+                "lat": 11.2,
+                "lon": -85.9
+              }
+            },
+            "poligono_geojson": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [
+                    -85.9,
+                    7.2
+                  ],
+                  [
+                    -77.2,
+                    7.2
+                  ],
+                  [
+                    -77.2,
+                    11.2
+                  ],
+                  [
+                    -85.9,
+                    11.2
+                  ],
+                  [
+                    -85.9,
+                    7.2
+                  ]
+                ]
+              ]
+            }
+          },
+          "mallas_reales": {
+            "gpcp": {
+              "resolucion": "0.5° × 0.5°",
+              "lat_min_real": 7.25,
+              "lat_max_real": 10.75,
+              "lon_min_real": -85.75,
+              "lon_max_real": -77.25,
+              "n_lat": 8,
+              "n_lon": 18,
+              "n_celdas": 144
+            },
+            "merra2": {
+              "resolucion": "0.5° × 0.625°",
+              "lat_min_real": 7.5,
+              "lat_max_real": 11.0,
+              "lon_min_real": -85.625,
+              "lon_max_real": -77.5,
+              "n_lat": 8,
+              "n_lon": 14,
+              "n_celdas": 112
+            },
+            "gldas": {
+              "resolucion": "0.25° × 0.25°",
+              "lat_min_real": 7.375,
+              "lat_max_real": 11.125,
+              "lon_min_real": -85.875,
+              "lon_max_real": -77.375,
+              "n_lat": 16,
+              "n_lon": 35,
+              "n_celdas": 560
+            },
+            "imerg": {
+              "resolucion": "0.1° × 0.1°",
+              "lat_min_real": 7.25,
+              "lat_max_real": 11.15,
+              "lon_min_real": -85.85,
+              "lon_max_real": -77.25,
+              "n_lat": 40,
+              "n_lon": 87,
+              "n_celdas": 3480
+            }
+          },
+          "shortcut": {
+            "region": "costa_rica_panama",
+            "oeste": -85.9,
+            "sur": 7.2,
+            "este": -77.2,
+            "norte": 11.2,
+            "centro_lat": 9.2,
+            "centro_lon": -81.55,
+            "query_region": "?region=costa_rica_panama",
+            "query_bbox": "?oeste=-85.9&sur=7.2&este=-77.2&norte=11.2"
+          }
+        },
+        {
+          "id": "istmo_centroamericano_completo",
+          "nombre": "Centroamérica Completa (Istmo)",
+          "descripcion": "Cobertura integral del istmo centroamericano desde la frontera con México hasta el tapón del Darién.",
+          "zona": "centroamerica",
+          "pais": "Belice, Guatemala, El Salvador, Honduras, Nicaragua, Costa Rica y Panamá",
+          "es_latinoamerica": true,
+          "bbox": [
+            -92.3,
+            7.2,
+            -77.2,
+            18.5
+          ],
+          "predefinida": true,
+          "coordenadas": {
+            "oeste": -92.3,
+            "sur": 7.2,
+            "este": -77.2,
+            "norte": 18.5,
+            "lon_min": -92.3,
+            "lat_min": 7.2,
+            "lon_max": -77.2,
+            "lat_max": 18.5,
+            "centro": {
+              "lat": 12.85,
+              "lon": -84.75
+            },
+            "extension_grados": {
+              "ancho_lon": 15.1,
+              "alto_lat": 11.3
+            },
+            "esquinas": {
+              "suroeste": {
+                "lat": 7.2,
+                "lon": -92.3
+              },
+              "sureste": {
+                "lat": 7.2,
+                "lon": -77.2
+              },
+              "noreste": {
+                "lat": 18.5,
+                "lon": -77.2
+              },
+              "noroeste": {
+                "lat": 18.5,
+                "lon": -92.3
+              }
+            },
+            "poligono_geojson": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [
+                    -92.3,
+                    7.2
+                  ],
+                  [
+                    -77.2,
+                    7.2
+                  ],
+                  [
+                    -77.2,
+                    18.5
+                  ],
+                  [
+                    -92.3,
+                    18.5
+                  ],
+                  [
+                    -92.3,
+                    7.2
+                  ]
+                ]
+              ]
+            }
+          },
+          "mallas_reales": {
+            "gpcp": {
+              "resolucion": "0.5° × 0.5°",
+              "lat_min_real": 7.25,
+              "lat_max_real": 18.25,
+              "lon_min_real": -92.25,
+              "lon_max_real": -77.25,
+              "n_lat": 23,
+              "n_lon": 31,
+              "n_celdas": 713
+            },
+            "merra2": {
+              "resolucion": "0.5° × 0.625°",
+              "lat_min_real": 7.5,
+              "lat_max_real": 18.5,
+              "lon_min_real": -91.875,
+              "lon_max_real": -77.5,
+              "n_lat": 23,
+              "n_lon": 24,
+              "n_celdas": 552
+            },
+            "gldas": {
+              "resolucion": "0.25° × 0.25°",
+              "lat_min_real": 7.375,
+              "lat_max_real": 18.375,
+              "lon_min_real": -92.125,
+              "lon_max_real": -77.375,
+              "n_lat": 45,
+              "n_lon": 60,
+              "n_celdas": 2700
+            },
+            "imerg": {
+              "resolucion": "0.1° × 0.1°",
+              "lat_min_real": 7.25,
+              "lat_max_real": 18.45,
+              "lon_min_real": -92.25,
+              "lon_max_real": -77.25,
+              "n_lat": 113,
+              "n_lon": 151,
+              "n_celdas": 17063
+            }
+          },
+          "shortcut": {
+            "region": "istmo_centroamericano_completo",
+            "oeste": -92.3,
+            "sur": 7.2,
+            "este": -77.2,
+            "norte": 18.5,
+            "centro_lat": 12.85,
+            "centro_lon": -84.75,
+            "query_region": "?region=istmo_centroamericano_completo",
+            "query_bbox": "?oeste=-92.3&sur=7.2&este=-77.2&norte=18.5"
+          }
+        }
+      ]
+    },
+    "regiones": [
+      {
+        "id": "noreste_mexico",
+        "nombre": "Noreste de México",
+        "descripcion": "Coahuila, Nuevo León y Tamaulipas (cuenca del Río Bravo y Sierra Madre Oriental).",
+        "zona": "mexico",
+        "pais": "México",
+        "es_latinoamerica": true,
+        "bbox": [
+          -106.0,
+          22.0,
+          -97.0,
+          30.0
+        ],
+        "predefinida": true,
+        "coordenadas": {
+          "oeste": -106.0,
+          "sur": 22.0,
+          "este": -97.0,
+          "norte": 30.0,
+          "lon_min": -106.0,
+          "lat_min": 22.0,
+          "lon_max": -97.0,
+          "lat_max": 30.0,
+          "centro": {
+            "lat": 26.0,
+            "lon": -101.5
+          },
+          "extension_grados": {
+            "ancho_lon": 9.0,
+            "alto_lat": 8.0
+          },
+          "esquinas": {
+            "suroeste": {
+              "lat": 22.0,
+              "lon": -106.0
+            },
+            "sureste": {
+              "lat": 22.0,
+              "lon": -97.0
+            },
+            "noreste": {
+              "lat": 30.0,
+              "lon": -97.0
+            },
+            "noroeste": {
+              "lat": 30.0,
+              "lon": -106.0
+            }
+          },
+          "poligono_geojson": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  -106.0,
+                  22.0
+                ],
+                [
+                  -97.0,
+                  22.0
+                ],
+                [
+                  -97.0,
+                  30.0
+                ],
+                [
+                  -106.0,
+                  30.0
+                ],
+                [
+                  -106.0,
+                  22.0
+                ]
+              ]
+            ]
+          }
+        },
+        "mallas_reales": {
+          "gpcp": {
+            "resolucion": "0.5° × 0.5°",
+            "lat_min_real": 22.25,
+            "lat_max_real": 29.75,
+            "lon_min_real": -105.75,
+            "lon_max_real": -97.25,
+            "n_lat": 16,
+            "n_lon": 18,
+            "n_celdas": 288
+          },
+          "merra2": {
+            "resolucion": "0.5° × 0.625°",
+            "lat_min_real": 22.0,
+            "lat_max_real": 30.0,
+            "lon_min_real": -105.625,
+            "lon_max_real": -97.5,
+            "n_lat": 17,
+            "n_lon": 14,
+            "n_celdas": 238
+          },
+          "gldas": {
+            "resolucion": "0.25° × 0.25°",
+            "lat_min_real": 22.125,
+            "lat_max_real": 29.875,
+            "lon_min_real": -105.875,
+            "lon_max_real": -97.125,
+            "n_lat": 32,
+            "n_lon": 36,
+            "n_celdas": 1152
+          },
+          "imerg": {
+            "resolucion": "0.1° × 0.1°",
+            "lat_min_real": 22.05,
+            "lat_max_real": 29.95,
+            "lon_min_real": -105.95,
+            "lon_max_real": -97.05,
+            "n_lat": 80,
+            "n_lon": 90,
+            "n_celdas": 7200
+          }
+        },
+        "shortcut": {
+          "region": "noreste_mexico",
+          "oeste": -106.0,
+          "sur": 22.0,
+          "este": -97.0,
+          "norte": 30.0,
+          "centro_lat": 26.0,
+          "centro_lon": -101.5,
+          "query_region": "?region=noreste_mexico",
+          "query_bbox": "?oeste=-106&sur=22&este=-97&norte=30"
+        }
+      },
+      {
+        "id": "noroeste_mexico_sonora_sinaloa",
+        "nombre": "Noroeste de México (Sonora, Sinaloa y Chihuahua)",
+        "descripcion": "Región del monzón norteamericano, Desierto de Sonora, valles agrícolas de Sinaloa y Sierra Madre Occidental.",
+        "zona": "mexico",
+        "pais": "México",
+        "es_latinoamerica": true,
+        "bbox": [
+          -115.0,
+          23.0,
+          -106.0,
+          32.5
+        ],
+        "predefinida": true,
+        "coordenadas": {
+          "oeste": -115.0,
+          "sur": 23.0,
+          "este": -106.0,
+          "norte": 32.5,
+          "lon_min": -115.0,
+          "lat_min": 23.0,
+          "lon_max": -106.0,
+          "lat_max": 32.5,
+          "centro": {
+            "lat": 27.75,
+            "lon": -110.5
+          },
+          "extension_grados": {
+            "ancho_lon": 9.0,
+            "alto_lat": 9.5
+          },
+          "esquinas": {
+            "suroeste": {
+              "lat": 23.0,
+              "lon": -115.0
+            },
+            "sureste": {
+              "lat": 23.0,
+              "lon": -106.0
+            },
+            "noreste": {
+              "lat": 32.5,
+              "lon": -106.0
+            },
+            "noroeste": {
+              "lat": 32.5,
+              "lon": -115.0
+            }
+          },
+          "poligono_geojson": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  -115.0,
+                  23.0
+                ],
+                [
+                  -106.0,
+                  23.0
+                ],
+                [
+                  -106.0,
+                  32.5
+                ],
+                [
+                  -115.0,
+                  32.5
+                ],
+                [
+                  -115.0,
+                  23.0
+                ]
+              ]
+            ]
+          }
+        },
+        "mallas_reales": {
+          "gpcp": {
+            "resolucion": "0.5° × 0.5°",
+            "lat_min_real": 23.25,
+            "lat_max_real": 32.25,
+            "lon_min_real": -114.75,
+            "lon_max_real": -106.25,
+            "n_lat": 19,
+            "n_lon": 18,
+            "n_celdas": 342
+          },
+          "merra2": {
+            "resolucion": "0.5° × 0.625°",
+            "lat_min_real": 23.0,
+            "lat_max_real": 32.5,
+            "lon_min_real": -115.0,
+            "lon_max_real": -106.25,
+            "n_lat": 20,
+            "n_lon": 15,
+            "n_celdas": 300
+          },
+          "gldas": {
+            "resolucion": "0.25° × 0.25°",
+            "lat_min_real": 23.125,
+            "lat_max_real": 32.375,
+            "lon_min_real": -114.875,
+            "lon_max_real": -106.125,
+            "n_lat": 38,
+            "n_lon": 36,
+            "n_celdas": 1368
+          },
+          "imerg": {
+            "resolucion": "0.1° × 0.1°",
+            "lat_min_real": 23.05,
+            "lat_max_real": 32.45,
+            "lon_min_real": -114.95,
+            "lon_max_real": -106.05,
+            "n_lat": 95,
+            "n_lon": 90,
+            "n_celdas": 8550
+          }
+        },
+        "shortcut": {
+          "region": "noroeste_mexico_sonora_sinaloa",
+          "oeste": -115.0,
+          "sur": 23.0,
+          "este": -106.0,
+          "norte": 32.5,
+          "centro_lat": 27.75,
+          "centro_lon": -110.5,
+          "query_region": "?region=noroeste_mexico_sonora_sinaloa",
+          "query_bbox": "?oeste=-115&sur=23&este=-106&norte=32.5"
+        }
+      },
+      {
+        "id": "peninsula_baja_california",
+        "nombre": "Península de Baja California",
+        "descripcion": "Baja California y Baja California Sur, zona árida con influencia de frentes invernales y ciclones del Pacífico.",
+        "zona": "mexico",
+        "pais": "México",
+        "es_latinoamerica": true,
+        "bbox": [
+          -117.0,
+          22.8,
+          -109.4,
+          32.5
+        ],
+        "predefinida": true,
+        "coordenadas": {
+          "oeste": -117.0,
+          "sur": 22.8,
+          "este": -109.4,
+          "norte": 32.5,
+          "lon_min": -117.0,
+          "lat_min": 22.8,
+          "lon_max": -109.4,
+          "lat_max": 32.5,
+          "centro": {
+            "lat": 27.65,
+            "lon": -113.2
+          },
+          "extension_grados": {
+            "ancho_lon": 7.6,
+            "alto_lat": 9.7
+          },
+          "esquinas": {
+            "suroeste": {
+              "lat": 22.8,
+              "lon": -117.0
+            },
+            "sureste": {
+              "lat": 22.8,
+              "lon": -109.4
+            },
+            "noreste": {
+              "lat": 32.5,
+              "lon": -109.4
+            },
+            "noroeste": {
+              "lat": 32.5,
+              "lon": -117.0
+            }
+          },
+          "poligono_geojson": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  -117.0,
+                  22.8
+                ],
+                [
+                  -109.4,
+                  22.8
+                ],
+                [
+                  -109.4,
+                  32.5
+                ],
+                [
+                  -117.0,
+                  32.5
+                ],
+                [
+                  -117.0,
+                  22.8
+                ]
+              ]
+            ]
+          }
+        },
+        "mallas_reales": {
+          "gpcp": {
+            "resolucion": "0.5° × 0.5°",
+            "lat_min_real": 23.25,
+            "lat_max_real": 32.25,
+            "lon_min_real": -116.75,
+            "lon_max_real": -109.75,
+            "n_lat": 19,
+            "n_lon": 15,
+            "n_celdas": 285
+          },
+          "merra2": {
+            "resolucion": "0.5° × 0.625°",
+            "lat_min_real": 23.0,
+            "lat_max_real": 32.5,
+            "lon_min_real": -116.875,
+            "lon_max_real": -110.0,
+            "n_lat": 20,
+            "n_lon": 12,
+            "n_celdas": 240
+          },
+          "gldas": {
+            "resolucion": "0.25° × 0.25°",
+            "lat_min_real": 22.875,
+            "lat_max_real": 32.375,
+            "lon_min_real": -116.875,
+            "lon_max_real": -109.625,
+            "n_lat": 39,
+            "n_lon": 30,
+            "n_celdas": 1170
+          },
+          "imerg": {
+            "resolucion": "0.1° × 0.1°",
+            "lat_min_real": 22.85,
+            "lat_max_real": 32.45,
+            "lon_min_real": -116.95,
+            "lon_max_real": -109.45,
+            "n_lat": 97,
+            "n_lon": 76,
+            "n_celdas": 7372
+          }
+        },
+        "shortcut": {
+          "region": "peninsula_baja_california",
+          "oeste": -117.0,
+          "sur": 22.8,
+          "este": -109.4,
+          "norte": 32.5,
+          "centro_lat": 27.65,
+          "centro_lon": -113.2,
+          "query_region": "?region=peninsula_baja_california",
+          "query_bbox": "?oeste=-117&sur=22.8&este=-109.4&norte=32.5"
+        }
+      },
+      {
+        "id": "altiplano_central_bajio",
+        "nombre": "Altiplano Central y El Bajío (Centro de México)",
+        "descripcion": "Valle de México, Querétaro, Guanajuato, Michoacán, Jalisco, Hidalgo, Tlaxcala, Morelos y Puebla.",
+        "zona": "mexico",
+        "pais": "México",
+        "es_latinoamerica": true,
+        "bbox": [
+          -104.5,
+          18.5,
+          -97.5,
+          22.5
+        ],
+        "predefinida": true,
+        "coordenadas": {
+          "oeste": -104.5,
+          "sur": 18.5,
+          "este": -97.5,
+          "norte": 22.5,
+          "lon_min": -104.5,
+          "lat_min": 18.5,
+          "lon_max": -97.5,
+          "lat_max": 22.5,
+          "centro": {
+            "lat": 20.5,
+            "lon": -101.0
+          },
+          "extension_grados": {
+            "ancho_lon": 7.0,
+            "alto_lat": 4.0
+          },
+          "esquinas": {
+            "suroeste": {
+              "lat": 18.5,
+              "lon": -104.5
+            },
+            "sureste": {
+              "lat": 18.5,
+              "lon": -97.5
+            },
+            "noreste": {
+              "lat": 22.5,
+              "lon": -97.5
+            },
+            "noroeste": {
+              "lat": 22.5,
+              "lon": -104.5
+            }
+          },
+          "poligono_geojson": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  -104.5,
+                  18.5
+                ],
+                [
+                  -97.5,
+                  18.5
+                ],
+                [
+                  -97.5,
+                  22.5
+                ],
+                [
+                  -104.5,
+                  22.5
+                ],
+                [
+                  -104.5,
+                  18.5
+                ]
+              ]
+            ]
+          }
+        },
+        "mallas_reales": {
+          "gpcp": {
+            "resolucion": "0.5° × 0.5°",
+            "lat_min_real": 18.75,
+            "lat_max_real": 22.25,
+            "lon_min_real": -104.25,
+            "lon_max_real": -97.75,
+            "n_lat": 8,
+            "n_lon": 14,
+            "n_celdas": 112
+          },
+          "merra2": {
+            "resolucion": "0.5° × 0.625°",
+            "lat_min_real": 18.5,
+            "lat_max_real": 22.5,
+            "lon_min_real": -104.375,
+            "lon_max_real": -97.5,
+            "n_lat": 9,
+            "n_lon": 12,
+            "n_celdas": 108
+          },
+          "gldas": {
+            "resolucion": "0.25° × 0.25°",
+            "lat_min_real": 18.625,
+            "lat_max_real": 22.375,
+            "lon_min_real": -104.375,
+            "lon_max_real": -97.625,
+            "n_lat": 16,
+            "n_lon": 28,
+            "n_celdas": 448
+          },
+          "imerg": {
+            "resolucion": "0.1° × 0.1°",
+            "lat_min_real": 18.55,
+            "lat_max_real": 22.45,
+            "lon_min_real": -104.45,
+            "lon_max_real": -97.55,
+            "n_lat": 40,
+            "n_lon": 70,
+            "n_celdas": 2800
+          }
+        },
+        "shortcut": {
+          "region": "altiplano_central_bajio",
+          "oeste": -104.5,
+          "sur": 18.5,
+          "este": -97.5,
+          "norte": 22.5,
+          "centro_lat": 20.5,
+          "centro_lon": -101.0,
+          "query_region": "?region=altiplano_central_bajio",
+          "query_bbox": "?oeste=-104.5&sur=18.5&este=-97.5&norte=22.5"
+        }
+      },
+      {
+        "id": "golfo_centro_veracruz",
+        "nombre": "Cuenca del Golfo Centro (Veracruz y Huasteca)",
+        "descripcion": "Vertiente húmeda del Golfo de México (Veracruz, Huasteca potosina, hidalguense y norte de Puebla).",
+        "zona": "mexico",
+        "pais": "México",
+        "es_latinoamerica": true,
+        "bbox": [
+          -99.0,
+          17.2,
+          -95.0,
+          22.5
+        ],
+        "predefinida": true,
+        "coordenadas": {
+          "oeste": -99.0,
+          "sur": 17.2,
+          "este": -95.0,
+          "norte": 22.5,
+          "lon_min": -99.0,
+          "lat_min": 17.2,
+          "lon_max": -95.0,
+          "lat_max": 22.5,
+          "centro": {
+            "lat": 19.85,
+            "lon": -97.0
+          },
+          "extension_grados": {
+            "ancho_lon": 4.0,
+            "alto_lat": 5.3
+          },
+          "esquinas": {
+            "suroeste": {
+              "lat": 17.2,
+              "lon": -99.0
+            },
+            "sureste": {
+              "lat": 17.2,
+              "lon": -95.0
+            },
+            "noreste": {
+              "lat": 22.5,
+              "lon": -95.0
+            },
+            "noroeste": {
+              "lat": 22.5,
+              "lon": -99.0
+            }
+          },
+          "poligono_geojson": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  -99.0,
+                  17.2
+                ],
+                [
+                  -95.0,
+                  17.2
+                ],
+                [
+                  -95.0,
+                  22.5
+                ],
+                [
+                  -99.0,
+                  22.5
+                ],
+                [
+                  -99.0,
+                  17.2
+                ]
+              ]
+            ]
+          }
+        },
+        "mallas_reales": {
+          "gpcp": {
+            "resolucion": "0.5° × 0.5°",
+            "lat_min_real": 17.25,
+            "lat_max_real": 22.25,
+            "lon_min_real": -98.75,
+            "lon_max_real": -95.25,
+            "n_lat": 11,
+            "n_lon": 8,
+            "n_celdas": 88
+          },
+          "merra2": {
+            "resolucion": "0.5° × 0.625°",
+            "lat_min_real": 17.5,
+            "lat_max_real": 22.5,
+            "lon_min_real": -98.75,
+            "lon_max_real": -95.0,
+            "n_lat": 11,
+            "n_lon": 7,
+            "n_celdas": 77
+          },
+          "gldas": {
+            "resolucion": "0.25° × 0.25°",
+            "lat_min_real": 17.375,
+            "lat_max_real": 22.375,
+            "lon_min_real": -98.875,
+            "lon_max_real": -95.125,
+            "n_lat": 21,
+            "n_lon": 16,
+            "n_celdas": 336
+          },
+          "imerg": {
+            "resolucion": "0.1° × 0.1°",
+            "lat_min_real": 17.25,
+            "lat_max_real": 22.45,
+            "lon_min_real": -98.95,
+            "lon_max_real": -95.05,
+            "n_lat": 53,
+            "n_lon": 40,
+            "n_celdas": 2120
+          }
+        },
+        "shortcut": {
+          "region": "golfo_centro_veracruz",
+          "oeste": -99.0,
+          "sur": 17.2,
+          "este": -95.0,
+          "norte": 22.5,
+          "centro_lat": 19.85,
+          "centro_lon": -97.0,
+          "query_region": "?region=golfo_centro_veracruz",
+          "query_bbox": "?oeste=-99&sur=17.2&este=-95&norte=22.5"
+        }
+      },
+      {
+        "id": "pacifico_sur_mexico",
+        "nombre": "Pacífico Sur de México (Guerrero y Oaxaca)",
+        "descripcion": "Sierra Madre del Sur y costa pacífica de Guerrero y Oaxaca, altamente expuesta a ciclones tropicales y sequía intraestival.",
+        "zona": "mexico",
+        "pais": "México",
+        "es_latinoamerica": true,
+        "bbox": [
+          -102.2,
+          15.6,
+          -94.0,
+          18.8
+        ],
+        "predefinida": true,
+        "coordenadas": {
+          "oeste": -102.2,
+          "sur": 15.6,
+          "este": -94.0,
+          "norte": 18.8,
+          "lon_min": -102.2,
+          "lat_min": 15.6,
+          "lon_max": -94.0,
+          "lat_max": 18.8,
+          "centro": {
+            "lat": 17.2,
+            "lon": -98.1
+          },
+          "extension_grados": {
+            "ancho_lon": 8.2,
+            "alto_lat": 3.2
+          },
+          "esquinas": {
+            "suroeste": {
+              "lat": 15.6,
+              "lon": -102.2
+            },
+            "sureste": {
+              "lat": 15.6,
+              "lon": -94.0
+            },
+            "noreste": {
+              "lat": 18.8,
+              "lon": -94.0
+            },
+            "noroeste": {
+              "lat": 18.8,
+              "lon": -102.2
+            }
+          },
+          "poligono_geojson": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  -102.2,
+                  15.6
+                ],
+                [
+                  -94.0,
+                  15.6
+                ],
+                [
+                  -94.0,
+                  18.8
+                ],
+                [
+                  -102.2,
+                  18.8
+                ],
+                [
+                  -102.2,
+                  15.6
+                ]
+              ]
+            ]
+          }
+        },
+        "mallas_reales": {
+          "gpcp": {
+            "resolucion": "0.5° × 0.5°",
+            "lat_min_real": 15.75,
+            "lat_max_real": 18.75,
+            "lon_min_real": -101.75,
+            "lon_max_real": -94.25,
+            "n_lat": 7,
+            "n_lon": 16,
+            "n_celdas": 112
+          },
+          "merra2": {
+            "resolucion": "0.5° × 0.625°",
+            "lat_min_real": 16.0,
+            "lat_max_real": 18.5,
+            "lon_min_real": -101.875,
+            "lon_max_real": -94.375,
+            "n_lat": 6,
+            "n_lon": 13,
+            "n_celdas": 78
+          },
+          "gldas": {
+            "resolucion": "0.25° × 0.25°",
+            "lat_min_real": 15.625,
+            "lat_max_real": 18.625,
+            "lon_min_real": -102.125,
+            "lon_max_real": -94.125,
+            "n_lat": 13,
+            "n_lon": 33,
+            "n_celdas": 429
+          },
+          "imerg": {
+            "resolucion": "0.1° × 0.1°",
+            "lat_min_real": 15.65,
+            "lat_max_real": 18.75,
+            "lon_min_real": -102.15,
+            "lon_max_real": -94.05,
+            "n_lat": 32,
+            "n_lon": 82,
+            "n_celdas": 2624
+          }
+        },
+        "shortcut": {
+          "region": "pacifico_sur_mexico",
+          "oeste": -102.2,
+          "sur": 15.6,
+          "este": -94.0,
+          "norte": 18.8,
+          "centro_lat": 17.2,
+          "centro_lon": -98.1,
+          "query_region": "?region=pacifico_sur_mexico",
+          "query_bbox": "?oeste=-102.2&sur=15.6&este=-94&norte=18.8"
+        }
+      },
+      {
+        "id": "sureste_mexico",
+        "nombre": "Sureste de México (Chiapas, Tabasco y Yucatán)",
+        "descripcion": "Chiapas, Tabasco y la península de Yucatán (cuencas Grijalva-Usumacinta y selva maya).",
+        "zona": "mexico",
+        "pais": "México",
+        "es_latinoamerica": true,
+        "bbox": [
+          -94.5,
+          14.5,
+          -86.5,
+          21.7
+        ],
+        "predefinida": true,
+        "coordenadas": {
+          "oeste": -94.5,
+          "sur": 14.5,
+          "este": -86.5,
+          "norte": 21.7,
+          "lon_min": -94.5,
+          "lat_min": 14.5,
+          "lon_max": -86.5,
+          "lat_max": 21.7,
+          "centro": {
+            "lat": 18.1,
+            "lon": -90.5
+          },
+          "extension_grados": {
+            "ancho_lon": 8.0,
+            "alto_lat": 7.2
+          },
+          "esquinas": {
+            "suroeste": {
+              "lat": 14.5,
+              "lon": -94.5
+            },
+            "sureste": {
+              "lat": 14.5,
+              "lon": -86.5
+            },
+            "noreste": {
+              "lat": 21.7,
+              "lon": -86.5
+            },
+            "noroeste": {
+              "lat": 21.7,
+              "lon": -94.5
+            }
+          },
+          "poligono_geojson": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  -94.5,
+                  14.5
+                ],
+                [
+                  -86.5,
+                  14.5
+                ],
+                [
+                  -86.5,
+                  21.7
+                ],
+                [
+                  -94.5,
+                  21.7
+                ],
+                [
+                  -94.5,
+                  14.5
+                ]
+              ]
+            ]
+          }
+        },
+        "mallas_reales": {
+          "gpcp": {
+            "resolucion": "0.5° × 0.5°",
+            "lat_min_real": 14.75,
+            "lat_max_real": 21.25,
+            "lon_min_real": -94.25,
+            "lon_max_real": -86.75,
+            "n_lat": 14,
+            "n_lon": 16,
+            "n_celdas": 224
+          },
+          "merra2": {
+            "resolucion": "0.5° × 0.625°",
+            "lat_min_real": 14.5,
+            "lat_max_real": 21.5,
+            "lon_min_real": -94.375,
+            "lon_max_real": -86.875,
+            "n_lat": 15,
+            "n_lon": 13,
+            "n_celdas": 195
+          },
+          "gldas": {
+            "resolucion": "0.25° × 0.25°",
+            "lat_min_real": 14.625,
+            "lat_max_real": 21.625,
+            "lon_min_real": -94.375,
+            "lon_max_real": -86.625,
+            "n_lat": 29,
+            "n_lon": 32,
+            "n_celdas": 928
+          },
+          "imerg": {
+            "resolucion": "0.1° × 0.1°",
+            "lat_min_real": 14.55,
+            "lat_max_real": 21.65,
+            "lon_min_real": -94.45,
+            "lon_max_real": -86.55,
+            "n_lat": 72,
+            "n_lon": 80,
+            "n_celdas": 5760
+          }
+        },
+        "shortcut": {
+          "region": "sureste_mexico",
+          "oeste": -94.5,
+          "sur": 14.5,
+          "este": -86.5,
+          "norte": 21.7,
+          "centro_lat": 18.1,
+          "centro_lon": -90.5,
+          "query_region": "?region=sureste_mexico",
+          "query_bbox": "?oeste=-94.5&sur=14.5&este=-86.5&norte=21.7"
+        }
+      },
+      {
+        "id": "peninsula_yucatan",
+        "nombre": "Península de Yucatán",
+        "descripcion": "Plataforma kárstica de Yucatán, Campeche y Quintana Roo.",
+        "zona": "mexico",
+        "pais": "México",
+        "es_latinoamerica": true,
+        "bbox": [
+          -91.5,
+          17.8,
+          -86.7,
+          21.6
+        ],
+        "predefinida": true,
+        "coordenadas": {
+          "oeste": -91.5,
+          "sur": 17.8,
+          "este": -86.7,
+          "norte": 21.6,
+          "lon_min": -91.5,
+          "lat_min": 17.8,
+          "lon_max": -86.7,
+          "lat_max": 21.6,
+          "centro": {
+            "lat": 19.7,
+            "lon": -89.1
+          },
+          "extension_grados": {
+            "ancho_lon": 4.8,
+            "alto_lat": 3.8
+          },
+          "esquinas": {
+            "suroeste": {
+              "lat": 17.8,
+              "lon": -91.5
+            },
+            "sureste": {
+              "lat": 17.8,
+              "lon": -86.7
+            },
+            "noreste": {
+              "lat": 21.6,
+              "lon": -86.7
+            },
+            "noroeste": {
+              "lat": 21.6,
+              "lon": -91.5
+            }
+          },
+          "poligono_geojson": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  -91.5,
+                  17.8
+                ],
+                [
+                  -86.7,
+                  17.8
+                ],
+                [
+                  -86.7,
+                  21.6
+                ],
+                [
+                  -91.5,
+                  21.6
+                ],
+                [
+                  -91.5,
+                  17.8
+                ]
+              ]
+            ]
+          }
+        },
+        "mallas_reales": {
+          "gpcp": {
+            "resolucion": "0.5° × 0.5°",
+            "lat_min_real": 18.25,
+            "lat_max_real": 21.25,
+            "lon_min_real": -91.25,
+            "lon_max_real": -86.75,
+            "n_lat": 7,
+            "n_lon": 10,
+            "n_celdas": 70
+          },
+          "merra2": {
+            "resolucion": "0.5° × 0.625°",
+            "lat_min_real": 18.0,
+            "lat_max_real": 21.5,
+            "lon_min_real": -91.25,
+            "lon_max_real": -86.875,
+            "n_lat": 8,
+            "n_lon": 8,
+            "n_celdas": 64
+          },
+          "gldas": {
+            "resolucion": "0.25° × 0.25°",
+            "lat_min_real": 17.875,
+            "lat_max_real": 21.375,
+            "lon_min_real": -91.375,
+            "lon_max_real": -86.875,
+            "n_lat": 15,
+            "n_lon": 19,
+            "n_celdas": 285
+          },
+          "imerg": {
+            "resolucion": "0.1° × 0.1°",
+            "lat_min_real": 17.85,
+            "lat_max_real": 21.55,
+            "lon_min_real": -91.45,
+            "lon_max_real": -86.75,
+            "n_lat": 38,
+            "n_lon": 48,
+            "n_celdas": 1824
+          }
+        },
+        "shortcut": {
+          "region": "peninsula_yucatan",
+          "oeste": -91.5,
+          "sur": 17.8,
+          "este": -86.7,
+          "norte": 21.6,
+          "centro_lat": 19.7,
+          "centro_lon": -89.1,
+          "query_region": "?region=peninsula_yucatan",
+          "query_bbox": "?oeste=-91.5&sur=17.8&este=-86.7&norte=21.6"
+        }
+      },
+      {
+        "id": "corredor_seco_centroamericano",
+        "nombre": "Corredor Seco Centroamericano",
+        "descripcion": "Franja pacífica y valles interiores desde Chiapas/Guatemala hasta el noroeste de Costa Rica, crítica por canícula y El Niño.",
+        "zona": "centroamerica",
+        "pais": "Guatemala, El Salvador, Honduras y Nicaragua",
+        "es_latinoamerica": true,
+        "bbox": [
+          -92.2,
+          11.5,
+          -85.0,
+          16.0
+        ],
+        "predefinida": true,
+        "coordenadas": {
+          "oeste": -92.2,
+          "sur": 11.5,
+          "este": -85.0,
+          "norte": 16.0,
+          "lon_min": -92.2,
+          "lat_min": 11.5,
+          "lon_max": -85.0,
+          "lat_max": 16.0,
+          "centro": {
+            "lat": 13.75,
+            "lon": -88.6
+          },
+          "extension_grados": {
+            "ancho_lon": 7.2,
+            "alto_lat": 4.5
+          },
+          "esquinas": {
+            "suroeste": {
+              "lat": 11.5,
+              "lon": -92.2
+            },
+            "sureste": {
+              "lat": 11.5,
+              "lon": -85.0
+            },
+            "noreste": {
+              "lat": 16.0,
+              "lon": -85.0
+            },
+            "noroeste": {
+              "lat": 16.0,
+              "lon": -92.2
+            }
+          },
+          "poligono_geojson": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  -92.2,
+                  11.5
+                ],
+                [
+                  -85.0,
+                  11.5
+                ],
+                [
+                  -85.0,
+                  16.0
+                ],
+                [
+                  -92.2,
+                  16.0
+                ],
+                [
+                  -92.2,
+                  11.5
+                ]
+              ]
+            ]
+          }
+        },
+        "mallas_reales": {
+          "gpcp": {
+            "resolucion": "0.5° × 0.5°",
+            "lat_min_real": 11.75,
+            "lat_max_real": 15.75,
+            "lon_min_real": -91.75,
+            "lon_max_real": -85.25,
+            "n_lat": 9,
+            "n_lon": 14,
+            "n_celdas": 126
+          },
+          "merra2": {
+            "resolucion": "0.5° × 0.625°",
+            "lat_min_real": 11.5,
+            "lat_max_real": 16.0,
+            "lon_min_real": -91.875,
+            "lon_max_real": -85.0,
+            "n_lat": 10,
+            "n_lon": 12,
+            "n_celdas": 120
+          },
+          "gldas": {
+            "resolucion": "0.25° × 0.25°",
+            "lat_min_real": 11.625,
+            "lat_max_real": 15.875,
+            "lon_min_real": -92.125,
+            "lon_max_real": -85.125,
+            "n_lat": 18,
+            "n_lon": 29,
+            "n_celdas": 522
+          },
+          "imerg": {
+            "resolucion": "0.1° × 0.1°",
+            "lat_min_real": 11.55,
+            "lat_max_real": 15.95,
+            "lon_min_real": -92.15,
+            "lon_max_real": -85.05,
+            "n_lat": 45,
+            "n_lon": 72,
+            "n_celdas": 3240
+          }
+        },
+        "shortcut": {
+          "region": "corredor_seco_centroamericano",
+          "oeste": -92.2,
+          "sur": 11.5,
+          "este": -85.0,
+          "norte": 16.0,
+          "centro_lat": 13.75,
+          "centro_lon": -88.6,
+          "query_region": "?region=corredor_seco_centroamericano",
+          "query_bbox": "?oeste=-92.2&sur=11.5&este=-85&norte=16"
+        }
+      },
+      {
+        "id": "guatemala_belice",
+        "nombre": "Guatemala y Belice",
+        "descripcion": "Altiplano volcánico guatemalteco, Petén, Belice y costa del Pacífico.",
+        "zona": "centroamerica",
+        "pais": "Guatemala y Belice",
+        "es_latinoamerica": true,
+        "bbox": [
+          -92.3,
+          13.7,
+          -87.8,
+          18.5
+        ],
+        "predefinida": true,
+        "coordenadas": {
+          "oeste": -92.3,
+          "sur": 13.7,
+          "este": -87.8,
+          "norte": 18.5,
+          "lon_min": -92.3,
+          "lat_min": 13.7,
+          "lon_max": -87.8,
+          "lat_max": 18.5,
+          "centro": {
+            "lat": 16.1,
+            "lon": -90.05
+          },
+          "extension_grados": {
+            "ancho_lon": 4.5,
+            "alto_lat": 4.8
+          },
+          "esquinas": {
+            "suroeste": {
+              "lat": 13.7,
+              "lon": -92.3
+            },
+            "sureste": {
+              "lat": 13.7,
+              "lon": -87.8
+            },
+            "noreste": {
+              "lat": 18.5,
+              "lon": -87.8
+            },
+            "noroeste": {
+              "lat": 18.5,
+              "lon": -92.3
+            }
+          },
+          "poligono_geojson": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  -92.3,
+                  13.7
+                ],
+                [
+                  -87.8,
+                  13.7
+                ],
+                [
+                  -87.8,
+                  18.5
+                ],
+                [
+                  -92.3,
+                  18.5
+                ],
+                [
+                  -92.3,
+                  13.7
+                ]
+              ]
+            ]
+          }
+        },
+        "mallas_reales": {
+          "gpcp": {
+            "resolucion": "0.5° × 0.5°",
+            "lat_min_real": 13.75,
+            "lat_max_real": 18.25,
+            "lon_min_real": -92.25,
+            "lon_max_real": -88.25,
+            "n_lat": 10,
+            "n_lon": 9,
+            "n_celdas": 90
+          },
+          "merra2": {
+            "resolucion": "0.5° × 0.625°",
+            "lat_min_real": 14.0,
+            "lat_max_real": 18.5,
+            "lon_min_real": -91.875,
+            "lon_max_real": -88.125,
+            "n_lat": 10,
+            "n_lon": 7,
+            "n_celdas": 70
+          },
+          "gldas": {
+            "resolucion": "0.25° × 0.25°",
+            "lat_min_real": 13.875,
+            "lat_max_real": 18.375,
+            "lon_min_real": -92.125,
+            "lon_max_real": -87.875,
+            "n_lat": 19,
+            "n_lon": 18,
+            "n_celdas": 342
+          },
+          "imerg": {
+            "resolucion": "0.1° × 0.1°",
+            "lat_min_real": 13.75,
+            "lat_max_real": 18.45,
+            "lon_min_real": -92.25,
+            "lon_max_real": -87.85,
+            "n_lat": 48,
+            "n_lon": 45,
+            "n_celdas": 2160
+          }
+        },
+        "shortcut": {
+          "region": "guatemala_belice",
+          "oeste": -92.3,
+          "sur": 13.7,
+          "este": -87.8,
+          "norte": 18.5,
+          "centro_lat": 16.1,
+          "centro_lon": -90.05,
+          "query_region": "?region=guatemala_belice",
+          "query_bbox": "?oeste=-92.3&sur=13.7&este=-87.8&norte=18.5"
+        }
+      },
+      {
+        "id": "el_salvador_honduras",
+        "nombre": "El Salvador y Honduras",
+        "descripcion": "Cuencas del río Lempa, Ulúa, Choluteca y Mosquitia hondureña.",
+        "zona": "centroamerica",
+        "pais": "El Salvador y Honduras",
+        "es_latinoamerica": true,
+        "bbox": [
+          -90.2,
+          13.0,
+          -83.1,
+          16.5
+        ],
+        "predefinida": true,
+        "coordenadas": {
+          "oeste": -90.2,
+          "sur": 13.0,
+          "este": -83.1,
+          "norte": 16.5,
+          "lon_min": -90.2,
+          "lat_min": 13.0,
+          "lon_max": -83.1,
+          "lat_max": 16.5,
+          "centro": {
+            "lat": 14.75,
+            "lon": -86.65
+          },
+          "extension_grados": {
+            "ancho_lon": 7.1,
+            "alto_lat": 3.5
+          },
+          "esquinas": {
+            "suroeste": {
+              "lat": 13.0,
+              "lon": -90.2
+            },
+            "sureste": {
+              "lat": 13.0,
+              "lon": -83.1
+            },
+            "noreste": {
+              "lat": 16.5,
+              "lon": -83.1
+            },
+            "noroeste": {
+              "lat": 16.5,
+              "lon": -90.2
+            }
+          },
+          "poligono_geojson": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  -90.2,
+                  13.0
+                ],
+                [
+                  -83.1,
+                  13.0
+                ],
+                [
+                  -83.1,
+                  16.5
+                ],
+                [
+                  -90.2,
+                  16.5
+                ],
+                [
+                  -90.2,
+                  13.0
+                ]
+              ]
+            ]
+          }
+        },
+        "mallas_reales": {
+          "gpcp": {
+            "resolucion": "0.5° × 0.5°",
+            "lat_min_real": 13.25,
+            "lat_max_real": 16.25,
+            "lon_min_real": -89.75,
+            "lon_max_real": -83.25,
+            "n_lat": 7,
+            "n_lon": 14,
+            "n_celdas": 98
+          },
+          "merra2": {
+            "resolucion": "0.5° × 0.625°",
+            "lat_min_real": 13.0,
+            "lat_max_real": 16.5,
+            "lon_min_real": -90.0,
+            "lon_max_real": -83.125,
+            "n_lat": 8,
+            "n_lon": 12,
+            "n_celdas": 96
+          },
+          "gldas": {
+            "resolucion": "0.25° × 0.25°",
+            "lat_min_real": 13.125,
+            "lat_max_real": 16.375,
+            "lon_min_real": -90.125,
+            "lon_max_real": -83.125,
+            "n_lat": 14,
+            "n_lon": 29,
+            "n_celdas": 406
+          },
+          "imerg": {
+            "resolucion": "0.1° × 0.1°",
+            "lat_min_real": 13.05,
+            "lat_max_real": 16.45,
+            "lon_min_real": -90.15,
+            "lon_max_real": -83.15,
+            "n_lat": 35,
+            "n_lon": 71,
+            "n_celdas": 2485
+          }
+        },
+        "shortcut": {
+          "region": "el_salvador_honduras",
+          "oeste": -90.2,
+          "sur": 13.0,
+          "este": -83.1,
+          "norte": 16.5,
+          "centro_lat": 14.75,
+          "centro_lon": -86.65,
+          "query_region": "?region=el_salvador_honduras",
+          "query_bbox": "?oeste=-90.2&sur=13&este=-83.1&norte=16.5"
+        }
+      },
+      {
+        "id": "nicaragua",
+        "nombre": "Nicaragua (Depresión Lacustre y Caribe)",
+        "descripcion": "Lagos Xolotlán y Cocibolca, cordillera central y llanura autónoma del Caribe nicaragüense.",
+        "zona": "centroamerica",
+        "pais": "Nicaragua",
+        "es_latinoamerica": true,
+        "bbox": [
+          -87.7,
+          10.7,
+          -83.1,
+          15.0
+        ],
+        "predefinida": true,
+        "coordenadas": {
+          "oeste": -87.7,
+          "sur": 10.7,
+          "este": -83.1,
+          "norte": 15.0,
+          "lon_min": -87.7,
+          "lat_min": 10.7,
+          "lon_max": -83.1,
+          "lat_max": 15.0,
+          "centro": {
+            "lat": 12.85,
+            "lon": -85.4
+          },
+          "extension_grados": {
+            "ancho_lon": 4.6,
+            "alto_lat": 4.3
+          },
+          "esquinas": {
+            "suroeste": {
+              "lat": 10.7,
+              "lon": -87.7
+            },
+            "sureste": {
+              "lat": 10.7,
+              "lon": -83.1
+            },
+            "noreste": {
+              "lat": 15.0,
+              "lon": -83.1
+            },
+            "noroeste": {
+              "lat": 15.0,
+              "lon": -87.7
+            }
+          },
+          "poligono_geojson": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  -87.7,
+                  10.7
+                ],
+                [
+                  -83.1,
+                  10.7
+                ],
+                [
+                  -83.1,
+                  15.0
+                ],
+                [
+                  -87.7,
+                  15.0
+                ],
+                [
+                  -87.7,
+                  10.7
+                ]
+              ]
+            ]
+          }
+        },
+        "mallas_reales": {
+          "gpcp": {
+            "resolucion": "0.5° × 0.5°",
+            "lat_min_real": 10.75,
+            "lat_max_real": 14.75,
+            "lon_min_real": -87.25,
+            "lon_max_real": -83.25,
+            "n_lat": 9,
+            "n_lon": 9,
+            "n_celdas": 81
+          },
+          "merra2": {
+            "resolucion": "0.5° × 0.625°",
+            "lat_min_real": 11.0,
+            "lat_max_real": 15.0,
+            "lon_min_real": -87.5,
+            "lon_max_real": -83.125,
+            "n_lat": 9,
+            "n_lon": 8,
+            "n_celdas": 72
+          },
+          "gldas": {
+            "resolucion": "0.25° × 0.25°",
+            "lat_min_real": 10.875,
+            "lat_max_real": 14.875,
+            "lon_min_real": -87.625,
+            "lon_max_real": -83.125,
+            "n_lat": 17,
+            "n_lon": 19,
+            "n_celdas": 323
+          },
+          "imerg": {
+            "resolucion": "0.1° × 0.1°",
+            "lat_min_real": 10.75,
+            "lat_max_real": 14.95,
+            "lon_min_real": -87.65,
+            "lon_max_real": -83.15,
+            "n_lat": 43,
+            "n_lon": 46,
+            "n_celdas": 1978
+          }
+        },
+        "shortcut": {
+          "region": "nicaragua",
+          "oeste": -87.7,
+          "sur": 10.7,
+          "este": -83.1,
+          "norte": 15.0,
+          "centro_lat": 12.85,
+          "centro_lon": -85.4,
+          "query_region": "?region=nicaragua",
+          "query_bbox": "?oeste=-87.7&sur=10.7&este=-83.1&norte=15"
+        }
+      },
+      {
+        "id": "costa_rica_panama",
+        "nombre": "Costa Rica y Panamá",
+        "descripcion": "Cordillera de Talamanca, Guanacaste, Cuenca del Canal de Panamá y Darién.",
+        "zona": "centroamerica",
+        "pais": "Costa Rica y Panamá",
+        "es_latinoamerica": true,
+        "bbox": [
+          -85.9,
+          7.2,
+          -77.2,
+          11.2
+        ],
+        "predefinida": true,
+        "coordenadas": {
+          "oeste": -85.9,
+          "sur": 7.2,
+          "este": -77.2,
+          "norte": 11.2,
+          "lon_min": -85.9,
+          "lat_min": 7.2,
+          "lon_max": -77.2,
+          "lat_max": 11.2,
+          "centro": {
+            "lat": 9.2,
+            "lon": -81.55
+          },
+          "extension_grados": {
+            "ancho_lon": 8.7,
+            "alto_lat": 4.0
+          },
+          "esquinas": {
+            "suroeste": {
+              "lat": 7.2,
+              "lon": -85.9
+            },
+            "sureste": {
+              "lat": 7.2,
+              "lon": -77.2
+            },
+            "noreste": {
+              "lat": 11.2,
+              "lon": -77.2
+            },
+            "noroeste": {
+              "lat": 11.2,
+              "lon": -85.9
+            }
+          },
+          "poligono_geojson": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  -85.9,
+                  7.2
+                ],
+                [
+                  -77.2,
+                  7.2
+                ],
+                [
+                  -77.2,
+                  11.2
+                ],
+                [
+                  -85.9,
+                  11.2
+                ],
+                [
+                  -85.9,
+                  7.2
+                ]
+              ]
+            ]
+          }
+        },
+        "mallas_reales": {
+          "gpcp": {
+            "resolucion": "0.5° × 0.5°",
+            "lat_min_real": 7.25,
+            "lat_max_real": 10.75,
+            "lon_min_real": -85.75,
+            "lon_max_real": -77.25,
+            "n_lat": 8,
+            "n_lon": 18,
+            "n_celdas": 144
+          },
+          "merra2": {
+            "resolucion": "0.5° × 0.625°",
+            "lat_min_real": 7.5,
+            "lat_max_real": 11.0,
+            "lon_min_real": -85.625,
+            "lon_max_real": -77.5,
+            "n_lat": 8,
+            "n_lon": 14,
+            "n_celdas": 112
+          },
+          "gldas": {
+            "resolucion": "0.25° × 0.25°",
+            "lat_min_real": 7.375,
+            "lat_max_real": 11.125,
+            "lon_min_real": -85.875,
+            "lon_max_real": -77.375,
+            "n_lat": 16,
+            "n_lon": 35,
+            "n_celdas": 560
+          },
+          "imerg": {
+            "resolucion": "0.1° × 0.1°",
+            "lat_min_real": 7.25,
+            "lat_max_real": 11.15,
+            "lon_min_real": -85.85,
+            "lon_max_real": -77.25,
+            "n_lat": 40,
+            "n_lon": 87,
+            "n_celdas": 3480
+          }
+        },
+        "shortcut": {
+          "region": "costa_rica_panama",
+          "oeste": -85.9,
+          "sur": 7.2,
+          "este": -77.2,
+          "norte": 11.2,
+          "centro_lat": 9.2,
+          "centro_lon": -81.55,
+          "query_region": "?region=costa_rica_panama",
+          "query_bbox": "?oeste=-85.9&sur=7.2&este=-77.2&norte=11.2"
+        }
+      },
+      {
+        "id": "istmo_centroamericano_completo",
+        "nombre": "Centroamérica Completa (Istmo)",
+        "descripcion": "Cobertura integral del istmo centroamericano desde la frontera con México hasta el tapón del Darién.",
+        "zona": "centroamerica",
+        "pais": "Belice, Guatemala, El Salvador, Honduras, Nicaragua, Costa Rica y Panamá",
+        "es_latinoamerica": true,
+        "bbox": [
+          -92.3,
+          7.2,
+          -77.2,
+          18.5
+        ],
+        "predefinida": true,
+        "coordenadas": {
+          "oeste": -92.3,
+          "sur": 7.2,
+          "este": -77.2,
+          "norte": 18.5,
+          "lon_min": -92.3,
+          "lat_min": 7.2,
+          "lon_max": -77.2,
+          "lat_max": 18.5,
+          "centro": {
+            "lat": 12.85,
+            "lon": -84.75
+          },
+          "extension_grados": {
+            "ancho_lon": 15.1,
+            "alto_lat": 11.3
+          },
+          "esquinas": {
+            "suroeste": {
+              "lat": 7.2,
+              "lon": -92.3
+            },
+            "sureste": {
+              "lat": 7.2,
+              "lon": -77.2
+            },
+            "noreste": {
+              "lat": 18.5,
+              "lon": -77.2
+            },
+            "noroeste": {
+              "lat": 18.5,
+              "lon": -92.3
+            }
+          },
+          "poligono_geojson": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  -92.3,
+                  7.2
+                ],
+                [
+                  -77.2,
+                  7.2
+                ],
+                [
+                  -77.2,
+                  18.5
+                ],
+                [
+                  -92.3,
+                  18.5
+                ],
+                [
+                  -92.3,
+                  7.2
+                ]
+              ]
+            ]
+          }
+        },
+        "mallas_reales": {
+          "gpcp": {
+            "resolucion": "0.5° × 0.5°",
+            "lat_min_real": 7.25,
+            "lat_max_real": 18.25,
+            "lon_min_real": -92.25,
+            "lon_max_real": -77.25,
+            "n_lat": 23,
+            "n_lon": 31,
+            "n_celdas": 713
+          },
+          "merra2": {
+            "resolucion": "0.5° × 0.625°",
+            "lat_min_real": 7.5,
+            "lat_max_real": 18.5,
+            "lon_min_real": -91.875,
+            "lon_max_real": -77.5,
+            "n_lat": 23,
+            "n_lon": 24,
+            "n_celdas": 552
+          },
+          "gldas": {
+            "resolucion": "0.25° × 0.25°",
+            "lat_min_real": 7.375,
+            "lat_max_real": 18.375,
+            "lon_min_real": -92.125,
+            "lon_max_real": -77.375,
+            "n_lat": 45,
+            "n_lon": 60,
+            "n_celdas": 2700
+          },
+          "imerg": {
+            "resolucion": "0.1° × 0.1°",
+            "lat_min_real": 7.25,
+            "lat_max_real": 18.45,
+            "lon_min_real": -92.25,
+            "lon_max_real": -77.25,
+            "n_lat": 113,
+            "n_lon": 151,
+            "n_celdas": 17063
+          }
+        },
+        "shortcut": {
+          "region": "istmo_centroamericano_completo",
+          "oeste": -92.3,
+          "sur": 7.2,
+          "este": -77.2,
+          "norte": 18.5,
+          "centro_lat": 12.85,
+          "centro_lon": -84.75,
+          "query_region": "?region=istmo_centroamericano_completo",
+          "query_bbox": "?oeste=-92.3&sur=7.2&este=-77.2&norte=18.5"
+        }
+      }
+    ]
+  }
+}

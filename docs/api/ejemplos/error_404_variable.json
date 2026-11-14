@@ -1,0 +1,8 @@
+{
+  "request": "GET /api/v1/variables/no_existe",
+  "status": 404,
+  "response": {
+    "error": "no_encontrado",
+    "mensaje": "Variable 'no_existe' no existe en el catálogo (válidas: ['cdd_imerg', 'dias_humedos_imerg', 'evapotranspiracion', 'humedad_suelo', 'lluvia_gpcp', 'lluvia_imerg_dia', 'lluvia_imerg_mes', 'lluvia_merra2', 'prcptot_imerg', 'r20mm_imerg', 'sdii_imerg', 'temp_aire', 'vapor_agua'])"
+  }
+}

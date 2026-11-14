@@ -1,0 +1,32 @@
+{
+  "request": "GET /",
+  "status": 200,
+  "response": {
+    "nombre": "NASA Space Apps — Las Dos Caras de la Lluvia API",
+    "version": "0.2.0",
+    "modo_acceso": "opendap_memoria_sin_archivos",
+    "documentacion": "/docs",
+    "prefijo_api": "/api/v1",
+    "datasets": [
+      "gpcp",
+      "merra2",
+      "gldas",
+      "imerg"
+    ],
+    "variables": [
+      "lluvia_gpcp",
+      "lluvia_merra2",
+      "temp_aire",
+      "vapor_agua",
+      "humedad_suelo",
+      "evapotranspiracion",
+      "lluvia_imerg_mes",
+      "lluvia_imerg_dia",
+      "cdd_imerg",
+      "r20mm_imerg",
+      "dias_humedos_imerg",
+      "prcptot_imerg",
+      "sdii_imerg"
+    ]
+  }
+}

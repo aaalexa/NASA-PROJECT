@@ -1,0 +1,274 @@
+{
+  "request": "GET /api/v1/mapas/lluvia_gpcp?region=noreste_mexico&sintetico=true",
+  "status": 200,
+  "response": {
+    "variable": "lluvia_gpcp",
+    "nombre_simple": "Precipitación (P)",
+    "unidad_pendiente": "mm/mes/decada",
+    "region": {
+      "id": "noreste_mexico",
+      "nombre": "Noreste de México",
+      "descripcion": "Coahuila, Nuevo León y Tamaulipas (cuenca del Río Bravo y Sierra Madre Oriental).",
+      "zona": "mexico",
+      "pais": "México",
+      "es_latinoamerica": true,
+      "bbox": [
+        -106.0,
+        22.0,
+        -97.0,
+        30.0
+      ],
+      "predefinida": true,
+      "coordenadas": {
+        "oeste": -106.0,
+        "sur": 22.0,
+        "este": -97.0,
+        "norte": 30.0,
+        "lon_min": -106.0,
+        "lat_min": 22.0,
+        "lon_max": -97.0,
+        "lat_max": 30.0,
+        "centro": {
+          "lat": 26.0,
+          "lon": -101.5
+        },
+        "extension_grados": {
+          "ancho_lon": 9.0,
+          "alto_lat": 8.0
+        },
+        "esquinas": {
+          "suroeste": {
+            "lat": 22.0,
+            "lon": -106.0
+          },
+          "sureste": {
+            "lat": 22.0,
+            "lon": -97.0
+          },
+          "noreste": {
+            "lat": 30.0,
+            "lon": -97.0
+          },
+          "noroeste": {
+            "lat": 30.0,
+            "lon": -106.0
+          }
+        },
+        "poligono_geojson": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -106.0,
+                22.0
+              ],
+              [
+                -97.0,
+                22.0
+              ],
+              [
+                -97.0,
+                30.0
+              ],
+              [
+                -106.0,
+                30.0
+              ],
+              [
+                -106.0,
+                22.0
+              ]
+            ]
+          ]
+        }
+      },
+      "mallas_reales": {
+        "gpcp": {
+          "resolucion": "0.5° × 0.5°",
+          "lat_min_real": 22.25,
+          "lat_max_real": 29.75,
+          "lon_min_real": -105.75,
+          "lon_max_real": -97.25,
+          "n_lat": 16,
+          "n_lon": 18,
+          "n_celdas": 288
+        },
+        "merra2": {
+          "resolucion": "0.5° × 0.625°",
+          "lat_min_real": 22.0,
+          "lat_max_real": 30.0,
+          "lon_min_real": -105.625,
+          "lon_max_real": -97.5,
+          "n_lat": 17,
+          "n_lon": 14,
+          "n_celdas": 238
+        },
+        "gldas": {
+          "resolucion": "0.25° × 0.25°",
+          "lat_min_real": 22.125,
+          "lat_max_real": 29.875,
+          "lon_min_real": -105.875,
+          "lon_max_real": -97.125,
+          "n_lat": 32,
+          "n_lon": 36,
+          "n_celdas": 1152
+        },
+        "imerg": {
+          "resolucion": "0.1° × 0.1°",
+          "lat_min_real": 22.05,
+          "lat_max_real": 29.95,
+          "lon_min_real": -105.95,
+          "lon_max_real": -97.05,
+          "n_lat": 80,
+          "n_lon": 90,
+          "n_celdas": 7200
+        }
+      },
+      "shortcut": {
+        "region": "noreste_mexico",
+        "oeste": -106.0,
+        "sur": 22.0,
+        "este": -97.0,
+        "norte": 30.0,
+        "centro_lat": 26.0,
+        "centro_lon": -101.5,
+        "query_region": "?region=noreste_mexico",
+        "query_bbox": "?oeste=-106&sur=22&este=-97&norte=30"
+      }
+    },
+    "periodo": [
+      "2001-01",
+      "2024-12"
+    ],
+    "alfa": 0.05,
+    "fuente_datos": "sintetico",
+    "codigos_veredicto": {
+      "2": "significativo",
+      "1": "indicio",
+      "0": "sin tendencia clara"
+    },
+    "lat": [
+      22.25,
+      24.75,
+      27.25,
+      29.75
+    ],
+    "lon": [
+      -105.75,
+      -102.91666666666667,
+      -100.08333333333333,
+      -97.25
+    ],
+    "pendiente_decada": [
+      [
+        -7.058239731660347,
+        -7.764881313469277,
+        -6.672251868037353,
+        -6.3802499343529115
+      ],
+      [
+        -7.604412585528561,
+        -6.745845002211816,
+        -6.591314318427674,
+        -7.298693036635589
+      ],
+      [
+        -7.886056207806675,
+        -6.758949125481899,
+        -6.2970051737009705,
+        -6.700546388732114
+      ],
+      [
+        -6.233642216179131,
+        -7.46788668117459,
+        -6.024067370243513,
+        -7.20441752184309
+      ]
+    ],
+    "p_t": [
+      [
+        6.207494453787821e-09,
+        3.55773797812474e-12,
+        1.3596165199768326e-09,
+        3.65826968099599e-08
+      ],
+      [
+        6.959193696781316e-11,
+        1.505727584922999e-08,
+        1.3872595911089643e-10,
+        2.03445244117306e-11
+      ],
+      [
+        7.810158089929078e-13,
+        2.8689158918646787e-09,
+        5.5475919632207525e-09,
+        5.584845756798868e-13
+      ],
+      [
+        8.91967421613087e-09,
+        8.978390091713126e-11,
+        7.944768463085073e-08,
+        3.759292972056231e-11
+      ]
+    ],
+    "p_mk": [
+      [
+        8.176206178767131e-08,
+        2.276889787822256e-11,
+        3.552713678800501e-15,
+        2.1599194477417427e-07
+      ],
+      [
+        2.220446049250313e-16,
+        3.141448656762691e-09,
+        2.6664226382422385e-11,
+        0.0
+      ],
+      [
+        0.0,
+        6.661338147750939e-15,
+        3.369924339580166e-10,
+        0.0
+      ],
+      [
+        2.7006565184173326e-07,
+        2.2327695248236523e-11,
+        1.4597212327771558e-12,
+        1.3735457216057512e-11
+      ]
+    ],
+    "veredicto": [
+      [
+        2.0,
+        2.0,
+        2.0,
+        2.0
+      ],
+      [
+        2.0,
+        2.0,
+        2.0,
+        2.0
+      ],
+      [
+        2.0,
+        2.0,
+        2.0,
+        2.0
+      ],
+      [
+        2.0,
+        2.0,
+        2.0,
+        2.0
+      ]
+    ],
+    "resumen": {
+      "n_pixeles_total": 16,
+      "n_pixeles_validos": 16,
+      "n_significativos_secos": 16,
+      "n_significativos_humedos": 0,
+      "n_indicio": 0
+    }
+  }
+}

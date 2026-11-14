@@ -1,0 +1,11 @@
+{
+  "request": "GET /api/v1/cache",
+  "status": 200,
+  "response": {
+    "almacenamiento_disco": false,
+    "tipo_cache": "lru_memoria_ram",
+    "total": 0,
+    "kb_ram_total": 0,
+    "entradas": []
+  }
+}

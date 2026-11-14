@@ -26,10 +26,11 @@ jobs:
       - name: Checkout del repositorio
         uses: actions/checkout@v4
 
-      - name: Instalar dependencias nativas C (HDF5, NetCDF, GEOS, PROJ)
+      - name: Instalar dependencias nativas C (HDF5, NetCDF, GEOS, PROJ, Expat)
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
+            libexpat1 \
             libhdf5-dev \
             libnetcdf-dev \
             libgeos-dev \
@@ -134,15 +135,16 @@ jobs:
         run: |
           echo "Omitiendo despliegue SSH: define AZURE_VM_HOST, AZURE_VM_USER y AZURE_VM_SSH_KEY en GitHub Secrets para activar el despliegue automático en api.moody-trends.earth."
 
+      - name: Checkout de archivos de despliegue (docker-compose.yml y Caddyfile)
+        if: env.HAS_SSH_KEY == 'true'
+        uses: actions/checkout@v4
+
       - name: Descargar imagen Docker empaquetada
         if: env.HAS_SSH_KEY == 'true'
         uses: actions/download-artifact@v4
         with:
           name: docker-image-tarball
-
-      - name: Checkout de archivos de despliegue (docker-compose.yml y Caddyfile)
-        if: env.HAS_SSH_KEY == 'true'
-        uses: actions/checkout@v4
+          path: .
 
       - name: Transferir paquete e iniciar contenedores en Azure VM (api.moody-trends.earth)
         if: env.HAS_SSH_KEY == 'true'
@@ -153,6 +155,7 @@ jobs:
           VM_PATH: ${{ secrets.AZURE_VM_APP_DIR || '/opt/nasa-down-to-earth' }}
           SSH_KEY: ${{ secrets.AZURE_VM_SSH_KEY }}
         run: |
+          ls -lh nasa-down-to-earth-api.tar.gz
           install -m 600 -D /dev/null ~/.ssh/id_deploy
           printf '%s\n' "${SSH_KEY}" > ~/.ssh/id_deploy
           ssh-keyscan -p "${VM_PORT}" -H "${VM_HOST}" >> ~/.ssh/known_hosts
@@ -165,10 +168,14 @@ jobs:
           ssh -i ~/.ssh/id_deploy -p "${VM_PORT}" "${VM_USER}@${VM_HOST}" <<EOF
             set -euo pipefail
             cd "${VM_PATH}"
+            chmod +x deploy/setup-debian12-docker.sh
+            if ! command -v docker >/dev/null 2>&1; then
+              sudo ./deploy/setup-debian12-docker.sh
+            fi
             [ -f .env ] || cp .env.example .env
-            gunzip -c nasa-down-to-earth-api.tar.gz | docker load
+            gunzip -c nasa-down-to-earth-api.tar.gz | sudo docker load
             rm -f nasa-down-to-earth-api.tar.gz
-            docker compose up -d
-            docker compose ps
+            sudo docker compose up -d
+            sudo docker compose ps
           EOF
 
