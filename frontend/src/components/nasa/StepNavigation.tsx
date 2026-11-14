@@ -2,94 +2,52 @@
 
 import { WorkflowStep } from "@/types/geo";
 import { useTranslation } from "@/context/LanguageContext";
-import {
-  MapPinIcon,
-  CalendarDaysIcon,
-  AdjustmentsHorizontalIcon,
-  ChartBarSquareIcon,
-  CheckIcon,
-} from "@heroicons/react/24/outline";
 
 interface StepNavigationProps {
   activeStep: WorkflowStep;
   onSelectStep: (step: WorkflowStep) => void;
   hasRegion: boolean;
   hasVariables: boolean;
+  readOnly?: boolean;
 }
 
-export function StepNavigation({
-  activeStep,
-  onSelectStep,
-  hasRegion,
-  hasVariables,
-}: StepNavigationProps) {
-  const { t } = useTranslation();
+const ORDER: WorkflowStep[] = ["region", "period", "variables", "results"];
 
-  const steps: { id: WorkflowStep; label: string; icon: any; enabled: boolean }[] = [
-    {
-      id: "region",
-      label: t("nav.step1"),
-      icon: MapPinIcon,
-      enabled: true,
-    },
-    {
-      id: "period",
-      label: t("nav.step2"),
-      icon: CalendarDaysIcon,
-      enabled: hasRegion,
-    },
-    {
-      id: "variables",
-      label: t("nav.step3"),
-      icon: AdjustmentsHorizontalIcon,
-      enabled: hasRegion,
-    },
-    {
-      id: "results",
-      label: t("nav.step4"),
-      icon: ChartBarSquareIcon,
-      enabled: hasRegion && hasVariables,
-    },
+export function StepNavigation({ activeStep, onSelectStep, hasRegion, hasVariables, readOnly }: StepNavigationProps) {
+  const { t } = useTranslation();
+  const activeIndex = ORDER.indexOf(activeStep);
+
+  const steps = [
+    { id: "region" as const, label: t("nav.step1"), enabled: true },
+    { id: "period" as const, label: t("nav.step2"), enabled: hasRegion },
+    { id: "variables" as const, label: t("nav.step3"), enabled: hasRegion },
+    { id: "results" as const, label: t("nav.step4"), enabled: hasRegion && hasVariables },
   ];
 
   return (
-    <nav className="flex items-center gap-1.5 p-1 rounded-2xl bg-card/90 dark:bg-black/90 border border-border backdrop-blur-md shadow-2xl select-none transition-colors">
+    <nav aria-label="Workflow" className="panel flex items-center gap-1 p-1">
       {steps.map((step, index) => {
-        const Icon = step.icon;
         const isActive = activeStep === step.id;
-        const isPast =
-          (step.id === "region" && hasRegion && activeStep !== "region") ||
-          (step.id === "period" && activeStep !== "region" && activeStep !== "period") ||
-          (step.id === "variables" && activeStep === "results");
-
+        const isPast = index < activeIndex;
         return (
           <button
             key={step.id}
             type="button"
-            disabled={!step.enabled}
+            disabled={!step.enabled || readOnly}
+            aria-current={isActive ? "step" : undefined}
             onClick={() => onSelectStep(step.id)}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-mono transition-all ${
+            className={`flex h-8 items-center gap-2 rounded-full px-3 text-xs font-medium transition-colors disabled:cursor-default ${
               isActive
-                ? "bg-blue-600 text-white font-semibold shadow-lg shadow-blue-600/30 ring-1 ring-blue-400/40"
-                : isPast
-                ? "text-foreground hover:bg-muted cursor-pointer"
+                ? "bg-foreground text-background"
                 : step.enabled
-                ? "text-muted-foreground hover:text-foreground hover:bg-muted/60 cursor-pointer"
-                : "text-muted-foreground/40 cursor-not-allowed opacity-50"
+                ? "cursor-pointer text-foreground hover:bg-muted"
+                : "text-muted-foreground/50"
             }`}
           >
-            <span
-              className={`flex items-center justify-center w-5 h-5 rounded-lg text-[10px] font-bold ${
-                isActive
-                  ? "bg-black/30 text-white"
-                  : isPast
-                  ? "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-400 border border-blue-500/30"
-                  : "bg-muted text-muted-foreground border border-border"
-              }`}
-            >
-              {isPast ? <CheckIcon className="w-3 h-3 text-blue-600 dark:text-blue-400" /> : `0${index + 1}`}
+            <span className={`tabular-nums ${isActive ? "text-brand-red" : isPast ? "text-primary" : "text-muted-foreground"}`}>
+              {String(index + 1).padStart(2, "0")}
             </span>
-            <span className="hidden sm:inline uppercase tracking-wider">{step.label}</span>
+            <span className="hidden sm:inline">{step.label}</span>
           </button>
         );
       })}

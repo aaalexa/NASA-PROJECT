@@ -1,380 +1,442 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import CobeGlobePulse from "@/components/globe/CobeGlobePulse";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  ArrowPathIcon,
+  MoonIcon,
+  SpeakerWaveIcon,
+  SpeakerXMarkIcon,
+  SunIcon,
+  UserCircleIcon,
+} from "@heroicons/react/24/outline";
+import CobeGlobePulse from "@/components/globe/CobeGlobePulse";
+import { VoiceController } from "@/components/hud/VoiceController";
+import { ExperienceModal } from "@/components/onboarding/ExperienceModal";
+import { GuidedFlow, GuidedStage } from "@/components/guided/GuidedFlow";
+import { StepNavigation } from "@/components/nasa/StepNavigation";
+import { RegionStep } from "@/components/nasa/RegionStep";
+import { PeriodStep } from "@/components/nasa/PeriodStep";
+import { VariablesStep } from "@/components/nasa/VariablesStep";
+import { ResultsStep } from "@/components/nasa/ResultsStep";
+import { PREDEFINED_REGIONS } from "@/components/nasa/PredefinedRegions";
+import { PERIODS } from "@/lib/catalog";
+import { DEMOS, DemoDef, DemoStep } from "@/lib/demos";
+import { useSpeak } from "@/hooks/useSpeak";
+import { useTranslation } from "@/context/LanguageContext";
+import { useTheme } from "@/context/ThemeContext";
+import type {
+  AppPhase,
   DateRange,
+  Experience,
   GeoPoint,
   PredefinedRegion,
   RegionAnalysisPayload,
   VariableId,
   WorkflowStep,
 } from "@/types/geo";
-import { VoiceController } from "@/components/hud/VoiceController";
-import { StepNavigation } from "@/components/nasa/StepNavigation";
-import { RegionStep } from "@/components/nasa/RegionStep";
-import { PeriodStep } from "@/components/nasa/PeriodStep";
-import { VariablesStep } from "@/components/nasa/VariablesStep";
-import { ResultsStep } from "@/components/nasa/ResultsStep";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { useTranslation } from "@/context/LanguageContext";
-import { useTheme } from "@/context/ThemeContext";
-import {
-  GlobeAmericasIcon,
-  LanguageIcon,
-  ArrowPathIcon,
-  ViewfinderCircleIcon,
-  ServerIcon,
-  ChartBarIcon,
-  SunIcon,
-  MoonIcon,
-} from "@heroicons/react/24/outline";
+
+const DEFAULT_RANGE: DateRange = { start: "2019-01-01", end: "2024-12-31", preset: "5y" };
+const DEFAULT_VARIABLES: VariableId[] = ["precipitation", "temperature"];
+
+interface DemoState {
+  def: DemoDef;
+  index: number;
+  finished: boolean;
+}
+
+function buildPayload(name: string, description: string, v: [GeoPoint, GeoPoint, GeoPoint]): RegionAnalysisPayload {
+  return {
+    regionName: name,
+    description,
+    triangleVertices: v,
+    geoJsonPolygon: {
+      type: "Polygon",
+      coordinates: [[[v[0].lng, v[0].lat], [v[1].lng, v[1].lat], [v[2].lng, v[2].lat], [v[0].lng, v[0].lat]]],
+    },
+    suggestedVariables: [],
+  };
+}
 
 export default function HomePage() {
   const { language, toggleLanguage, t } = useTranslation();
   const { theme, toggleTheme } = useTheme();
+  const speech = useSpeak(language);
 
-  // Workflow state
+  const [phase, setPhase] = useState<AppPhase>("onboarding");
   const [activeStep, setActiveStep] = useState<WorkflowStep>("region");
   const [points, setPoints] = useState<GeoPoint[]>([]);
   const [regionData, setRegionData] = useState<RegionAnalysisPayload | null>(null);
-  const [dateRange, setDateRange] = useState<DateRange>({
-    start: "2019-01-01",
-    end: "2024-12-31",
-    preset: "5y",
-  });
-  const [selectedVariables, setSelectedVariables] = useState<VariableId[]>([
-    "temperature",
-    "precipitation",
-  ]);
-  const [isSearchingText, setIsSearchingText] = useState(false);
+  const [dateRange, setDateRange] = useState<DateRange>(DEFAULT_RANGE);
+  const [selectedVariables, setSelectedVariables] = useState<VariableId[]>(DEFAULT_VARIABLES);
+  const [isSearching, setIsSearching] = useState(false);
 
-  // User Geolocation tracking
-  const [userLocation, setUserLocation] = useState<{
-    lat: number;
-    lng: number;
-    accuracy?: number;
-  } | null>(null);
-  const [locationStatus, setLocationStatus] = useState<
-    "locating" | "detected" | "denied" | "unsupported"
-  >("locating");
+  const voiceHandlerRef = useRef<((text: string) => void) | null>(null);
+  const registerVoice = useCallback((fn: ((text: string) => void) | null) => {
+    voiceHandlerRef.current = fn;
+  }, []);
+  const demoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [hint, setHint] = useState<string | undefined>();
+  const [flash, setFlash] = useState<string | null>(null);
 
-  // Capturar y registrar la ubicación del usuario en consola (sin emojis)
+  const [demo, setDemo] = useState<DemoState | null>(null);
+  const [guidedKey, setGuidedKey] = useState(0);
+  const [guidedStart, setGuidedStart] = useState<GuidedStage>("intro");
+
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number; accuracy?: number } | null>(null);
+
+  // Observer geolocation (used only as context for the analysis payload).
   useEffect(() => {
-    if (typeof window === "undefined" || !("geolocation" in navigator)) {
-      setLocationStatus("unsupported");
-      console.warn("[NASA Earth Detective] Geolocation API is not supported by this browser.");
-      return;
-    }
-
+    if (typeof navigator === "undefined" || !("geolocation" in navigator)) return;
     navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const coords = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-          accuracy: position.coords.accuracy,
-        };
-        setUserLocation(coords);
-        setLocationStatus("detected");
-
-        console.group("[NASA Earth Detective] User Geolocation Captured");
-        console.log("Latitude:", coords.lat);
-        console.log("Longitude:", coords.lng);
-        console.log("Accuracy:", coords.accuracy ? `${coords.accuracy.toFixed(1)} meters` : "N/A");
-        console.log("Timestamp:", new Date(position.timestamp).toISOString());
-        console.log("Geodetic Reference: WGS 84");
-        console.log("Status: Spatial Geospatial Correlation Active");
-        console.groupEnd();
-      },
-      (error) => {
-        setLocationStatus("denied");
-        console.group("[NASA Earth Detective] Geolocation Notice");
-        console.warn("User location permission status:", error.message);
-        console.log("Operating under standard Earth orbital coordinates.");
-        console.groupEnd();
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 12000,
-        maximumAge: 60000,
-      }
+      (p) => setUserLocation({ lat: p.coords.latitude, lng: p.coords.longitude, accuracy: p.coords.accuracy }),
+      () => undefined,
+      { enableHighAccuracy: false, timeout: 12000, maximumAge: 60000 }
     );
   }, []);
 
-  const handleRegionParsed = (data: RegionAnalysisPayload) => {
+  useEffect(() => {
+    if (!flash) return;
+    const id = setTimeout(() => setFlash(null), 4500);
+    return () => clearTimeout(id);
+  }, [flash]);
+
+  // ---- Region handling ------------------------------------------------------------------
+
+  const applyRegion = useCallback((data: RegionAnalysisPayload) => {
     setRegionData(data);
     setPoints(data.triangleVertices);
+  }, []);
 
-    console.group("[NASA Earth Detective] Region Triangle Generated");
-    console.log("Region Name:", data.regionName);
-    console.log("Description:", data.description);
-    console.log("Vertices:", data.triangleVertices);
-    console.log("GeoJSON Polygon:", data.geoJsonPolygon);
-    console.log("Suggested Variables:", data.suggestedVariables);
-    console.groupEnd();
-  };
+  const selectPredefined = useCallback(
+    (reg: PredefinedRegion) => applyRegion(buildPayload(reg.name[language], reg.area[language], reg.triangle)),
+    [applyRegion, language]
+  );
 
-  const handleSelectPredefined = (reg: PredefinedRegion) => {
-    const v = reg.triangle;
-    const payload: RegionAnalysisPayload = {
-      regionName: reg.name[language],
-      description: `Analisis cientifico de tendencias para la zona de ${reg.name[language]} (${reg.area[language]}).`,
-      triangleVertices: [v[0], v[1], v[2]],
-      geoJsonPolygon: {
-        type: "Polygon",
-        coordinates: [
-          [
-            [v[0].lng, v[0].lat],
-            [v[1].lng, v[1].lat],
-            [v[2].lng, v[2].lat],
-            [v[0].lng, v[0].lat],
-          ],
-        ],
-      },
-      suggestedVariables: [
-        {
-          id: "GPM_PRECIP",
-          name: "Precipitacion (GPM)",
-          simpleExplanation: "Mide acumulacion de precipitaciones para detectar sequias.",
-        },
-        {
-          id: "MODIS_LST",
-          name: "Temperatura Superficial (MODIS)",
-          simpleExplanation: "Evalua anomalias termicas y estres de calor en ecosistemas.",
-        },
-      ],
-    };
-
-    handleRegionParsed(payload);
-  };
-
-  const handleManualSearch = async (queryText: string) => {
-    setIsSearchingText(true);
-    try {
-      const res = await fetch("/api/parse-voice", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: queryText, locale: language }),
-      });
-      const data = await res.json();
-      if (!data.error) {
-        handleRegionParsed(data);
-      } else {
-        alert(data.error);
+  const searchRegion = useCallback(
+    async (text: string): Promise<boolean> => {
+      setIsSearching(true);
+      try {
+        const res = await fetch("/api/parse-voice", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt: text, locale: language }),
+        });
+        if (!res.ok) return false;
+        applyRegion(await res.json());
+        return true;
+      } catch {
+        return false;
+      } finally {
+        setIsSearching(false);
       }
-    } catch (err) {
-      console.error("[NASA Earth Detective] Search error:", err);
-    } finally {
-      setIsSearchingText(false);
-    }
-  };
+    },
+    [applyRegion, language]
+  );
 
-  const toggleVariable = (id: VariableId) => {
-    setSelectedVariables((current) =>
-      current.includes(id)
-        ? current.filter((item) => item !== id)
-        : [...current, id]
-    );
-  };
+  // ---- Voice ------------------------------------------------------------------------------
+
+  const handleTranscript = useCallback(
+    (text: string) => {
+      if (phase === "expert") {
+        setActiveStep("region");
+        void searchRegion(text).then((ok) => !ok && setFlash(t("regionStep.notFound")));
+      } else {
+        voiceHandlerRef.current?.(text);
+      }
+    },
+    [phase, searchRegion, t]
+  );
+
+  // ---- Mode ---------------------------------------------------------------------------------
 
   const resetAll = () => {
+    clearDemoTimer();
+    setDemo(null);
     setPoints([]);
     setRegionData(null);
     setActiveStep("region");
-    setSelectedVariables(["temperature", "precipitation"]);
-    setDateRange({ start: "2019-01-01", end: "2024-12-31", preset: "5y" });
+    setSelectedVariables(DEFAULT_VARIABLES);
+    setDateRange(DEFAULT_RANGE);
+    setGuidedStart("intro");
+    setGuidedKey((k) => k + 1);
   };
 
-  // Coordenadas para visualización en el visor
-  const centerLat =
-    points.length > 0
-      ? points.reduce((sum, p) => sum + p.lat, 0) / points.length
-      : null;
-  const centerLng =
-    points.length > 0
-      ? points.reduce((sum, p) => sum + p.lng, 0) / points.length
-      : null;
+  const chooseExperience = (level: Experience) => {
+    clearDemoTimer();
+    setDemo(null);
+    speech.setEnabled(level === "novice");
+    setPhase(level === "novice" ? "guided" : "expert");
+    setActiveStep("region");
+    setGuidedStart("intro");
+    setGuidedKey((k) => k + 1);
+  };
+
+  const changeMode = () => {
+    speech.cancel();
+    clearDemoTimer();
+    setDemo(null);
+    setPhase("onboarding");
+  };
+
+  // ---- Demo runner --------------------------------------------------------------------------
+
+  const applyDemoStep = useCallback(
+    (step: DemoStep) => {
+      if (step.region) {
+        const reg = PREDEFINED_REGIONS.find((r) => r.id === step.region);
+        if (reg) selectPredefined(reg);
+      }
+      if (step.preset) {
+        const p = PERIODS.find((x) => x.id === step.preset);
+        if (p) setDateRange({ start: p.start, end: p.end, preset: p.id });
+      }
+      if (step.variables) setSelectedVariables(step.variables);
+      if (step.step) setActiveStep(step.step);
+    },
+    [selectPredefined]
+  );
+
+  const clearDemoTimer = () => {
+    if (demoTimer.current) clearTimeout(demoTimer.current);
+    demoTimer.current = null;
+  };
+
+  useEffect(() => clearDemoTimer, []);
+
+  const runDemoStep = (def: DemoDef, index: number) => {
+    const step = def.steps[index];
+    applyDemoStep(step);
+    speech.speak(step.caption[language]);
+    setDemo({ def, index, finished: false });
+    demoTimer.current = setTimeout(() => {
+      if (index + 1 >= def.steps.length) setDemo({ def, index, finished: true });
+      else runDemoStep(def, index + 1);
+    }, step.duration);
+  };
+
+  const startDemo = (id: string) => {
+    const def = DEMOS.find((d) => d.id === id);
+    if (!def) return;
+    clearDemoTimer();
+    setPoints([]);
+    setRegionData(null);
+    runDemoStep(def, 0);
+  };
+
+  const stopDemo = () => {
+    speech.cancel();
+    clearDemoTimer();
+    setDemo(null);
+    setGuidedStart("intro");
+    setGuidedKey((k) => k + 1);
+    setActiveStep("region");
+  };
+
+  const tryItYourself = () => {
+    speech.cancel();
+    clearDemoTimer();
+    setDemo(null);
+    setPoints([]);
+    setRegionData(null);
+    setActiveStep("region");
+    setGuidedStart("topic");
+    setGuidedKey((k) => k + 1);
+  };
+
+  // ---- Rendering ----------------------------------------------------------------------------
+
+  const toggleVariable = (id: VariableId) =>
+    setSelectedVariables((cur) => (cur.includes(id) ? cur.filter((v) => v !== id) : [...cur, id]));
+
+  const renderStep = (readOnly = false) => (
+    <>
+      {activeStep === "region" && (
+        <RegionStep
+          regionData={regionData}
+          onSelectPredefined={selectPredefined}
+          onSearchManual={searchRegion}
+          isSearching={isSearching}
+          onContinue={() => setActiveStep("period")}
+        />
+      )}
+      {activeStep === "period" && (
+        <PeriodStep range={dateRange} onChangeRange={setDateRange} onBack={() => setActiveStep("region")} onContinue={() => setActiveStep("variables")} />
+      )}
+      {activeStep === "variables" && (
+        <VariablesStep selected={selectedVariables} onToggleVariable={toggleVariable} onBack={() => setActiveStep("period")} onContinue={() => setActiveStep("results")} />
+      )}
+      {activeStep === "results" && regionData && (
+        <ResultsStep
+          regionData={regionData}
+          range={dateRange}
+          selectedVariables={selectedVariables}
+          userLocation={userLocation}
+          readOnly={readOnly}
+          onEditCriteria={() => (phase === "guided" ? (setGuidedStart("suggest"), setGuidedKey((k) => k + 1), setActiveStep("region")) : setActiveStep("variables"))}
+          onRestart={resetAll}
+        />
+      )}
+    </>
+  );
+
+  const centerLat = points.length ? points.reduce((s, p) => s + p.lat, 0) / points.length : null;
+  const centerLng = points.length ? points.reduce((s, p) => s + p.lng, 0) / points.length : null;
+
+  const showNav = phase === "expert" || (phase === "guided" && demo !== null);
+  const currentStepDef = demo ? demo.def.steps[demo.index] : null;
+
+  const voiceHint =
+    phase === "onboarding" ? undefined : phase === "expert" ? t("regionStep.hint") : hint;
 
   return (
-    <main className="relative w-screen h-screen overflow-hidden bg-background text-foreground font-sans select-none transition-colors duration-300">
-      {/* Globo 3D WebGL (cobe) con vértices rojos y aristas azules */}
+    <main className="relative h-screen w-screen overflow-hidden bg-background text-foreground">
       <CobeGlobePulse trianglePoints={points} />
 
-      {/* Barra Superior - Header HUD de Misión */}
-      <header className="fixed top-4 left-4 right-4 z-20 flex flex-wrap items-center justify-between gap-3 pointer-events-none">
-        {/* Identidad de la estación */}
-        <div className="pointer-events-auto flex items-center gap-3 bg-card/90 dark:bg-black/90 backdrop-blur-md border border-border px-4 py-2.5 rounded-2xl shadow-2xl transition-colors">
-          <span className="flex h-2.5 w-2.5 rounded-full bg-blue-600 ring-4 ring-blue-600/30" />
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs sm:text-sm font-bold tracking-wider uppercase text-foreground font-mono">
-                {t("system.name")}
-              </span>
-              <Badge
-                variant="outline"
-                className="text-[9px] bg-blue-500/10 dark:bg-blue-950/70 text-blue-600 dark:text-blue-400 border-blue-500/30 py-0 px-1.5 h-4 font-mono font-semibold"
-              >
-                {t("system.badge")}
-              </Badge>
-            </div>
-            <p className="text-[10px] text-muted-foreground font-mono hidden sm:block">
-              {t("system.subline")}
-            </p>
+      {/* Header */}
+      <header className="pointer-events-none fixed left-4 right-4 top-4 z-30 flex items-center justify-between gap-3">
+        <div className="pointer-events-auto flex items-center gap-2.5">
+          <span className="h-3 w-3 rounded-full bg-brand-red" aria-hidden />
+          <span className="text-sm font-bold tracking-tight">{t("system.name")}</span>
+          <span className="eyebrow hidden md:inline">{t("system.badge")}</span>
+        </div>
+
+        {showNav && (
+          <div className="pointer-events-auto absolute left-1/2 hidden -translate-x-1/2 sm:block">
+            <StepNavigation activeStep={activeStep} onSelectStep={setActiveStep} hasRegion={points.length === 3} hasVariables={selectedVariables.length > 0} readOnly={demo !== null} />
           </div>
-        </div>
+        )}
 
-        {/* Navegación por Pasos Centrada */}
-        <div className="pointer-events-auto">
-          <StepNavigation
-            activeStep={activeStep}
-            onSelectStep={setActiveStep}
-            hasRegion={points.length === 3}
-            hasVariables={selectedVariables.length > 0}
-          />
-        </div>
-
-        {/* Acciones de Cabecera: Ubicación, Tema, Idioma, Reset */}
         <div className="pointer-events-auto flex items-center gap-2">
-          {/* Geolocation del Detective */}
-          <div className="hidden xl:flex items-center gap-1.5 bg-card/90 dark:bg-black/90 backdrop-blur-md border border-border px-3 py-1.5 rounded-xl text-[10px] text-muted-foreground font-mono transition-colors">
-            <span
-              className={`w-1.5 h-1.5 rounded-full ${
-                userLocation ? "bg-blue-500 animate-pulse" : "bg-muted-foreground"
-              }`}
-            />
-            {userLocation ? (
-              <span>
-                {t("header.userLocPrefix")}: {userLocation.lat.toFixed(2)}°, {userLocation.lng.toFixed(2)}°
-              </span>
-            ) : (
-              <span>COORDENADAS ORBITALES</span>
-            )}
-          </div>
-
-          {/* Selector de Modo Claro / Modo Oscuro */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={toggleTheme}
-            className="bg-card/90 dark:bg-black/90 border-border text-foreground hover:bg-muted h-9 px-3 rounded-xl cursor-pointer font-mono font-bold text-xs transition-colors"
-            title={theme === "dark" ? "Cambiar a modo claro / Switch to light mode" : "Cambiar a modo oscuro / Switch to dark mode"}
-            aria-label="Toggle theme"
-          >
-            {theme === "dark" ? (
-              <SunIcon className="w-4 h-4 text-amber-400" />
-            ) : (
-              <MoonIcon className="w-4 h-4 text-blue-600" />
-            )}
-            <span className="hidden sm:inline text-[11px]">
-              {theme === "dark" ? "CLARO" : "OSCURO"}
-            </span>
-          </Button>
-
-          {/* Selector Bilingüe ES / EN */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={toggleLanguage}
-            className="bg-card/90 dark:bg-black/90 border-border text-foreground hover:bg-muted h-9 px-3 rounded-xl cursor-pointer font-mono font-bold text-xs transition-colors"
-            title="Cambiar idioma / Switch language"
-          >
-            <LanguageIcon className="w-4 h-4 mr-1.5 text-blue-500" />
-            <span>{t("header.langToggle")}</span>
-          </Button>
-
-          {/* Botón Reiniciar si hay datos activos */}
-          {points.length > 0 && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={resetAll}
-              className="bg-card/90 dark:bg-black/90 border-red-500/40 text-red-500 hover:bg-red-600 hover:text-white hover:border-red-600 h-9 px-3 rounded-xl cursor-pointer text-xs font-mono transition-all"
+          {phase !== "onboarding" && (
+            <button type="button" className="icon-btn !w-auto gap-1.5 px-3 text-xs font-medium" onClick={changeMode}>
+              <UserCircleIcon className="h-4 w-4" />
+              <span className="hidden md:inline">{t("header.changeMode")}</span>
+            </button>
+          )}
+          {phase === "guided" && (
+            <button
+              type="button"
+              className="icon-btn"
+              onClick={() => speech.setEnabled(!speech.enabled)}
+              aria-pressed={speech.enabled}
+              title={speech.enabled ? t("header.voiceGuideOn") : t("header.voiceGuideOff")}
+              aria-label={speech.enabled ? t("header.voiceGuideOn") : t("header.voiceGuideOff")}
             >
-              <ArrowPathIcon className="w-3.5 h-3.5 mr-1" />
-              <span>{t("header.clearButton")}</span>
-            </Button>
+              {speech.enabled ? <SpeakerWaveIcon className="h-4 w-4 text-primary" /> : <SpeakerXMarkIcon className="h-4 w-4" />}
+            </button>
+          )}
+          <button type="button" className="icon-btn text-xs font-bold" onClick={toggleLanguage} aria-label="Language">
+            {t("header.langToggle")}
+          </button>
+          <button
+            type="button"
+            className="icon-btn"
+            onClick={toggleTheme}
+            title={theme === "dark" ? t("header.themeToLight") : t("header.themeToDark")}
+            aria-label={theme === "dark" ? t("header.themeToLight") : t("header.themeToDark")}
+          >
+            {theme === "dark" ? <SunIcon className="h-4 w-4" /> : <MoonIcon className="h-4 w-4" />}
+          </button>
+          {points.length > 0 && phase !== "onboarding" && (
+            <button type="button" className="icon-btn text-brand-red" onClick={resetAll} title={t("header.clearButton")} aria-label={t("header.clearButton")}>
+              <ArrowPathIcon className="h-4 w-4" />
+            </button>
           )}
         </div>
       </header>
 
-      {/* Panel Lateral de Trabajo Científico (Workflow) */}
-      <section className="fixed top-20 left-4 z-20 w-[92vw] max-w-[400px] max-h-[calc(100vh-145px)] overflow-y-auto bg-card/90 dark:bg-black/90 backdrop-blur-md border border-border p-4 text-foreground rounded-2xl shadow-2xl transition-colors">
-        {activeStep === "region" && (
-          <RegionStep
-            regionData={regionData}
-            onSelectPredefined={handleSelectPredefined}
-            onSearchManual={handleManualSearch}
-            isSearching={isSearchingText}
-            onContinue={() => setActiveStep("period")}
-          />
-        )}
+      {/* Work panel */}
+      {phase !== "onboarding" && (
+        <section className="panel fixed left-4 top-[68px] z-20 max-h-[calc(100dvh-15rem)] w-[calc(100vw-2rem)] max-w-[400px] overflow-y-auto p-5 sm:max-h-[calc(100dvh-6.5rem)]">
+          {phase === "expert" && renderStep()}
 
-        {activeStep === "period" && (
-          <PeriodStep
-            range={dateRange}
-            onChangeRange={setDateRange}
-            onBack={() => setActiveStep("region")}
-            onContinue={() => setActiveStep("variables")}
-          />
-        )}
+          {phase === "guided" && demo && currentStepDef && (
+            <div className="space-y-4">
+              <div>
+                <div className="flex items-center justify-between">
+                  <p className="eyebrow flex items-center gap-2">
+                    <span className="rounded-full inline-block h-2 w-2 bg-brand-red" />
+                    {t("demo.label")} · {demo.def.title[language]}
+                  </p>
+                  <button type="button" className="text-xs underline underline-offset-4 hover:text-brand-red" onClick={stopDemo}>
+                    {t("demo.stop")}
+                  </button>
+                </div>
+                {!demo.finished ? (
+                  <>
+                    <p className="mt-3 text-sm font-medium leading-relaxed" aria-live="polite">
+                      {currentStepDef.caption[language]}
+                    </p>
+                    <div className="mt-3 h-0.5 bg-border" aria-hidden>
+                      <div
+                        key={`${demo.def.id}-${demo.index}`}
+                        className="h-full origin-left bg-brand-red"
+                        style={{ animation: `demo-progress ${currentStepDef.duration}ms linear forwards` }}
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <div className="mt-3 space-y-3">
+                    <p className="text-sm font-bold">{t("demo.done")}</p>
+                    <div className="flex gap-2">
+                      <button type="button" className="btn btn-primary flex-1" onClick={tryItYourself}>
+                        {t("demo.tryIt")}
+                      </button>
+                      <button type="button" className="btn btn-line flex-1" onClick={stopDemo}>
+                        {t("demo.another")}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div className="border-t border-border pt-4">
+                <div inert className="select-none">
+                  {renderStep(true)}
+                </div>
+                <p className="mt-3 text-xs text-muted-foreground">{t("demo.note")}</p>
+              </div>
+            </div>
+          )}
 
-        {activeStep === "variables" && (
-          <VariablesStep
-            selected={selectedVariables}
-            onToggleVariable={toggleVariable}
-            onBack={() => setActiveStep("period")}
-            onContinue={() => setActiveStep("results")}
-          />
-        )}
+          {phase === "guided" && !demo && activeStep === "results" && renderStep()}
 
-        {activeStep === "results" && regionData && (
-          <ResultsStep
-            regionData={regionData}
-            range={dateRange}
-            selectedVariables={selectedVariables}
-            userLocation={userLocation}
-            onEditCriteria={() => setActiveStep("variables")}
-            onRestart={resetAll}
-          />
-        )}
-      </section>
+          {phase === "guided" && !demo && activeStep !== "results" && (
+            <GuidedFlow
+              key={guidedKey}
+              initialStage={guidedStart}
+              regionData={regionData}
+              isSearching={isSearching}
+              onSelectPredefined={selectPredefined}
+              onSearchRegion={searchRegion}
+              onSetRange={setDateRange}
+              selectedVariables={selectedVariables}
+              onSetVariables={setSelectedVariables}
+              onFinish={() => setActiveStep("results")}
+              onStartDemo={startDemo}
+              registerVoice={registerVoice}
+              speak={speech.speak}
+              onHint={setHint}
+            />
+          )}
+        </section>
+      )}
 
-      {/* Rótulo Geodésico Flotante sobre el Globo */}
-      {points.length === 3 && centerLat !== null && centerLng !== null && (
-        <div className="fixed top-20 right-4 z-10 hidden sm:flex flex-col gap-1.5 pointer-events-none">
-          <div className="bg-card/85 dark:bg-black/85 backdrop-blur-md border border-border px-3 py-1.5 rounded-xl text-[10px] font-mono text-foreground transition-colors">
-            <span className="text-red-500 font-bold mr-1">LAT:</span>
-            {Math.abs(centerLat).toFixed(2)}° {centerLat >= 0 ? "N" : "S"}
-          </div>
-          <div className="bg-card/85 dark:bg-black/85 backdrop-blur-md border border-border px-3 py-1.5 rounded-xl text-[10px] font-mono text-foreground transition-colors">
-            <span className="text-blue-500 font-bold mr-1">LON:</span>
-            {Math.abs(centerLng).toFixed(2)}° {centerLng >= 0 ? "E" : "W"}
-          </div>
+      {/* Coordinates of the active region */}
+      {centerLat !== null && centerLng !== null && phase !== "onboarding" && (
+        <div className="pointer-events-none fixed right-4 top-[68px] z-10 hidden text-right text-xs tabular-nums text-muted-foreground sm:block">
+          <span className="font-bold text-brand-red">{Math.abs(centerLat).toFixed(2)}° {centerLat >= 0 ? "N" : "S"}</span>
+          {"  "}
+          <span className="font-bold text-primary">{Math.abs(centerLng).toFixed(2)}° {centerLng >= 0 ? "E" : "W"}</span>
         </div>
       )}
 
-      {/* Control de Voz Principal */}
-      <VoiceController onRegionParsed={handleRegionParsed} />
+      {phase === "onboarding" && <ExperienceModal onChoose={chooseExperience} registerVoice={registerVoice} speak={speech.speak} />}
 
-      {/* Barra Inferior Derecha de Telemetría */}
-      <footer className="fixed bottom-4 right-4 z-10 hidden lg:flex items-center gap-3 bg-card/90 dark:bg-black/90 backdrop-blur-md border border-border px-3 py-1.5 rounded-xl text-[10px] font-mono text-muted-foreground select-none transition-colors">
-        <div className="flex items-center gap-1.5">
-          <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-          <span>{t("globe.resolution")}</span>
-        </div>
-        <div className="w-px h-3 bg-border" />
-        <div className="flex items-center gap-1.5">
-          <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
-          <span>DATUM: WGS 84</span>
-        </div>
-        <div className="w-px h-3 bg-border" />
-        <div className="flex items-center gap-1.5">
-          <ServerIcon className="w-3 h-3 text-muted-foreground" />
-          <span>STAC API / FASTAPI READY</span>
-        </div>
-      </footer>
+      <VoiceController
+        onTranscript={handleTranscript}
+        onBeforeListen={speech.cancel}
+        hint={flash ?? voiceHint}
+      />
     </main>
   );
 }

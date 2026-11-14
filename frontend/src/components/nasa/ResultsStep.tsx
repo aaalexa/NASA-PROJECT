@@ -3,17 +3,8 @@
 import { useState } from "react";
 import { DateRange, GeoPoint, RegionAnalysisPayload, VariableId } from "@/types/geo";
 import { useTranslation } from "@/context/LanguageContext";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import {
-  ChartBarSquareIcon,
-  ArrowTrendingUpIcon,
-  ArrowTrendingDownIcon,
-  PaperAirplaneIcon,
-  ArrowPathIcon,
-  CheckCircleIcon,
-  AdjustmentsHorizontalIcon,
-} from "@heroicons/react/24/outline";
+import { VARIABLES } from "@/lib/catalog";
+import { ArrowTrendingDownIcon, ArrowTrendingUpIcon } from "@heroicons/react/24/outline";
 
 interface ResultsStepProps {
   regionData: RegionAnalysisPayload;
@@ -22,274 +13,149 @@ interface ResultsStepProps {
   userLocation: { lat: number; lng: number; accuracy?: number } | null;
   onEditCriteria: () => void;
   onRestart: () => void;
+  readOnly?: boolean;
 }
 
-const STATISTICAL_TRENDS: Record<
-  VariableId,
-  {
-    rate: string;
-    direction: "up" | "down";
-    pValue: number;
-    isSignificant: boolean;
-    confidence: string;
-  }
-> = {
-  temperature: {
-    rate: "+0.82 °C / decada",
-    direction: "up",
-    pValue: 0.012,
-    isSignificant: true,
-    confidence: "98.8%",
-  },
-  precipitation: {
-    rate: "-3.14% / decada",
-    direction: "down",
-    pValue: 0.038,
-    isSignificant: true,
-    confidence: "96.2%",
-  },
-  vegetation: {
-    rate: "-1.85% / decada",
-    direction: "down",
-    pValue: 0.041,
-    isSignificant: true,
-    confidence: "95.9%",
-  },
-  moisture: {
-    rate: "-0.76% / decada",
-    direction: "down",
-    pValue: 0.027,
-    isSignificant: true,
-    confidence: "97.3%",
-  },
+// Illustrative values taken from the project guide (section 03.2). NOT computed from data.
+const ILLUSTRATIVE: Record<VariableId, { slope: number; ci: [number, number]; pHolm: number; decimals: number; unit: string }> = {
+  precipitation: { slope: -20, ci: [-32, -8], pHolm: 0.012, decimals: 0, unit: "mm" },
+  temperature: { slope: 0.3, ci: [0.1, 0.5], pHolm: 0.054, decimals: 1, unit: "°C" },
+  moisture: { slope: -0.01, ci: [-0.025, 0.005], pHolm: 0.24, decimals: 3, unit: "m³/m³" },
+  evapotranspiration: { slope: 8, ci: [-10, 26], pHolm: 0.4, decimals: 0, unit: "mm" },
+  vegetation: { slope: -0.02, ci: [-0.04, 0.0], pHolm: 0.09, decimals: 2, unit: "NDVI" },
 };
 
-const VARIABLE_TITLES: Record<VariableId, string> = {
-  temperature: "Temperatura Superficial (MODIS LST)",
-  precipitation: "Precipitacion Acumulada (GPM IMERG)",
-  vegetation: "Indice de Vegetacion (MODIS NDVI)",
-  moisture: "Humedad del Suelo (GLDAS SOILM)",
-};
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
 
-export function ResultsStep({
-  regionData,
-  range,
-  selectedVariables,
-  userLocation,
-  onEditCriteria,
-  onRestart,
-}: ResultsStepProps) {
-  const { t } = useTranslation();
+export function ResultsStep({ regionData, range, selectedVariables, userLocation, onEditCriteria, onRestart, readOnly }: ResultsStepProps) {
+  const { language, t } = useTranslation();
   const [isSending, setIsSending] = useState(false);
-  const [feedback, setFeedback] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<{ ok: boolean; text: string } | null>(null);
+
+  const sign = (n: number, d: number) => `${n > 0 ? "+" : ""}${n.toFixed(d)}`;
 
   const handleSendBackend = async () => {
     setIsSending(true);
     setFeedback(null);
-
     const payload = {
       region: regionData.regionName,
       geometry: regionData.geoJsonPolygon,
-      timeWindow: {
-        start: range.start,
-        end: range.end,
-      },
+      timeWindow: { start: range.start, end: range.end },
       variables: selectedVariables,
       observerLocation: userLocation
-        ? {
-            latitude: userLocation.lat,
-            longitude: userLocation.lng,
-            accuracyMeters: userLocation.accuracy,
-          }
+        ? { latitude: userLocation.lat, longitude: userLocation.lng, accuracyMeters: userLocation.accuracy }
         : null,
       timestamp: new Date().toISOString(),
     };
-
-    console.group("[NASA Earth Detective] Dispatching Telemetry to Backend");
-    console.log("Target Backend URL:", `${process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000"}/analyze`);
-    console.log("GeoJSON Payload:", JSON.stringify(payload, null, 2));
-    console.groupEnd();
-
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000"}/analyze`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        }
-      );
-
-      if (!res.ok) {
-        throw new Error(`HTTP Error: ${res.status}`);
-      }
-
-      const data = await res.json();
-      console.log("[NASA Earth Detective] Backend Response:", data);
-      setFeedback(t("resultsStep.backendDone"));
+      const res = await fetch(`${BACKEND_URL}/analyze`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      setFeedback({ ok: true, text: t("resultsStep.sent") });
     } catch {
-      setFeedback(t("resultsStep.backendDone"));
+      setFeedback({ ok: false, text: t("resultsStep.sendFailed").replace("{url}", BACKEND_URL) });
     } finally {
       setIsSending(false);
     }
   };
 
   return (
-    <div className="space-y-3.5 animate-in fade-in duration-300">
-      <div className="flex items-start justify-between gap-2">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <ChartBarSquareIcon className="w-4 h-4 text-blue-500" />
-            <h2 className="text-sm font-bold uppercase tracking-wider text-foreground font-mono">
-              {t("resultsStep.title")}
-            </h2>
-          </div>
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            {t("resultsStep.description")}
+    <div className="space-y-5 animate-in fade-in duration-300">
+      <div>
+        <h2 className="title text-lg">{t("resultsStep.title")}</h2>
+        <p className="mt-1.5 text-sm text-muted-foreground">{t("resultsStep.description")}</p>
+      </div>
+
+      <div className="flex items-start justify-between gap-3 border-l-2 border-primary/70 pl-3">
+        <div className="min-w-0">
+          <p className="eyebrow">{t("resultsStep.region")}</p>
+          <p className="mt-1 truncate text-sm font-bold">{regionData.regionName}</p>
+          <p className="text-xs text-muted-foreground tabular-nums">
+            {range.start.slice(0, 4)} – {range.end.slice(0, 4)}
           </p>
         </div>
-        <Badge className="bg-red-500/10 text-red-500 dark:text-red-400 border-red-500/30 text-[10px] font-mono shrink-0 py-1">
-          ANALISIS STATS
-        </Badge>
+        {!readOnly && (
+          <button type="button" onClick={onEditCriteria} className="shrink-0 cursor-pointer text-xs underline underline-offset-4 hover:text-primary">
+            {t("resultsStep.edit")}
+          </button>
+        )}
       </div>
 
-      {/* Resumen de Región y Periodo */}
-      <div className="p-2.5 rounded-xl bg-card/90 border border-border text-xs font-mono flex items-center justify-between">
-        <div className="truncate pr-2">
-          <span className="text-blue-500 font-semibold block truncate">
-            {regionData.regionName}
-          </span>
-          <span className="text-[10px] text-muted-foreground">
-            {range.start.slice(0, 4)} - {range.end.slice(0, 4)} ({range.start} a {range.end})
-          </span>
-        </div>
-        <button
-          type="button"
-          onClick={onEditCriteria}
-          className="text-[10px] text-muted-foreground hover:text-foreground underline cursor-pointer shrink-0"
-        >
-          Editar
-        </button>
-      </div>
-
-      {/* Métricas Estadísticas de Tendencias */}
-      <div className="space-y-2 max-h-52 overflow-y-auto pr-1">
-        {selectedVariables.map((varId) => {
-          const stats = STATISTICAL_TRENDS[varId];
-          const isUp = stats.direction === "up";
-
+      <ul className="max-h-[38vh] space-y-2 overflow-y-auto pr-1">
+        {selectedVariables.map((id) => {
+          const s = ILLUSTRATIVE[id];
+          const up = s.slope > 0;
+          const significant = s.pHolm <= 0.05;
+          const Arrow = up ? ArrowTrendingUpIcon : ArrowTrendingDownIcon;
           return (
-            <div
-              key={varId}
-              className="p-3 rounded-xl bg-card/80 border border-border hover:border-blue-500/40 transition-colors space-y-2"
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-foreground font-mono">
-                  {VARIABLE_TITLES[varId]}
-                </span>
-                <span
-                  className={`flex items-center gap-1 text-xs font-bold font-mono ${
-                    isUp ? "text-red-500" : "text-blue-500"
-                  }`}
-                >
-                  {isUp ? (
-                    <ArrowTrendingUpIcon className="w-3.5 h-3.5" />
-                  ) : (
-                    <ArrowTrendingDownIcon className="w-3.5 h-3.5" />
-                  )}
-                  {stats.rate}
+            <li key={id} className="border border-border p-3" style={{ borderRadius: 16 }}>
+              <div className="flex items-start justify-between gap-3">
+                <span className="text-sm font-bold">{VARIABLES[id].name[language]}</span>
+                <span className={`flex items-center gap-1 text-sm font-bold tabular-nums ${up ? "text-brand-red" : "text-primary"}`}>
+                  <Arrow className="h-4 w-4" />
+                  {sign(s.slope, s.decimals)} {s.unit}
                 </span>
               </div>
-
-              <div className="grid grid-cols-2 gap-1 text-[10px] font-mono text-muted-foreground pt-1 border-t border-border">
-                <div>
-                  <span className="text-muted-foreground/70">Mann-Kendall:</span>{" "}
-                  <span className="text-foreground">p = {stats.pValue}</span>
-                </div>
-                <div className="text-right">
-                  <span className="text-muted-foreground/70">Confianza:</span>{" "}
-                  <span className="text-blue-500 font-bold">{stats.confidence}</span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-1.5 text-[9px] font-mono uppercase">
-                <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-                <span className="text-red-500 font-semibold">
-                  {t("resultsStep.statusSignificant")}
+              <p className="mt-0.5 text-right text-[11px] text-muted-foreground">{t("resultsStep.perDecade")}</p>
+              <div className="mt-2 flex items-center justify-between border-t border-border pt-2 text-xs text-muted-foreground tabular-nums">
+                <span>
+                  {t("resultsStep.ci")} [{sign(s.ci[0], s.decimals)}, {sign(s.ci[1], s.decimals)}]
+                </span>
+                <span>
+                  {t("resultsStep.pAdj")} {s.pHolm}
                 </span>
               </div>
-            </div>
+              <p className={`mt-1.5 flex items-center gap-1.5 text-xs font-medium ${significant ? "text-brand-red" : "text-muted-foreground"}`}>
+                <span className={`inline-block h-1.5 w-1.5 ${significant ? "bg-brand-red" : "bg-muted-foreground"}`} />
+                {significant ? t("resultsStep.significant") : t("resultsStep.insufficient")}
+              </p>
+            </li>
           );
         })}
-      </div>
+      </ul>
 
-      {/* Vértices Geodésicos del Triángulo Activo */}
-      <div className="p-2.5 rounded-xl bg-card/80 border border-border text-[10px] font-mono">
-        <div className="flex items-center justify-between text-muted-foreground mb-1.5 uppercase">
-          <span>Triangulo GeoJSON Cerrado</span>
-          <span className="text-red-500 font-bold">3 Vertices</span>
-        </div>
-        <div className="grid grid-cols-3 gap-1 text-center">
+      <p className="text-xs leading-relaxed text-muted-foreground">
+        {t("resultsStep.illustrative")} {t("resultsStep.limits")}
+      </p>
+
+      <details className="text-xs">
+        <summary className="eyebrow cursor-pointer">{t("resultsStep.vertices")}</summary>
+        <div className="mt-2 grid grid-cols-3 gap-2 tabular-nums">
           {regionData.triangleVertices.map((p: GeoPoint, i: number) => (
-            <div key={i} className="p-1.5 rounded bg-muted/60 border border-border">
-              <span className="text-red-500 font-bold block">P{i + 1}</span>
-              <span className="text-muted-foreground text-[9px] block">
+            <div key={i} className="border border-border p-2" style={{ borderRadius: 16 }}>
+              <span className="font-bold text-brand-red">P{i + 1}</span>
+              <span className="block text-muted-foreground">
                 {p.lat.toFixed(2)}°, {p.lng.toFixed(2)}°
               </span>
             </div>
           ))}
         </div>
-      </div>
+      </details>
 
-      {/* Notificación de envío */}
       {feedback && (
-        <div className="p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/30 text-[11px] text-blue-600 dark:text-blue-300 flex items-start gap-2 animate-in fade-in">
-          <CheckCircleIcon className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
-          <span>{feedback}</span>
-        </div>
+        <p role="status" className={`text-xs ${feedback.ok ? "text-primary" : "text-brand-red"}`}>
+          {feedback.text}
+        </p>
       )}
 
-      {/* Botón para despachar al backend */}
-      <Button
-        type="button"
-        disabled={isSending}
-        onClick={handleSendBackend}
-        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold h-10 rounded-xl text-xs cursor-pointer shadow-lg shadow-blue-600/30 transition-all active:scale-[0.98]"
-      >
-        {isSending ? (
-          <>
-            <ArrowPathIcon className="w-4 h-4 mr-2 animate-spin" />
-            {t("resultsStep.sending")}
-          </>
-        ) : (
-          <>
-            <PaperAirplaneIcon className="w-3.5 h-3.5 mr-2" />
-            {t("resultsStep.sendBackend")}
-          </>
-        )}
-      </Button>
-
-      {/* Botones secundarios */}
-      <div className="flex items-center gap-2 pt-1">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onEditCriteria}
-          className="flex-1 border-border text-foreground hover:bg-muted h-8 rounded-xl text-xs cursor-pointer"
-        >
-          <AdjustmentsHorizontalIcon className="w-3.5 h-3.5 mr-1" />
-          Modificar Criterios
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onRestart}
-          className="flex-1 border-red-500/30 text-red-500 hover:bg-red-500 hover:text-white h-8 rounded-xl text-xs cursor-pointer"
-        >
-          <ArrowPathIcon className="w-3.5 h-3.5 mr-1" />
-          Nueva Busqueda
-        </Button>
-      </div>
+      {!readOnly && (
+        <div className="space-y-2">
+          <button type="button" className="btn btn-primary w-full" disabled={isSending} onClick={handleSendBackend}>
+            {isSending ? t("resultsStep.sending") : t("resultsStep.send")}
+          </button>
+          <div className="flex gap-2">
+            <button type="button" className="btn btn-line flex-1" onClick={onEditCriteria}>
+              {t("resultsStep.modify")}
+            </button>
+            <button type="button" className="btn btn-red flex-1" onClick={onRestart}>
+              {t("resultsStep.restart")}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,6 +1,15 @@
 export type WorkflowStep = "region" | "period" | "variables" | "results";
 
-export type VariableId = "precipitation" | "temperature" | "vegetation" | "moisture";
+export type VariableId =
+  | "precipitation"
+  | "temperature"
+  | "moisture"
+  | "evapotranspiration"
+  | "vegetation";
+
+export type Experience = "novice" | "expert";
+export type AppPhase = "onboarding" | "guided" | "expert";
+export type TopicId = "rain" | "heat" | "vegetation" | "soil";
 
 export interface DateRange {
   start: string;
@@ -17,10 +26,6 @@ export interface NasaVariableSuggestion {
   id: string;
   name: string;
   simpleExplanation: string;
-  trendRate?: string;
-  isIncreasing?: boolean;
-  pValue?: number;
-  isSignificant?: boolean;
 }
 
 export interface RegionAnalysisPayload {

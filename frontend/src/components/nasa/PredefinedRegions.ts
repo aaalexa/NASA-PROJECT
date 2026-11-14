@@ -17,6 +17,30 @@ export const PREDEFINED_REGIONS: PredefinedRegion[] = [
     aliases: ["nicaragua", "cocibolca", "lago nicaragua", "corredor seco", "managua"],
   },
   {
+    id: "mediterranean",
+    name: { es: "Mediterráneo, Europa", en: "Mediterranean, Europe" },
+    area: { es: "Sur de Europa", en: "Southern Europe" },
+    center: { lat: 39.0, lng: 10.0 },
+    triangle: [
+      { lat: 37.5, lng: -4.0 },
+      { lat: 35.5, lng: 24.0 },
+      { lat: 44.0, lng: 10.0 },
+    ],
+    aliases: ["mediterraneo", "mediterranean", "espana", "italia", "grecia", "spain", "italy", "greece"],
+  },
+  {
+    id: "northeurope",
+    name: { es: "Norte de Europa", en: "Northern Europe" },
+    area: { es: "Escandinavia y Báltico", en: "Scandinavia and Baltic" },
+    center: { lat: 59.0, lng: 15.0 },
+    triangle: [
+      { lat: 59.0, lng: 5.0 },
+      { lat: 61.0, lng: 26.0 },
+      { lat: 55.5, lng: 14.0 },
+    ],
+    aliases: ["norte de europa", "northern europe", "escandinavia", "scandinavia", "suecia", "sweden", "noruega", "norway", "finlandia", "finland"],
+  },
+  {
     id: "amazon",
     name: {
       es: "Cuenca del Amazonas, Sudamerica",

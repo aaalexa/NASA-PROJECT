@@ -26,7 +26,7 @@ function interpolateEdge(p1: GeoPoint, p2: GeoPoint, steps = 12): Marker[] {
         p1.lat + (p2.lat - p1.lat) * t,
         p1.lng + (p2.lng - p1.lng) * t,
       ],
-      size: 0.028,
+      size: 0.012,
       color: [0.145, 0.388, 0.921], // Azul NASA (#2563eb)
     });
   }
@@ -111,15 +111,16 @@ export default function CobeGlobePulse({ trianglePoints, className }: CobeGlobeP
         theta: 0.2,
         dark: isDark ? 1 : 0,
         diffuse: isDark ? 1.2 : 1.5,
-        mapSamples: 16000,
-        mapBrightness: isDark ? 6 : 2.5,
-        baseColor: isDark ? [0.12, 0.14, 0.18] : [0.84, 0.88, 0.94],
+        mapSamples: 42000,
+        mapBrightness: isDark ? 3.2 : 1.6,
+        mapBaseBrightness: 0,
+        baseColor: isDark ? [0.06, 0.07, 0.1] : [0.93, 0.95, 0.98],
         markerColor: [0.937, 0.267, 0.267], // Rojo Alerta (#ef4444)
-        glowColor: [0.145, 0.388, 0.921], // Halo Azul NASA (#2563eb)
+        glowColor: isDark ? [0.1, 0.16, 0.35] : [0.8, 0.86, 0.98], // halo suave
         markers: [],
         arcs,
-        arcWidth: 0.8,
-        arcHeight: 0.05,
+        arcWidth: 0.35,
+        arcHeight: 0.03,
       });
 
       const render = () => {
@@ -141,7 +142,7 @@ export default function CobeGlobePulse({ trianglePoints, className }: CobeGlobeP
         }
 
         // Animación Pulse en los 3 vértices rojos
-        const pulse = 0.065 + Math.sin(Date.now() / 200) * 0.025;
+        const pulse = 0.032 + Math.sin(Date.now() / 450) * 0.008;
         const currentMarkers: Marker[] = [
           ...(trianglePoints || []).map((p) => ({
             location: [p.lat, p.lng] as [number, number],
@@ -184,8 +185,6 @@ export default function CobeGlobePulse({ trianglePoints, className }: CobeGlobeP
         className || ""
       }`}
     >
-      {/* Resplandor atmosférico Azul NASA */}
-      <div className="absolute w-[680px] h-[680px] rounded-full bg-blue-500/10 dark:bg-blue-600/15 blur-3xl pointer-events-none select-none transition-all duration-500" />
       <div className="relative w-full max-w-[800px] aspect-square flex items-center justify-center">
         <canvas
           ref={canvasRef}
