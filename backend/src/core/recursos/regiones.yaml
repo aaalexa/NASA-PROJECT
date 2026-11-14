@@ -1,0 +1,28 @@
+# Regiones predefinidas para la API. bbox = [oeste, sur, este, norte] en grados, lon en [-180, 180).
+# Son cajas aproximadas: edítalas aquí (no en el código). El id es el slug que se usa en la caché.
+regiones:
+  - id: sahel
+    nombre: Sahel
+    descripcion: Franja semiárida al sur del Sahara, de Senegal a Sudán.
+    bbox: [-20.0, 10.0, 40.0, 20.0]
+
+  - id: noreste_mexico
+    nombre: Noreste de México
+    descripcion: Coahuila, Nuevo León y Tamaulipas.
+    bbox: [-106.0, 22.0, -97.0, 30.0]
+
+  - id: sureste_mexico
+    nombre: Sureste de México
+    descripcion: Chiapas, Tabasco y la península de Yucatán.
+    bbox: [-94.5, 14.5, -86.5, 21.7]
+
+  - id: amazonia
+    nombre: Amazonía
+    descripcion: Cuenca central del Amazonas.
+    bbox: [-75.0, -15.0, -45.0, 5.0]
+
+  - id: india_monzon
+    nombre: India (monzón)
+    descripcion: Centro de la India, zona núcleo del monzón de verano.
+    bbox: [72.0, 16.0, 88.0, 28.0]
+
