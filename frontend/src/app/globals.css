@@ -76,7 +76,7 @@
   --card-foreground: #ffffff;
   --popover: color-mix(in srgb, var(--deep-space-blue) 86%, var(--steel-blue));
   --popover-foreground: #ffffff;
-  --primary: var(--brick-red);
+  --primary: var(--palm-leaf);
   --primary-foreground: #ffffff;
   --secondary: var(--palm-leaf);
   --secondary-foreground: #ffffff;
@@ -84,15 +84,15 @@
   --muted-foreground: var(--steel-blue);
   --accent: color-mix(in srgb, var(--steel-blue) 24%, var(--deep-space-blue));
   --accent-foreground: #ffffff;
-  --destructive: var(--brick-red);
+  --destructive: var(--palm-leaf);
   --destructive-foreground: #ffffff;
   --border: color-mix(in srgb, var(--steel-blue) 28%, var(--deep-space-blue));
   --input: color-mix(in srgb, var(--steel-blue) 34%, var(--deep-space-blue));
   --ring: var(--steel-blue);
-  --red: var(--brick-red);
+  --red: var(--palm-leaf);
   --blue: var(--steel-blue);
   --olive: var(--palm-leaf);
-  --lava: color-mix(in srgb, var(--molten-lava) 70%, var(--brick-red));
+  --lava: color-mix(in srgb, var(--palm-leaf) 78%, var(--deep-space-blue));
 }
 
 body {

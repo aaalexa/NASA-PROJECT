@@ -104,7 +104,7 @@ export function DteCard({ info, v, language }: { info: BackendVariable; v: DteVa
           {t("resultsStep.pAdj")} {fmtP(v.p_holm)}
         </span>
       </div>
-      <Badge variant="outline" className={`mt-2 w-fit ${significant ? "border-brand-red/50 text-brand-red" : "border-brand-olive/60 text-brand-olive"}`}>
+      <Badge variant="outline" className={`mt-2 w-fit ${significant ? "border-brand-red/50 text-brand-red" : "border-brand-olive/60 text-brand-olive dark:border-border dark:text-muted-foreground"}`}>
         {labelText(v, language, t)}
       </Badge>
       {estimate && <p className="mt-1.5 text-xs text-muted-foreground">{estimate}</p>}
@@ -149,7 +149,7 @@ export function TrendCard({ info, r }: { info: BackendVariable; r: TendenciaResp
           p {fmtP(tr.p_t)} · MK {fmtP(tr.p_mk)}
         </span>
       </div>
-      <Badge variant="outline" className={`mt-2 w-fit ${significant ? "border-brand-red/50 text-brand-red" : "border-brand-olive/60 text-brand-olive"}`}>
+      <Badge variant="outline" className={`mt-2 w-fit ${significant ? "border-brand-red/50 text-brand-red" : "border-brand-olive/60 text-brand-olive dark:border-border dark:text-muted-foreground"}`}>
         {verdict}
       </Badge>
       {tr.cambio_pct_decada !== null && (
