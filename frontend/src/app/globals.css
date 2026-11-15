@@ -127,6 +127,18 @@ body {
   100% { transform: scale(1.9); opacity: 0; }
 }
 
+/* Error screens: staggered entrance and a slow floating globe. */
+@keyframes mt-fade-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes mt-float {
+  0%, 100% { transform: translateY(-5px); }
+  50% { transform: translateY(5px); }
+}
+.mt-fade-up { animation: mt-fade-up 0.9s ease-out both; }
+.mt-float { animation: mt-float 5s ease-in-out infinite; }
+
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
