@@ -68,7 +68,10 @@ export function AnalysisDrawer({ open, regionData, range, selectedVariables, ana
   );
 
   // The per-pixel map is fetched on demand, only while its view is open.
-  const mapRequest = regionData && activeVar ? { region: regionData, inicio: range.start, fin: range.end, mode } : null;
+  // In "descargar" mode the Down to Earth job already left the P/T/SM/ET cubes in the server RAM: read them from
+  // there instead of starting another synchronous NASA download for the map.
+  const mapMode = mode === "descargar" && activeVar && ID_TO_DTE[activeVar] ? "memoria" : mode;
+  const mapRequest = regionData && activeVar ? { region: regionData, inicio: range.start, fin: range.end, mode: mapMode } : null;
   const mapKey = mapRequest && activeVar ? `${activeVar}|${JSON.stringify(dteParams(mapRequest))}` : "";
   const [mapOutcome, setMapOutcome] = useState<MapOutcome | null>(null);
   const mapWanted = open && view === "map" && mapRequest !== null && activeVar !== null && backend.variableById(activeVar)?.frecuencia !== "diaria";
@@ -168,8 +171,10 @@ export function AnalysisDrawer({ open, regionData, range, selectedVariables, ana
           <div className="relative min-h-0 bg-[var(--deep-space-blue)]">
             {(loading || mapLoading || !slideDone) && (
               <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-background/70 px-8 backdrop-blur-sm" role="status">
-                <p className="text-sm text-muted-foreground">{mode === "descargar" ? t("resultsStep.loadingLive") : t("analysis.loading")}</p>
-                <Progress value={null} className="w-56" aria-label={t("analysis.loading")} />
+                <p className="text-sm text-muted-foreground">
+                  {analysis.job ? `${t("resultsStep.jobTitle")} · ${Math.round(analysis.job.porcentaje)} %` : mode === "descargar" ? t("resultsStep.loadingLive") : t("analysis.loading")}
+                </p>
+                <Progress value={analysis.job ? analysis.job.porcentaje : null} className="w-56" aria-label={t("analysis.loading")} />
               </div>
             )}
 

@@ -52,16 +52,50 @@ export interface DteVariable {
   monthly: { date: string; value: number | null; z: number | null }[];
   annual: { year: number; value: number | null; fitted: number | null }[];
   slope_decade: number | null;
-  ci95: [number, number] | null;
+  /** Individual 95 % CI per decade (b ± 1.96·SE) × 10. */
+  ci95: [number | null, number | null] | null;
   p_raw: number | null;
+  /** Holm-adjusted p over the fixed family [P, T, SM, ET]: this decides the label. */
   p_holm: number | null;
-  significant: boolean;
-  direction: "aumento" | "disminucion" | "estable";
+  significant: boolean | null;
+  /** Only set when there is statistical evidence; null otherwise (never "stable"). */
+  direction: "aumento" | "disminucion" | null;
+  /** Sign of the estimated slope, also when the evidence is insufficient. */
+  estimate_sign: "positiva" | "negativa" | "nula" | null;
+  /** Official label (Spanish): "aumento/disminución con evidencia estadística según este método", "evidencia insuficiente"… */
   label: string;
   summary_text: string;
-  sensible_al_rezago: boolean;
+  sensible_al_rezago: boolean | null;
   quality: DteQuality;
 }
+
+export interface DteCleaningSummary {
+  unidad: string;
+  limites_fisicos: [number, number];
+  n_meses_esperados: number;
+  n_meses_validos: number;
+  n_meses_faltantes: number;
+  anios_incompletos: number[];
+  relleno: number;
+  fuera_de_rango: number;
+  no_finitos: number;
+  duplicados_contradictorios: number;
+  duplicados_identicos: number;
+  meses_ausentes: number;
+  ceros_exactos: number;
+  fuera_de_periodo: number;
+}
+
+export interface DteCleaningEntry {
+  fecha: string | null;
+  variable: string | null;
+  valor_original: number | null;
+  accion: string;
+  motivo: string;
+}
+
+export type DteTable = "mensual" | "anual" | "limpieza" | "diccionario" | "serie_regional";
+export type TableRow = Record<string, string | number | null>;
 
 export interface DtePair {
   pair: string;
@@ -79,14 +113,29 @@ export interface DteResult {
   metadata: {
     period: [string, string];
     alpha: number;
-    source: "sintetico" | "opendap_memoria";
+    /** "opendap_memoria" (real NASA data), "sintetico", "entrada_usuario" (uploaded CSV)… */
+    source: string;
+    /** True when any value is synthetic or the user flagged the upload as simulated: label the whole view. */
+    simulated: boolean;
+    warnings: string[];
+    /** Common span of complete, consecutive years used for the four trends. */
+    trend_span: { start: number; end: number; n_years: number; criterion: string } | null;
+    spatial_weighting?: string;
     months_total: number;
     years_expected: number;
     years_complete_count: number;
-    region: { id: string; nombre: string; bbox: [number, number, number, number]; [k: string]: unknown };
+    region: { id: string; nombre: string; bbox: [number, number, number, number]; [k: string]: unknown } | null;
+    input?: { rows: number; units: string; columns_used: Record<string, string>; missing_variables: string[]; file_name?: string };
     [k: string]: unknown;
   };
   variables: Record<DteCode, DteVariable>;
+  data_cleaning: {
+    steps: string[];
+    summary: Record<DteCode, DteCleaningSummary>;
+    log: DteCleaningEntry[];
+  };
+  /** Only when requested (incluir_tablas): presentation tables already formatted by the backend. */
+  tablas?: { mensual: TableRow[]; anual: TableRow[]; diccionario: TableRow[] } | null;
   joint: {
     standardized_anomalies: { date: string; P: number | null; T: number | null; SM: number | null; ET: number | null }[];
     pairs_list: DtePair[];
@@ -100,9 +149,31 @@ export interface DteResult {
   };
 }
 
+/** `POST/GET /api/v1/down-to-earth/trabajos`: real NASA download + analysis running on the server. */
+export interface DteJob {
+  id: string;
+  region: string;
+  bbox: [number, number, number, number];
+  inicio: string;
+  fin: string;
+  alfa: number;
+  estado: "pendiente" | "ejecutando" | "completado" | "error";
+  /** "P" | "T" | "SM" | "ET" | "analisis" | "en cola" | "completado" */
+  etapa: string;
+  paso_actual: number;
+  total_pasos: number;
+  porcentaje: number;
+  mensaje: string;
+  etapas: string[];
+  etapas_completadas: string[];
+  error: string | null;
+  enlaces: { estado: string; resultado: string; tablas: Record<DteTable, string> };
+}
+
 export interface Salud {
   estado: string;
   credenciales_earthdata: { listo: boolean };
+  dte_precarga?: { id: string; region: string; estado: DteJob["estado"]; porcentaje: number; error: string | null }[];
   [k: string]: unknown;
 }
 
@@ -210,6 +281,14 @@ export class BackendOfflineError extends Error {
   }
 }
 
+/** A real-data job finished with `estado: "error"` (e.g. a NASA product was unavailable). Never replaced by synthetic data. */
+export class JobFailedError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "JobFailedError";
+  }
+}
+
 export type ApiFailure =
   | "offline"
   | "bad_request"
@@ -217,18 +296,37 @@ export type ApiFailure =
   | "no_data_in_memory"
   | "series_rejected"
   | "validation"
+  | "job_failed"
+  | "job_not_ready"
+  | "file_too_large"
   | "aborted"
   | "unknown";
 
 export function classifyError(e: unknown): ApiFailure {
   if (e instanceof DOMException && e.name === "AbortError") return "aborted";
   if (e instanceof BackendOfflineError) return "offline";
+  if (e instanceof JobFailedError) return "job_failed";
   if (e instanceof ApiError) {
     if (e.status === 400) return "bad_request";
     if (e.status === 404) return e.body.error === "datos_no_disponibles_en_memoria" ? "no_data_in_memory" : "not_found";
+    if (e.status === 409) {
+      const detail = e.body.detail as { error?: string } | undefined;
+      return detail?.error === "trabajo_con_error" ? "job_failed" : "job_not_ready";
+    }
+    if (e.status === 413) return "file_too_large";
     if (e.status === 422) return e.body.error === "serie_rechazada" ? "series_rejected" : "validation";
   }
   return "unknown";
+}
+
+/** Human detail of a failure when the backend gave one (job error text, 400 message…). */
+export function failureDetail(e: unknown): string | undefined {
+  if (e instanceof JobFailedError) return e.message;
+  if (e instanceof ApiError) {
+    const detail = e.body.detail as { mensaje?: string } | string | undefined;
+    return e.body.mensaje ?? (typeof detail === "string" ? detail : detail?.mensaje);
+  }
+  return undefined;
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -313,10 +411,10 @@ function buildUrl(path: string, params: Params = {}) {
   return `${BACKEND_URL}${path}${qs.size ? `?${qs}` : ""}`;
 }
 
-export async function apiGet<T>(path: string, params: Params = {}, signal?: AbortSignal): Promise<T> {
+async function request<T>(url: string, init: RequestInit = {}): Promise<T> {
   let res: Response;
   try {
-    res = await fetch(buildUrl(path, params), { signal });
+    res = await fetch(url, init);
   } catch (e) {
     if (e instanceof DOMException && e.name === "AbortError") throw e;
     throw new BackendOfflineError();
@@ -325,6 +423,21 @@ export async function apiGet<T>(path: string, params: Params = {}, signal?: Abor
   if (!res.ok) throw new ApiError(res.status, body);
   return body as T;
 }
+
+export const apiGet = <T>(path: string, params: Params = {}, signal?: AbortSignal) =>
+  request<T>(buildUrl(path, params), { signal });
+
+export const apiPost = <T>(path: string, payload: unknown, signal?: AbortSignal) =>
+  request<T>(buildUrl(path), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+    signal,
+  });
+
+/** multipart/form-data (file uploads). The browser sets the boundary header itself. */
+export const apiPostForm = <T>(path: string, form: FormData, signal?: AbortSignal) =>
+  request<T>(buildUrl(path), { method: "POST", body: form, signal });
 
 export const fetchSalud = (signal?: AbortSignal) => apiGet<Salud>("/api/v1/salud", {}, signal);
 
@@ -357,10 +470,129 @@ export function dteParams(o: Omit<DteOptions, "signal">) {
   };
 }
 
-export const fetchDteResult = (o: DteOptions) => apiGet<DteResult>("/demo/result", dteParams(o), o.signal);
+/** `GET /api/v1/down-to-earth/analisis` (same handler as `/demo/result`): instant when the cubes are in RAM. */
+export const fetchDteResult = (o: DteOptions) =>
+  apiGet<DteResult>("/api/v1/down-to-earth/analisis", dteParams(o), o.signal);
 
+/** Download links never trigger a synchronous NASA download: in "descargar" mode the data is read from RAM. */
 export const csvUrl = (freq: "mensual" | "anual", o: Omit<DteOptions, "signal">) =>
-  buildUrl(`/demo/csv/${freq}`, dteParams(o));
+  buildUrl(`/api/v1/down-to-earth/csv/${freq}`, dteParams({ ...o, mode: o.mode === "descargar" ? "memoria" : o.mode }));
+
+// ---------------------------------------------------------------------------------------------
+// Down to Earth with real NASA data: background jobs (download ~30 min per region the first time)
+// ---------------------------------------------------------------------------------------------
+
+type JobRequest = Pick<DteOptions, "region" | "inicio" | "fin">;
+
+/** Body of `POST /trabajos`: an official region id, or a custom slug plus its full bbox. */
+export function jobBody(o: JobRequest) {
+  const p = regionParams(o.region);
+  const bbox = "oeste" in p ? [p.oeste, p.sur, p.este, p.norte] : undefined;
+  return { region: p.region, bbox, inicio: clampPeriod(toYearMonth(o.inicio)), fin: clampPeriod(toYearMonth(o.fin)) };
+}
+
+/** Starts the job, or returns the existing one with the same parameters (the backend de-duplicates). */
+export const startDteJob = (o: JobRequest, signal?: AbortSignal) =>
+  apiPost<DteJob>("/api/v1/down-to-earth/trabajos", jobBody(o), signal);
+
+export const fetchDteJob = (id: string, signal?: AbortSignal) =>
+  apiGet<DteJob>(`/api/v1/down-to-earth/trabajos/${encodeURIComponent(id)}`, {}, signal);
+
+export const fetchDteJobResult = (id: string, signal?: AbortSignal) =>
+  apiGet<DteResult>(`/api/v1/down-to-earth/trabajos/${encodeURIComponent(id)}/resultado`, {}, signal);
+
+export const dteTableUrl = (id: string, tabla: DteTable, formato: "csv" | "json" = "csv") =>
+  buildUrl(`/api/v1/down-to-earth/trabajos/${encodeURIComponent(id)}/tablas/${tabla}`, { formato });
+
+export const JOB_POLL_MS = 5000;
+
+function sleep(ms: number, signal?: AbortSignal) {
+  return new Promise<void>((resolve, reject) => {
+    if (signal?.aborted) return reject(new DOMException("Aborted", "AbortError"));
+    const id = setTimeout(resolve, ms);
+    signal?.addEventListener("abort", () => {
+      clearTimeout(id);
+      reject(new DOMException("Aborted", "AbortError"));
+    });
+  });
+}
+
+/**
+ * Runs a real-data job to the end: start (or reuse) it, poll every JOB_POLL_MS reporting progress, then fetch the
+ * result. A 404 while polling means another server worker answered (jobs live in each worker's RAM): the job is
+ * requested again and the backend de-duplicates it. Brief network drops are retried. A failed job throws
+ * JobFailedError: there is never a synthetic fallback for real data.
+ */
+export async function runDteJob(o: JobRequest, onProgress: (job: DteJob) => void, signal?: AbortSignal) {
+  let job = await startDteJob(o, signal);
+  onProgress(job);
+  let offlineRetries = 0;
+  while (job.estado !== "completado") {
+    if (job.estado === "error") throw new JobFailedError(job.error ?? job.mensaje);
+    await sleep(JOB_POLL_MS, signal);
+    try {
+      job = await fetchDteJob(job.id, signal);
+      offlineRetries = 0;
+    } catch (e) {
+      if (e instanceof ApiError && e.status === 404) job = await startDteJob(o, signal);
+      else if (e instanceof BackendOfflineError && offlineRetries < 3) {
+        offlineRetries += 1;
+        continue;
+      } else throw e;
+    }
+    onProgress(job);
+  }
+  const result = await fetchDteJobResult(job.id, signal);
+  return { result, job };
+}
+
+// ---------------------------------------------------------------------------------------------
+// Exact calculation on data sent by the client
+// ---------------------------------------------------------------------------------------------
+
+export interface CalcOptions {
+  unidades: "finales" | "originales";
+  simulado?: boolean;
+  inicio?: string;
+  fin?: string;
+  region?: string;
+}
+
+/** `POST /api/v1/down-to-earth/calcular/csv`: uploads a monthly regional CSV and returns the full analysis + tables. */
+export function analyzeCsv(file: File, o: CalcOptions, signal?: AbortSignal) {
+  const form = new FormData();
+  form.append("archivo", file);
+  form.append("unidades", o.unidades);
+  form.append("simulado", String(Boolean(o.simulado)));
+  form.append("incluir_tablas", "true");
+  if (o.inicio) form.append("inicio", o.inicio);
+  if (o.fin) form.append("fin", o.fin);
+  if (o.region) form.append("region", o.region);
+  return apiPostForm<DteResult>("/api/v1/down-to-earth/calcular/csv", form, signal);
+}
+
+export interface MonthlyRow {
+  fecha: string;
+  P?: number | null;
+  T?: number | null;
+  SM?: number | null;
+  ET?: number | null;
+}
+
+/** `POST /api/v1/down-to-earth/calcular`: same calculation from rows already in the browser (JSON). */
+export const calculateDte = (serie: MonthlyRow[], o: CalcOptions, signal?: AbortSignal) =>
+  apiPost<DteResult>("/api/v1/down-to-earth/calcular", { serie, ...o, incluir_tablas: true }, signal);
+
+/** CSV text from table rows (empty cell = missing), for client-side downloads of uploaded results. */
+export function rowsToCsv(rows: TableRow[]): string {
+  if (rows.length === 0) return "";
+  const cols = Object.keys(rows[0]);
+  const cell = (v: unknown) => {
+    const s = v === null || v === undefined ? "" : String(v);
+    return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  };
+  return [cols.join(","), ...rows.map((r) => cols.map((c) => cell(r[c])).join(","))].join("\n") + "\n";
+}
 
 export function fetchTendencia(variableId: string, o: Omit<DteOptions, "signal"> & { signal?: AbortSignal }) {
   return apiGet<TendenciaRespuesta>(

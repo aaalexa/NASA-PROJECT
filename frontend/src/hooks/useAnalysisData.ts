@@ -5,13 +5,16 @@ import { useBackend } from "@/context/BackendContext";
 import {
   ApiFailure,
   DataMode,
+  DteJob,
   DteResult,
   ID_TO_DTE,
   TendenciaRespuesta,
   classifyError,
   dteParams,
+  failureDetail,
   fetchDteResult,
   fetchTendencia,
+  runDteJob,
 } from "@/lib/api";
 import type { DateRange, RegionAnalysisPayload, VariableId } from "@/types/geo";
 
@@ -21,17 +24,38 @@ export interface AnalysisOutcome {
   dte?: DteResult;
   /** Per-variable trend for every selected variable outside that family. */
   extras: Record<string, TendenciaRespuesta | ApiFailure>;
+  /** True while the extra variables are still loading (the Down to Earth result is already shown). */
+  extrasPending?: boolean;
   failure?: ApiFailure;
+  /** Backend text for the failure when it gave one (e.g. why a real-data job failed). */
+  failureText?: string;
+  /** Id of the real-data job that produced `dte` (for its formatted tables). */
+  jobId?: string;
+}
+
+/** Result of an uploaded CSV (`POST /calcular/csv`): replaces the region view until the user goes back. */
+export interface UploadedAnalysis {
+  key: string;
+  fileName: string;
+  result: DteResult;
 }
 
 /**
  * Everything the analysis screens need from the backend for the current selection:
  * the joint Down to Earth result for P/T/SM/ET plus one trend per other variable.
+ *
+ * Data modes:
+ * - "sintetico": deterministic demo data from the backend.
+ * - "memoria": only what is already in the server RAM (404 otherwise, never a silent synthetic fallback).
+ * - "descargar": real NASA data. First the server RAM (instant if precomputed); if absent, a background job
+ *   (`POST /down-to-earth/trabajos`) downloads and analyses the region while this hook reports its progress.
  */
 export function useAnalysisData(regionData: RegionAnalysisPayload | null, range: DateRange, selected: VariableId[], enabled = true) {
   const backend = useBackend();
   const [modeOverride, setModeOverride] = useState<DataMode | null>(null);
   const [outcome, setOutcome] = useState<AnalysisOutcome | null>(null);
+  const [jobProgress, setJobProgress] = useState<{ key: string; job: DteJob } | null>(null);
+  const [uploadedState, setUploadedState] = useState<UploadedAnalysis | null>(null);
   const [attempt, setAttempt] = useState(0);
 
   const mode: DataMode = modeOverride ?? backend.defaultMode;
@@ -49,24 +73,39 @@ export function useAnalysisData(regionData: RegionAnalysisPayload | null, range:
   useEffect(() => {
     if (!ready || !request) return;
     const ctrl = new AbortController();
+    const signal = ctrl.signal;
+
+    const loadDte = async (): Promise<Pick<AnalysisOutcome, "dte" | "failure" | "failureText" | "jobId">> => {
+      if (!coreIds.length) return {};
+      try {
+        if (request.mode !== "descargar") return { dte: await fetchDteResult({ ...request, signal }) };
+        // Real data: the server RAM first (precomputed or an earlier job), then a background job with progress.
+        try {
+          return { dte: await fetchDteResult({ ...request, mode: "memoria", signal }) };
+        } catch (e) {
+          if (classifyError(e) !== "no_data_in_memory") throw e;
+        }
+        const { result, job } = await runDteJob(request, (j) => setJobProgress({ key, job: j }), signal);
+        return { dte: result, jobId: job.id };
+      } catch (e) {
+        return { failure: classifyError(e), failureText: failureDetail(e) };
+      }
+    };
+
     const run = async () => {
-      const dtePromise = coreIds.length ? fetchDteResult({ ...request, signal: ctrl.signal }) : Promise.resolve(undefined);
       const extraPromises = extraIds.map((id) =>
-        fetchTendencia(id, { ...request, signal: ctrl.signal }).then(
+        fetchTendencia(id, { ...request, signal }).then(
           (r): [string, TendenciaRespuesta | ApiFailure] => [id, r],
           (e): [string, TendenciaRespuesta | ApiFailure] => [id, classifyError(e)]
         )
       );
-      let dte: DteResult | undefined;
-      let failure: ApiFailure | undefined;
-      try {
-        dte = await dtePromise;
-      } catch (e) {
-        failure = classifyError(e);
-      }
+      const dtePart = await loadDte();
+      if (signal.aborted || dtePart.failure === "aborted") return;
+      // Show the Down to Earth result as soon as it is ready; the other variables follow.
+      if (coreIds.length && extraIds.length) setOutcome({ key, ...dtePart, extras: {}, extrasPending: true });
       const extras = Object.fromEntries(await Promise.all(extraPromises));
-      if (ctrl.signal.aborted || failure === "aborted") return;
-      setOutcome({ key, dte, extras, failure });
+      if (signal.aborted) return;
+      setOutcome({ key, ...dtePart, extras });
     };
     void run();
     return () => ctrl.abort();
@@ -75,10 +114,14 @@ export function useAnalysisData(regionData: RegionAnalysisPayload | null, range:
   }, [key, ready]);
 
   const current = outcome?.key === key ? outcome : undefined;
-  const extras = current?.extras ?? {};
-  const anyResult = Boolean(current?.dte) || Object.values(extras).some((r) => typeof r !== "string");
+  const uploaded = uploadedState?.key === key ? uploadedState : undefined;
+  const extras = uploaded ? {} : (current?.extras ?? {});
+  const dte = uploaded ? uploaded.result : current?.dte;
+  const job = !uploaded && loading && jobProgress?.key === key ? jobProgress.job : undefined;
+  const anyResult = Boolean(dte) || Object.values(extras).some((r) => typeof r !== "string");
   const synthetic =
-    current?.dte?.metadata.source === "sintetico" ||
+    Boolean(dte?.metadata.simulated) ||
+    dte?.metadata.source === "sintetico" ||
     Object.values(extras).some((r) => typeof r !== "string" && r.metadatos.fuente_datos === "sintetico");
 
   return {
@@ -88,11 +131,21 @@ export function useAnalysisData(regionData: RegionAnalysisPayload | null, range:
       backend.recheck();
       setAttempt((a) => a + 1);
     },
-    loading: loading || (enabled && backend.state === "checking"),
+    loading: !uploaded && (loading || (enabled && backend.state === "checking")),
     current,
-    dte: current?.dte,
+    dte,
     extras,
-    failure: current?.failure,
+    extrasPending: !uploaded && Boolean(current?.extrasPending),
+    failure: uploaded ? undefined : current?.failure,
+    failureText: uploaded ? undefined : current?.failureText,
+    /** Progress of the real-data job while it runs. */
+    job,
+    /** Id of the finished real-data job behind `dte` (formatted tables: mensual, anual, limpieza, diccionario). */
+    jobId: uploaded ? undefined : current?.jobId,
+    /** The uploaded CSV currently shown instead of the region, if any. */
+    uploaded,
+    setUploaded: (result: DteResult | null, fileName = "") =>
+      setUploadedState(result ? { key, fileName, result } : null),
     anyResult,
     synthetic,
     coreIds,

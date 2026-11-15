@@ -3,7 +3,7 @@
 import { ArrowDownTrayIcon } from "@heroicons/react/24/outline";
 import { useTranslation } from "@/context/LanguageContext";
 import { useBackend } from "@/context/BackendContext";
-import { ID_TO_DTE, csvUrl } from "@/lib/api";
+import { ID_TO_DTE, TableRow, csvUrl, dteTableUrl, rowsToCsv } from "@/lib/api";
 import type { RegionAnalysisPayload, DateRange, VariableId } from "@/types/geo";
 import type { useAnalysisData } from "@/hooks/useAnalysisData";
 import { failureMessage } from "@/lib/analysisText";
@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Block, DteCard, FailedCard, TrendCard, signed } from "@/components/nasa/analysisCards";
+import { Block, DataQuality, DteCard, FailedCard, TrendCard, signed } from "@/components/nasa/analysisCards";
 
 type Analysis = ReturnType<typeof useAnalysisData>;
 
@@ -34,8 +34,43 @@ export function AnalysisTabs({
 }) {
   const { language, t } = useTranslation();
   const backend = useBackend();
-  const { dte, extras, mode } = analysis;
+  const { dte, extras, mode, jobId, uploaded } = analysis;
   const csvReq = { region: regionData, inicio: range.start, fin: range.end, mode };
+  // An uploaded CSV always carries the four Down to Earth variables; otherwise show the user's selection.
+  const ids = uploaded ? Object.keys(ID_TO_DTE) : selectedVariables;
+
+  /** Download links: tables of the real-data job, client-side CSV of an uploaded result, or the cached analysis. */
+  const downloads: { label: string; href?: string; rows?: TableRow[]; file: string }[] = uploaded
+    ? [
+        { label: t("resultsStep.downloadAnnual"), rows: uploaded.result.tablas?.anual ?? [], file: "anual.csv" },
+        { label: t("resultsStep.downloadMonthly"), rows: uploaded.result.tablas?.mensual ?? [], file: "mensual.csv" },
+        {
+          label: t("resultsStep.downloadCleaning"),
+          rows: uploaded.result.data_cleaning.log as unknown as TableRow[],
+          file: "registro_limpieza.csv",
+        },
+        { label: t("resultsStep.downloadDictionary"), rows: uploaded.result.tablas?.diccionario ?? [], file: "diccionario_datos.csv" },
+      ]
+    : jobId
+      ? [
+          { label: t("resultsStep.downloadAnnual"), href: dteTableUrl(jobId, "anual"), file: "anual.csv" },
+          { label: t("resultsStep.downloadMonthly"), href: dteTableUrl(jobId, "mensual"), file: "mensual.csv" },
+          { label: t("resultsStep.downloadCleaning"), href: dteTableUrl(jobId, "limpieza"), file: "registro_limpieza.csv" },
+          { label: t("resultsStep.downloadDictionary"), href: dteTableUrl(jobId, "diccionario"), file: "diccionario_datos.csv" },
+        ]
+      : [
+          { label: t("resultsStep.downloadAnnual"), href: csvUrl("anual", csvReq), file: "anual.csv" },
+          { label: t("resultsStep.downloadMonthly"), href: csvUrl("mensual", csvReq), file: "mensual.csv" },
+        ];
+
+  const saveRows = (rows: TableRow[], file: string) => {
+    const url = URL.createObjectURL(new Blob([rowsToCsv(rows)], { type: "text/csv;charset=utf-8" }));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = file;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <Tabs defaultValue="vars" className="flex-col">
@@ -46,7 +81,7 @@ export function AnalysisTabs({
       </TabsList>
 
       <TabsContent value="vars" className="mt-3 space-y-2">
-        {selectedVariables.map((id) => {
+        {ids.map((id) => {
           const info = backend.variableById(id);
           if (!info) return null;
           const code = ID_TO_DTE[id];
@@ -71,6 +106,11 @@ export function AnalysisTabs({
             </div>
           );
         })}
+        {analysis.extrasPending && (
+          <p className="px-1 pt-1 text-xs text-muted-foreground" role="status">
+            {t("resultsStep.extrasPending")}
+          </p>
+        )}
         {dte && <p className="px-1 pt-1 text-xs text-muted-foreground">{t("resultsStep.familyNote")}</p>}
       </TabsContent>
 
@@ -106,19 +146,33 @@ export function AnalysisTabs({
           <Block title={t("resultsStep.jointReading")} items={[dte.conclusion.joint_reading]} />
           <Block title={t("resultsStep.withEvidence")} items={dte.conclusion.changes_with_statistical_evidence} empty={t("resultsStep.none")} />
           <Block title={t("resultsStep.withoutEvidence")} items={dte.conclusion.inconclusive_or_insufficient_evidence} empty={t("resultsStep.none")} />
+          {dte.metadata.warnings?.length > 0 && (
+            <Block title={t("resultsStep.warningsTitle")} items={dte.metadata.warnings} />
+          )}
           <Block title={t("resultsStep.limitsTitle")} items={dte.conclusion.methodological_limits} />
+          {dte.data_cleaning && (
+            <>
+              <Separator />
+              <DataQuality summary={dte.data_cleaning.summary} steps={dte.data_cleaning.steps} />
+            </>
+          )}
           <Separator />
           <div className="space-y-2">
             <p className="eyebrow">{t("resultsStep.download")}</p>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" className="flex-1" render={<a href={csvUrl("anual", csvReq)} download />}>
-                <ArrowDownTrayIcon className="size-4" />
-                {t("resultsStep.downloadAnnual")}
-              </Button>
-              <Button variant="outline" size="sm" className="flex-1" render={<a href={csvUrl("mensual", csvReq)} download />}>
-                <ArrowDownTrayIcon className="size-4" />
-                {t("resultsStep.downloadMonthly")}
-              </Button>
+            <div className="grid grid-cols-2 gap-2">
+              {downloads.map((d) =>
+                d.href ? (
+                  <Button key={d.file} variant="outline" size="sm" render={<a href={d.href} download={d.file} />}>
+                    <ArrowDownTrayIcon className="size-4" />
+                    {d.label}
+                  </Button>
+                ) : (
+                  <Button key={d.file} variant="outline" size="sm" onClick={() => saveRows(d.rows ?? [], d.file)}>
+                    <ArrowDownTrayIcon className="size-4" />
+                    {d.label}
+                  </Button>
+                )
+              )}
             </div>
           </div>
         </TabsContent>

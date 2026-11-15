@@ -77,8 +77,9 @@ export function buildSeriesData(
       monthly,
       annual: v.annual.map((a) => ({ year: a.year, value: a.value, fitted: a.fitted })),
       slopeDecade: v.slope_decade,
+      // `direction` is only set by the backend when there is statistical evidence; otherwise the trend is drawn flat.
       direction: v.direction === "aumento" ? "up" : v.direction === "disminucion" ? "down" : "flat",
-      significant: v.significant,
+      significant: v.significant === true,
     };
   }
 

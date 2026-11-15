@@ -48,6 +48,15 @@
     "months_total": 288,
     "years_expected": 24,
     "years_complete_count": 24,
+    "trend_span": {
+      "start": 2001,
+      "end": 2024,
+      "n_years": 24,
+      "criterion": "tramo común más largo de años completos y consecutivos (empate → el más reciente)"
+    },
+    "simulated": true,
+    "warnings": ["DATOS SIMULADOS: al menos una variable es sintética; las cifras no describen la región real."],
+    "spatial_weighting": "área esférica de cada celda dentro de la región × fracción de tierra según la huella de GLDAS",
     "alpha": 0.05,
     "method": {
       "ols_formula": "y = a + b * t, donde t = anio - anio_inicial",
@@ -72,15 +81,15 @@
       "name": "Precipitación (P)",
       "question": "¿Está llegando más o menos agua?",
       "why_chosen": "Es el fenómeno principal del proyecto.",
-      "collection": "GPCP mensual v3.2 / v3.3",
+      "collection": "GPCP mensual v3.3 (la v3.2 termina en 2023-12; v3.3 conserva sat_gauge_precip)",
       "short_name": "GPCPMON",
       "field": "sat_gauge_precip",
       "conversion_rule": "mm/día × días del mes → mm/mes",
       "annual_aggregation": "suma",
       "units": {
         "monthly": "mm/mes",
-        "annual": "mm",
-        "slope_decade": "mm por década"
+        "annual": "mm/anio",
+        "slope_decade": "mm por década (total anual)"
       },
       "monthly": [
         { "date": "2001-01", "value": 59.27356607791693, "z": 0.08093895645297859 }
@@ -98,8 +107,9 @@
       "p_holm": 1.1827165717997752e-71,
       "significant": true,
       "direction": "aumento",
-      "label": "Aumento con evidencia estadística.",
-      "summary_text": "Precipitación (P) cambió aproximadamente +81.9 mm por década; IC95 % [+73.0, +90.9]; p ajustado = 1.2e-71.",
+      "estimate_sign": "positiva",
+      "label": "aumento con evidencia estadística según este método",
+      "summary_text": "Precipitación (P) cambió aproximadamente +81.9 mm por década (total anual); IC95 % [+73.0, +90.9]; p ajustado < 0.001; aumento con evidencia estadística según este método. Período 2001–2024, 24 años válidos.",
       "sensible_al_rezago": false,
       "sensitivity": {
         "lag_1": {
@@ -115,6 +125,7 @@
         "lag_3": { "maxlags": 3, "significant": true }
       },
       "quality": {
+        "n_exact_zeros": 0,
         "n_months_expected": 288,
         "n_months_valid": 288,
         "n_months_missing": 0,
@@ -128,9 +139,9 @@
         "warnings": []
       }
     },
-    "T": { "id": "temp_aire", "code": "T", "units": { "monthly": "degC", "annual": "degC", "slope_decade": "°C por década" } },
-    "SM": { "id": "humedad_suelo", "code": "SM", "units": { "monthly": "m3/m3", "annual": "m3/m3", "slope_decade": "m³/m³ por década" } },
-    "ET": { "id": "evapotranspiracion", "code": "ET", "units": { "monthly": "mm/mes", "annual": "mm", "slope_decade": "mm por década" } }
+    "T": { "id": "temp_aire", "code": "T", "units": { "monthly": "°C", "annual": "°C", "slope_decade": "°C por década" } },
+    "SM": { "id": "humedad_suelo", "code": "SM", "units": { "monthly": "m³/m³", "annual": "m³/m³", "slope_decade": "m³/m³ por década" } },
+    "ET": { "id": "evapotranspiracion", "code": "ET", "units": { "monthly": "mm/mes", "annual": "mm/anio", "slope_decade": "mm por década (total anual)" } }
   },
   "joint": {
     "preprocessing": {
@@ -186,6 +197,29 @@
 
 ---
 
+### Valores posibles de `label`, `direction` y `estimate_sign`
+
+| Caso | `label` | `direction` | `significant` |
+|---|---|---|---|
+| p_holm ≤ 0.05, pendiente > 0 | `aumento con evidencia estadística según este método` | `"aumento"` | `true` |
+| p_holm ≤ 0.05, pendiente < 0 | `disminución con evidencia estadística según este método` | `"disminucion"` | `true` |
+| p_holm > 0.05 y p_raw ≤ 0.05 | `evidencia insuficiente tras el ajuste` | `null` | `false` |
+| p_holm > 0.05 y p_raw > 0.05 | `evidencia insuficiente` | `null` | `false` |
+| SE cero o no finito | `sin inferencia: …` | `null` | `null` |
+| sin años completos | `no evaluable: <motivo>` | `null` | `null` |
+
+- Si la decisión cambia con los rezagos 2 o 3, `label` termina en `; resultado sensible al rezago`.
+- `estimate_sign` (`positiva`/`negativa`/`nula`) es el signo de la pendiente estimada, también cuando no hay
+  evidencia. Muéstralo como "estimación positiva/negativa", nunca como "aumentó/disminuyó".
+- "Evidencia insuficiente" **no** significa "sin cambio": el front no debe mostrar "sin cambio" ni "estable".
+- Si `metadata.simulated` es `true`, rotula toda la vista como **datos simulados**.
+- Las cuatro pendientes usan el mismo tramo `metadata.trend_span`; muéstralo junto a los resultados.
+- `data_cleaning`: `steps` (reglas de limpieza), `summary[P|T|SM|ET]` (conteos: `relleno`, `fuera_de_rango`,
+  `no_finitos`, `duplicados_*`, `meses_ausentes`, `ceros_exactos`, `n_meses_validos`, `anios_incompletos`) y `log`
+  (`[{fecha, variable, valor_original, accion, motivo}]`). Útil para una vista de "calidad de datos".
+
+---
+
 ## 3. Output real de `GET /catalog` (`200 OK`)
 
 > Output completo disponible en `docs/api/ejemplos/catalog_dte.json`.
@@ -217,3 +251,66 @@ fecha,P_mm_mes,T_degC,SM_m3_m3,ET_mm_mes
 2001-01,47.1214,19.3095,0.156267,23.6281
 ```
 
+
+---
+
+## 5. Endpoints de cálculo exacto (`/api/v1/down-to-earth/...`)
+
+Todos usan el mismo motor que `/demo/result` (limpieza estructural + OLS anual + HAC rezago 1 + Holm sobre
+[P, T, SM, ET] + sensibilidad rezagos 2 y 3 + anomalías z y Pearson P–SM, T–SM, P–ET) y devuelven `ResultadoDTE`.
+
+### 5.1 `POST /calcular` — desde una serie mensual en JSON (síncrono)
+
+```json
+{
+  "serie": [{ "fecha": "2001-01", "P": 15.9, "T": 15.5, "SM": 0.179, "ET": 27.4 }],
+  "unidades": "finales",
+  "inicio": "2001-01",
+  "fin": "2024-12",
+  "alfa": 0.05,
+  "region": "corredor_seco_centroamericano",
+  "simulado": false,
+  "incluir_tablas": true
+}
+```
+
+- `unidades`: `"finales"` (mm/mes, °C, m³/m³, mm/mes) u `"originales"` NASA (mm/día, K, kg/m², kg/m²/s).
+- Valores `null` = faltante (nunca se rellenan). Variables ausentes → `label: "no evaluable: …"`.
+- `incluir_tablas: true` añade `tablas.mensual`, `tablas.anual` y `tablas.diccionario` (registros con formato).
+- Errores: `422` (cuerpo inválido), `400` (`parametro_invalido`: sin columna de fecha o de variables, período mal).
+
+### 5.2 `POST /calcular/csv` — desde un archivo (multipart/form-data, síncrono)
+
+Campos: `archivo` (CSV ≤ 5 MB), `unidades`, `inicio`, `fin`, `alfa`, `region`, `simulado`, `incluir_tablas`.
+El CSV acepta `fecha`/`date`/`time` (o `anio`+`mes`) y columnas `P, T, SM, ET` o los campos NASA
+`sat_gauge_precip, T2M, SoilMoi0_10cm_inst, Evap_tavg`. `metadata.input` informa las columnas usadas.
+
+```ts
+const fd = new FormData();
+fd.append("archivo", file);
+fd.append("unidades", "originales");
+const res = await fetch(`${BACKEND_URL}/api/v1/down-to-earth/calcular/csv`, { method: "POST", body: fd });
+```
+
+### 5.3 Trabajos con datos reales de NASA (asíncrono)
+
+1. `POST /trabajos` con `{"region": "corredor_seco_centroamericano", "inicio": "2001-01", "fin": "2024-12"}`
+   (o `"bbox": [oeste, sur, este, norte]`) → `202` con `TrabajoDTE`.
+2. Sondear `GET /trabajos/{id}` cada 5–10 s: `estado` (`pendiente|ejecutando|completado|error`), `etapa`
+   (`P|T|SM|ET|analisis`), `paso_actual/total_pasos`, `porcentaje`, `mensaje`, `enlaces`.
+3. Cuando `estado == "completado"`: `GET /trabajos/{id}/resultado` (`?incluir_tablas=true` opcional).
+   Antes de terminar o si falló → `409`. Id inexistente → `404`.
+4. Tablas: `GET /trabajos/{id}/tablas/{mensual|anual|limpieza|diccionario|serie_regional}?formato=csv|json`.
+
+Una corrida completa (4 productos × 288 meses) tarda del orden de 30 min por región. Nunca usa datos sintéticos:
+si falta un producto, el trabajo termina en `error`. Después, `GET /down-to-earth/analisis?region=…&estricto_memoria=true`
+responde al instante con los cubos ya en RAM.
+
+```ts
+const t = await (await fetch(`${BACKEND_URL}/api/v1/down-to-earth/trabajos`, {
+  method: "POST", headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ region: "corredor_seco_centroamericano" }),
+})).json();
+// sondear t.enlaces.estado hasta estado === "completado", luego:
+const resultado = await (await fetch(`${BACKEND_URL}${t.enlaces.resultado}`)).json();
+```
