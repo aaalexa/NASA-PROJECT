@@ -265,5 +265,36 @@
     "verdictNone": "No clear trend",
     "mapError": "The map for this variable could not be loaded",
     "noSeries": "This variable has no series to show in 3D."
+  },
+  "errors": {
+    "notFound": {
+      "eyebrow": "Error 404",
+      "title": "Lost in orbit",
+      "description": "We couldn't find this page. It may have moved, or the link may be mistyped.",
+      "back": "Go back",
+      "home": "Go home"
+    },
+    "server": {
+      "eyebrow": "Error 500",
+      "title": "Something failed at our station",
+      "description": "An unexpected error occurred while showing this section. You can retry; if it persists, go back home.",
+      "retry": "Retry",
+      "home": "Go home",
+      "reference": "Reference"
+    },
+    "offline": {
+      "eyebrow": "No signal",
+      "title": "No internet connection",
+      "description": "Moody Trends needs internet to query NASA data and Gemini. This screen will close on its own when the connection returns.",
+      "retry": "Retry",
+      "waiting": "Waiting for connection…"
+    },
+    "backend": {
+      "eyebrow": "Server error",
+      "title": "There's a problem with the server",
+      "description": "We couldn't load the data right now. Please try again in a few minutes.",
+      "retry": "Retry",
+      "checking": "Checking…"
+    }
   }
 }

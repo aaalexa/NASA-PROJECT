@@ -265,5 +265,36 @@
     "verdictNone": "Sin tendencia clara",
     "mapError": "No se pudo cargar el mapa de esta variable",
     "noSeries": "Esta variable no tiene serie para mostrar en 3D."
+  },
+  "errors": {
+    "notFound": {
+      "eyebrow": "Error 404",
+      "title": "Perdidos en órbita",
+      "description": "No encontramos esta página. Puede que se haya movido o que el enlace esté mal escrito.",
+      "back": "Volver",
+      "home": "Ir al inicio"
+    },
+    "server": {
+      "eyebrow": "Error 500",
+      "title": "Algo falló en nuestra estación",
+      "description": "Ocurrió un error inesperado al mostrar esta sección. Puedes reintentar; si el problema continúa, vuelve al inicio.",
+      "retry": "Reintentar",
+      "home": "Ir al inicio",
+      "reference": "Referencia"
+    },
+    "offline": {
+      "eyebrow": "Sin señal",
+      "title": "Sin conexión a internet",
+      "description": "Moody Trends necesita internet para consultar los datos de NASA y a Gemini. Esta pantalla se cerrará sola cuando vuelva la conexión.",
+      "retry": "Reintentar",
+      "waiting": "Esperando conexión…"
+    },
+    "backend": {
+      "eyebrow": "Error del servidor",
+      "title": "Hay un problema con el servidor",
+      "description": "No pudimos cargar los datos en este momento. Inténtalo de nuevo en unos minutos.",
+      "retry": "Reintentar",
+      "checking": "Comprobando…"
+    }
   }
 }

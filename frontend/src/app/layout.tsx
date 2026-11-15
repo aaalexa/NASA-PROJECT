@@ -4,6 +4,8 @@ import { LanguageProvider } from "@/context/LanguageContext";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { BackendProvider } from "@/context/BackendContext";
 import { ThemeProvider } from "@/context/ThemeContext";
+import { OfflineScreen } from "@/components/errors/OfflineScreen";
+import { BackendErrorScreen } from "@/components/errors/BackendErrorScreen";
 
 export const metadata: Metadata = {
   title: "Moody Trends | NASA Space Apps 2026",
@@ -22,7 +24,9 @@ export default function RootLayout({
           <LanguageProvider>
             <BackendProvider>
               <TooltipProvider>{children}</TooltipProvider>
+              <BackendErrorScreen />
             </BackendProvider>
+            <OfflineScreen />
           </LanguageProvider>
         </ThemeProvider>
       </body>
