@@ -27,6 +27,8 @@ function DatePicker({
   label,
   min,
   max,
+  boundsMin,
+  boundsMax,
 }: {
   value: string
   onChange: (iso: string) => void
@@ -34,6 +36,9 @@ function DatePicker({
   label: string
   min?: string
   max?: string
+  /** Overall limits of the calendar (the backend period). */
+  boundsMin: string
+  boundsMax: string
 }) {
   const [open, setOpen] = React.useState(false)
   const selected = toDate(value)
@@ -58,12 +63,9 @@ function DatePicker({
           selected={selected}
           defaultMonth={selected}
           captionLayout="dropdown"
-          startMonth={new Date(1990, 0)}
-          endMonth={new Date(2026, 11)}
-          disabled={[
-            ...(min ? [{ before: toDate(min)! }] : []),
-            ...(max ? [{ after: toDate(max)! }] : []),
-          ]}
+          startMonth={toDate(boundsMin)}
+          endMonth={toDate(boundsMax)}
+          disabled={[{ before: toDate(min ?? boundsMin)! }, { after: toDate(max ?? boundsMax)! }]}
           onSelect={(d) => {
             if (d) {
               onChange(toIso(d))

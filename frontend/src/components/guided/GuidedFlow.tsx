@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react";
 import { ArrowLeftIcon, ArrowRightIcon, MagnifyingGlassIcon, PlayIcon } from "@heroicons/react/24/outline";
 import { useTranslation } from "@/context/LanguageContext";
-import { ALL_VARIABLES, PERIODS, TOPICS, VARIABLES } from "@/lib/catalog";
+import { useBackend } from "@/context/BackendContext";
+import { TOPICS, periodPresets, rangeFromPreset } from "@/lib/catalog";
+import type { BackendRegion } from "@/lib/api";
 import { DEMOS } from "@/lib/demos";
 import { classifyPeriod, classifyTopic } from "@/lib/intent";
-import { PREDEFINED_REGIONS } from "@/components/nasa/PredefinedRegions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -14,7 +15,7 @@ import { ChoiceButton } from "@/components/ui/choice-button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import type { DateRange, PredefinedRegion, RegionAnalysisPayload, TopicId, VariableId } from "@/types/geo";
+import type { DateRange, RegionAnalysisPayload, TopicId, VariableId } from "@/types/geo";
 
 export type GuidedStage = "intro" | "topic" | "region" | "period" | "suggest";
 const STAGES: GuidedStage[] = ["topic", "region", "period", "suggest"];
@@ -23,7 +24,7 @@ interface GuidedFlowProps {
   initialStage?: GuidedStage;
   regionData: RegionAnalysisPayload | null;
   isSearching: boolean;
-  onSelectPredefined: (reg: PredefinedRegion) => void;
+  onSelectRegion: (reg: BackendRegion) => void;
   /** Resolves true when the text was turned into a region. */
   onSearchRegion: (text: string) => Promise<boolean>;
   onPreviewText?: (text: string) => void;
@@ -48,7 +49,7 @@ export function GuidedFlow({
   initialStage = "intro",
   regionData,
   isSearching,
-  onSelectPredefined,
+  onSelectRegion,
   onSearchRegion,
   onPreviewText,
   onSetRange,
@@ -61,6 +62,8 @@ export function GuidedFlow({
   onHint,
 }: GuidedFlowProps) {
   const { language, t } = useTranslation();
+  const backend = useBackend();
+  const presets = periodPresets(backend.period);
   const [stage, setStage] = useState<GuidedStage>(initialStage);
   const [topic, setTopic] = useState<TopicId | null>(null);
   const [query, setQuery] = useState("");
@@ -97,9 +100,10 @@ export function GuidedFlow({
     go("region");
   };
 
-  const choosePeriod = (id: (typeof PERIODS)[number]["id"]) => {
-    const p = PERIODS.find((x) => x.id === id)!;
-    onSetRange({ start: p.start, end: p.end, preset: p.id });
+  const choosePeriod = (id: string) => {
+    const p = presets.find((x) => x.id === id);
+    if (!p) return;
+    onSetRange(rangeFromPreset(p));
     go("suggest");
   };
 
@@ -142,7 +146,20 @@ export function GuidedFlow({
     fetch("/api/guide", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ topic, regionName: regionData.regionName, locale: language }),
+      body: JSON.stringify({
+        topic,
+        regionName: regionData.regionName,
+        locale: language,
+        // The catalog the AI ranks comes from the backend, not from a copy in the UI.
+        catalog: backend.analyzable.map((v) => ({
+          id: v.id,
+          nombre: v.nombre_simple,
+          definicion: v.definicion_simple,
+          pregunta: v.pregunta,
+          dataset: v.dataset,
+          unidad: v.unidad_final,
+        })),
+      }),
     })
       .then((r) => r.json())
       .then((data: Omit<GuideResult, "key">) => {
@@ -150,11 +167,11 @@ export function GuidedFlow({
         done(data);
       })
       .catch(() => {
-        const fallback = TOPICS.find((x) => x.id === topic)!.variables;
+        const fallback = TOPICS.find((x) => x.id === topic)!.variables.filter((id) => backend.variableById(id));
         done({
           source: "local",
           summary: "",
-          ranked: fallback.map((id) => ({ id, reason: VARIABLES[id].question[language] })),
+          ranked: fallback.map((id) => ({ id, reason: backend.variableById(id)?.pregunta ?? backend.variableById(id)?.definicion_simple ?? "" })),
         });
       });
     return () => {
@@ -265,17 +282,17 @@ export function GuidedFlow({
           )}
 
           <div className="grid grid-cols-2 gap-2">
-            {PREDEFINED_REGIONS.slice(0, 6).map((reg) => (
+            {backend.regions.slice(0, 8).map((reg) => (
               <ChoiceButton
                 key={reg.id}
-                selected={regionData?.regionName === reg.name[language]}
+                selected={regionData?.backendId === reg.id}
                 className="!px-3 !py-2"
                 onClick={() => {
                   setNotice(null);
-                  onSelectPredefined(reg);
+                  onSelectRegion(reg);
                 }}
               >
-                <span className="line-clamp-2 text-xs font-medium leading-snug">{reg.name[language]}</span>
+                <span className="line-clamp-2 text-xs font-medium leading-snug">{reg.nombre}</span>
               </ChoiceButton>
             ))}
           </div>
@@ -294,7 +311,7 @@ export function GuidedFlow({
         <>
           <h2 className="title text-xl">{t("guided.q3")}</h2>
           <div className="space-y-2">
-            {PERIODS.map((p) => (
+            {presets.map((p) => (
               <ChoiceButton key={p.id} className="flex-col gap-0.5" onClick={() => choosePeriod(p.id)}>
                 <span className="text-sm font-bold">{p.label[language]}</span>
                 <span className="text-xs text-muted-foreground">{p.desc[language]}</span>
@@ -321,16 +338,16 @@ export function GuidedFlow({
               {guide.summary && <p className="text-sm leading-relaxed">{guide.summary}</p>}
               <div className="space-y-2">
                 {guide.ranked
-                  .filter((r) => ALL_VARIABLES.includes(r.id))
+                  .filter((r) => backend.variableById(r.id))
                   .map((r) => {
-                    const info = VARIABLES[r.id];
+                    const info = backend.variableById(r.id)!;
                     const on = selectedVariables.includes(r.id);
                     return (
                       <ChoiceButton key={r.id} selected={on} aria-pressed={on} onClick={() => toggle(r.id)}>
                         <Checkbox checked={on} tabIndex={-1} className="pointer-events-none mt-0.5" aria-hidden />
                         <span>
                           <span className="block text-sm font-bold">
-                            {info.name[language]} <span className="font-normal text-muted-foreground">· {info.product}</span>
+                            {info.nombre_simple} <span className="font-normal text-muted-foreground">· {info.short_name ?? info.fuente}</span>
                           </span>
                           <span className="mt-0.5 block text-xs leading-snug text-muted-foreground">{r.reason}</span>
                         </span>

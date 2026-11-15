@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowPathIcon,
   MoonIcon,
@@ -12,7 +12,11 @@ import {
 // Swap back to CobeGlobePulse to restore the previous globe.
 import GlobeGlExplorer from "@/components/globe/GlobeGlExplorer";
 import { VoiceController } from "@/components/hud/VoiceController";
+import { useBackend } from "@/context/BackendContext";
 import { MoodyChat } from "@/components/chat/MoodyChat";
+import { AnalysisDrawer } from "@/components/analysis/AnalysisDrawer";
+import { useAnalysisData } from "@/hooks/useAnalysisData";
+import { buildDigest } from "@/lib/analysisText";
 import { ExperienceModal } from "@/components/onboarding/ExperienceModal";
 import { GuidedFlow, GuidedStage } from "@/components/guided/GuidedFlow";
 import { StepNavigation } from "@/components/nasa/StepNavigation";
@@ -20,8 +24,9 @@ import { RegionStep } from "@/components/nasa/RegionStep";
 import { PeriodStep } from "@/components/nasa/PeriodStep";
 import { VariablesStep } from "@/components/nasa/VariablesStep";
 import { ResultsStep } from "@/components/nasa/ResultsStep";
-import { PREDEFINED_REGIONS, findMatchingPredefinedRegion } from "@/components/nasa/PredefinedRegions";
-import { PERIODS } from "@/lib/catalog";
+import { periodPresets, rangeFromPreset } from "@/lib/catalog";
+import { matchRegion, payloadFromBackendRegion } from "@/lib/regionMatch";
+import type { BackendRegion } from "@/lib/api";
 import { DEMOS, DemoDef, DemoStep } from "@/lib/demos";
 import { useSpeak } from "@/hooks/useSpeak";
 import { Badge } from "@/components/ui/badge";
@@ -39,14 +44,13 @@ import type {
   DateRange,
   Experience,
   GeoPoint,
-  PredefinedRegion,
   RegionAnalysisPayload,
   VariableId,
   WorkflowStep,
 } from "@/types/geo";
 
-const DEFAULT_RANGE: DateRange = { start: "2019-01-01", end: "2024-12-31", preset: "5y" };
-const DEFAULT_VARIABLES: VariableId[] = ["precipitation", "temperature"];
+/** Backend variable ids selected by default (rain and temperature). */
+const DEFAULT_VARIABLES: VariableId[] = ["lluvia_gpcp", "temp_aire"];
 
 interface DemoState {
   def: DemoDef;
@@ -54,31 +58,30 @@ interface DemoState {
   finished: boolean;
 }
 
-function buildPayload(name: string, description: string, v: [GeoPoint, GeoPoint, GeoPoint]): RegionAnalysisPayload {
-  return {
-    regionName: name,
-    description,
-    triangleVertices: v,
-    geoJsonPolygon: {
-      type: "Polygon",
-      coordinates: [[[v[0].lng, v[0].lat], [v[1].lng, v[1].lat], [v[2].lng, v[2].lat], [v[0].lng, v[0].lat]]],
-    },
-    suggestedVariables: [],
-  };
-}
-
 export default function HomePage() {
   const { language, setLanguage, t } = useTranslation();
   const { theme, toggleTheme } = useTheme();
   const speech = useSpeak(language);
+  const backend = useBackend();
+  const [analysisOpen, setAnalysisOpen] = useState(false);
 
   const [phase, setPhase] = useState<AppPhase>("onboarding");
   const [activeStep, setActiveStep] = useState<WorkflowStep>("region");
   const [points, setPoints] = useState<GeoPoint[]>([]);
   const [regionData, setRegionData] = useState<RegionAnalysisPayload | null>(null);
-  const [dateRange, setDateRange] = useState<DateRange>(DEFAULT_RANGE);
+  // The default period is the backend's full common period; the user can override it.
+  const [rangeOverride, setDateRange] = useState<DateRange | null>(null);
+  const defaultRange = useMemo(() => {
+    const archive = periodPresets(backend.period).find((p) => p.id === "archive")!;
+    return rangeFromPreset(archive);
+  }, [backend.period]);
+  const dateRange = rangeOverride ?? defaultRange;
   const [selectedVariables, setSelectedVariables] = useState<VariableId[]>(DEFAULT_VARIABLES);
   const [isSearching, setIsSearching] = useState(false);
+
+  // One fetch of the backend analysis, shared by the side panel and the 3D drawer.
+  const analysis = useAnalysisData(regionData, dateRange, selectedVariables, activeStep === "results" && phase !== "onboarding");
+  const digest = useMemo(() => buildDigest(analysis.coreIds, analysis.dte, analysis.extras), [analysis.coreIds, analysis.dte, analysis.extras]);
 
   const voiceHandlerRef = useRef<((text: string) => void) | null>(null);
   const registerVoice = useCallback((fn: ((text: string) => void) | null) => {
@@ -92,18 +95,6 @@ export default function HomePage() {
   const [guidedKey, setGuidedKey] = useState(0);
   const [guidedStart, setGuidedStart] = useState<GuidedStage>("intro");
 
-  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number; accuracy?: number } | null>(null);
-
-  // Observer geolocation (used only as context for the analysis payload).
-  useEffect(() => {
-    if (typeof navigator === "undefined" || !("geolocation" in navigator)) return;
-    navigator.geolocation.getCurrentPosition(
-      (p) => setUserLocation({ lat: p.coords.latitude, lng: p.coords.longitude, accuracy: p.coords.accuracy }),
-      () => undefined,
-      { enableHighAccuracy: false, timeout: 12000, maximumAge: 60000 }
-    );
-  }, []);
-
   useEffect(() => {
     if (!flash) return;
     const id = setTimeout(() => setFlash(null), 4500);
@@ -114,20 +105,17 @@ export default function HomePage() {
 
   const applyRegion = useCallback((data: RegionAnalysisPayload) => {
     setRegionData(data);
-    setPoints(data.triangleVertices);
+    setPoints(data.outline ?? data.triangleVertices);
   }, []);
 
-  const selectPredefined = useCallback(
-    (reg: PredefinedRegion) => applyRegion(buildPayload(reg.name[language], reg.area[language], reg.triangle)),
-    [applyRegion, language]
-  );
+  const selectRegion = useCallback((reg: BackendRegion) => applyRegion(payloadFromBackendRegion(reg)), [applyRegion]);
 
   const searchRegion = useCallback(
     async (text: string): Promise<boolean> => {
-      // Known regions: turn the globe instantly, no network round trip.
-      const local = findMatchingPredefinedRegion(text);
+      // Official backend regions: turn the globe instantly, no network round trip.
+      const local = matchRegion(text, backend.regions);
       if (local) {
-        selectPredefined(local);
+        selectRegion(local);
         return true;
       }
       setIsSearching(true);
@@ -146,20 +134,20 @@ export default function HomePage() {
         setIsSearching(false);
       }
     },
-    [applyRegion, language, selectPredefined]
+    [applyRegion, language, selectRegion, backend.regions]
   );
 
-  // Typing preview: as soon as the text matches a known region, aim the globe at it.
+  // Typing preview: as soon as the text matches a backend region, aim the globe at it.
   const previewTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const previewText = useCallback(
     (text: string) => {
       if (previewTimer.current) clearTimeout(previewTimer.current);
       previewTimer.current = setTimeout(() => {
-        const m = findMatchingPredefinedRegion(text);
-        if (m) selectPredefined(m);
+        const m = matchRegion(text, backend.regions);
+        if (m) selectRegion(m);
       }, 250);
     },
-    [selectPredefined]
+    [selectRegion, backend.regions]
   );
 
   // ---- Voice ------------------------------------------------------------------------------
@@ -179,13 +167,14 @@ export default function HomePage() {
   // ---- Mode ---------------------------------------------------------------------------------
 
   const resetAll = () => {
+    setAnalysisOpen(false);
     clearDemoTimer();
     setDemo(null);
     setPoints([]);
     setRegionData(null);
     setActiveStep("region");
     setSelectedVariables(DEFAULT_VARIABLES);
-    setDateRange(DEFAULT_RANGE);
+    setDateRange(null);
     setGuidedStart("intro");
     setGuidedKey((k) => k + 1);
   };
@@ -212,17 +201,17 @@ export default function HomePage() {
   const applyDemoStep = useCallback(
     (step: DemoStep) => {
       if (step.region) {
-        const reg = PREDEFINED_REGIONS.find((r) => r.id === step.region);
-        if (reg) selectPredefined(reg);
+        const reg = backend.regions.find((r) => r.id === step.region);
+        if (reg) selectRegion(reg);
       }
       if (step.preset) {
-        const p = PERIODS.find((x) => x.id === step.preset);
-        if (p) setDateRange({ start: p.start, end: p.end, preset: p.id });
+        const p = periodPresets(backend.period).find((x) => x.id === step.preset);
+        if (p) setDateRange(rangeFromPreset(p));
       }
       if (step.variables) setSelectedVariables(step.variables);
       if (step.step) setActiveStep(step.step);
     },
-    [selectPredefined]
+    [selectRegion, backend.regions, backend.period]
   );
 
   const clearDemoTimer = () => {
@@ -277,12 +266,28 @@ export default function HomePage() {
   const toggleVariable = (id: VariableId) =>
     setSelectedVariables((cur) => (cur.includes(id) ? cur.filter((v) => v !== id) : [...cur, id]));
 
+  const goStep = (step: WorkflowStep) => {
+    setAnalysisOpen(false);
+    setActiveStep(step);
+  };
+
+  const editCriteria = () => {
+    setAnalysisOpen(false);
+    if (phase === "guided") {
+      setGuidedStart("suggest");
+      setGuidedKey((k) => k + 1);
+      setActiveStep("region");
+    } else {
+      setActiveStep("variables");
+    }
+  };
+
   const renderStep = (readOnly = false) => (
     <>
       {activeStep === "region" && (
         <RegionStep
           regionData={regionData}
-          onSelectPredefined={selectPredefined}
+          onSelectRegion={selectRegion}
           onSearchManual={searchRegion}
           onPreviewText={previewText}
           isSearching={isSearching}
@@ -300,14 +305,18 @@ export default function HomePage() {
           regionData={regionData}
           range={dateRange}
           selectedVariables={selectedVariables}
-          userLocation={userLocation}
+          analysis={analysis}
+          onOpen3d={() => setAnalysisOpen(true)}
           readOnly={readOnly}
-          onEditCriteria={() => (phase === "guided" ? (setGuidedStart("suggest"), setGuidedKey((k) => k + 1), setActiveStep("region")) : setActiveStep("variables"))}
+          onEditCriteria={editCriteria}
           onRestart={resetAll}
         />
       )}
     </>
   );
+
+  // The 3D analysis opens only on request; the results always live in the side panel first.
+  const drawerOpen = analysisOpen && activeStep === "results" && demo === null && regionData !== null && phase !== "onboarding";
 
   const centerLat = points.length ? points.reduce((s, p) => s + p.lat, 0) / points.length : null;
   const centerLng = points.length ? points.reduce((s, p) => s + p.lng, 0) / points.length : null;
@@ -334,7 +343,7 @@ export default function HomePage() {
 
         {showNav && (
           <div className="pointer-events-auto absolute left-1/2 hidden -translate-x-1/2 lg:block">
-            <StepNavigation activeStep={activeStep} onSelectStep={setActiveStep} hasRegion={points.length === 3} hasVariables={selectedVariables.length > 0} readOnly={demo !== null} />
+            <StepNavigation activeStep={activeStep} onSelectStep={goStep} hasRegion={points.length >= 3} hasVariables={selectedVariables.length > 0} readOnly={demo !== null} />
           </div>
         )}
 
@@ -463,7 +472,7 @@ export default function HomePage() {
                   initialStage={guidedStart}
                   regionData={regionData}
                   isSearching={isSearching}
-                  onSelectPredefined={selectPredefined}
+                  onSelectRegion={selectRegion}
                   onSearchRegion={searchRegion}
                   onPreviewText={previewText}
                   onSetRange={setDateRange}
@@ -492,6 +501,16 @@ export default function HomePage() {
 
       {phase === "onboarding" && <ExperienceModal onChoose={chooseExperience} registerVoice={registerVoice} speak={speech.speak} />}
 
+      <AnalysisDrawer
+        open={drawerOpen}
+        regionData={regionData}
+        range={dateRange}
+        selectedVariables={selectedVariables}
+        analysis={analysis}
+        onClose={() => setAnalysisOpen(false)}
+        onRestart={resetAll}
+      />
+
       <MoodyChat
         context={{
           phase,
@@ -500,14 +519,17 @@ export default function HomePage() {
           period: `${dateRange.start.slice(0, 4)}-${dateRange.end.slice(0, 4)}`,
           variables: selectedVariables,
           demo: demo ? demo.def.title.en : null,
+          results: digest,
+          catalog: backend.analyzable.map((v) => `- ${v.id} (${v.nombre_simple}; ${v.dataset}; ${v.unidad_final}; ${v.frecuencia}): ${v.definicion_simple}`).join("\n"),
+          regions: backend.regions.map((r) => `- ${r.id}: ${r.nombre} (${r.zona})`).join("\n"),
         }}
       />
 
-      <VoiceController
+      {!drawerOpen && <VoiceController
         onTranscript={handleTranscript}
         onBeforeListen={speech.cancel}
         hint={flash ?? voiceHint}
-      />
+      /> }
     </main>
   );
 }

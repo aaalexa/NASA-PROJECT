@@ -2,7 +2,8 @@
 
 import { VariableId } from "@/types/geo";
 import { useTranslation } from "@/context/LanguageContext";
-import { ALL_VARIABLES, VARIABLES } from "@/lib/catalog";
+import { useBackend } from "@/context/BackendContext";
+import { GROUP_LABELS } from "@/lib/catalog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -18,6 +19,13 @@ interface VariablesStepProps {
 
 export function VariablesStep({ selected, onToggleVariable, onBack, onContinue }: VariablesStepProps) {
   const { language, t } = useTranslation();
+  const backend = useBackend();
+
+  // Backend variables grouped by `grupo`, in the backend's own order.
+  const groups = backend.analyzable.reduce<Record<string, typeof backend.analyzable>>((acc, v) => {
+    (acc[v.grupo] ??= []).push(v);
+    return acc;
+  }, {});
 
   return (
     <div className="space-y-5 animate-in fade-in duration-300">
@@ -31,23 +39,27 @@ export function VariablesStep({ selected, onToggleVariable, onBack, onContinue }
         </Badge>
       </div>
 
-      <div className="space-y-2">
-        {ALL_VARIABLES.map((id) => {
-          const info = VARIABLES[id];
-          const on = selected.includes(id);
-          return (
-            <ChoiceButton key={id} selected={on} aria-pressed={on} onClick={() => onToggleVariable(id)}>
-              <Checkbox checked={on} tabIndex={-1} className="pointer-events-none mt-0.5" aria-hidden />
-              <span>
-                <span className="block text-sm font-bold">
-                  {info.name[language]} <span className="font-normal text-muted-foreground">· {info.product}</span>
+      {backend.analyzable.length === 0 && <p className="text-sm text-brand-red">{t("backend.offlineShort")}</p>}
+
+      {Object.entries(groups).map(([grupo, vars]) => (
+        <div key={grupo} className="space-y-2">
+          <p className="eyebrow">{GROUP_LABELS[grupo]?.[language] ?? grupo}</p>
+          {vars.map((v) => {
+            const on = selected.includes(v.id);
+            return (
+              <ChoiceButton key={v.id} selected={on} aria-pressed={on} onClick={() => onToggleVariable(v.id)}>
+                <Checkbox checked={on} tabIndex={-1} className="pointer-events-none mt-0.5" aria-hidden />
+                <span>
+                  <span className="block text-sm font-bold">
+                    {v.nombre_simple} <span className="font-normal text-muted-foreground">· {v.short_name ?? v.fuente}</span>
+                  </span>
+                  <span className="mt-0.5 block text-xs leading-snug text-muted-foreground">{v.definicion_simple}</span>
                 </span>
-                <span className="mt-0.5 block text-xs leading-snug text-muted-foreground">{info.desc[language]}</span>
-              </span>
-            </ChoiceButton>
-          );
-        })}
-      </div>
+              </ChoiceButton>
+            );
+          })}
+        </div>
+      ))}
 
       <div className="flex gap-2 pt-1">
         <Button variant="outline" onClick={onBack}>

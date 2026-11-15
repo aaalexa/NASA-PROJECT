@@ -25,6 +25,10 @@ export interface MoodyContext {
   period: string | null;
   variables: string[];
   demo: string | null;
+  /** Digest of the real analysis results on screen, if any. */
+  results?: string | null;
+  catalog?: string | null;
+  regions?: string | null;
 }
 
 const DEFAULT_QUESTIONS: Record<"es" | "en", string[]> = {

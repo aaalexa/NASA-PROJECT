@@ -1,25 +1,30 @@
 "use client";
 
 import { useState } from "react";
-import { PredefinedRegion, RegionAnalysisPayload } from "@/types/geo";
+import { RegionAnalysisPayload } from "@/types/geo";
 import { useTranslation } from "@/context/LanguageContext";
-import { PREDEFINED_REGIONS } from "./PredefinedRegions";
+import { useBackend } from "@/context/BackendContext";
+import { ZONE_LABELS } from "@/lib/catalog";
+import type { BackendRegion } from "@/lib/api";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ChoiceButton } from "@/components/ui/choice-button";
 import { Input } from "@/components/ui/input";
-import { ArrowRightIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ArrowRightIcon, ChevronDownIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
 interface RegionStepProps {
   regionData: RegionAnalysisPayload | null;
-  onSelectPredefined: (region: PredefinedRegion) => void;
+  onSelectRegion: (region: BackendRegion) => void;
   onSearchManual: (query: string) => Promise<boolean>;
   onPreviewText?: (text: string) => void;
   isSearching: boolean;
   onContinue: () => void;
 }
 
-export function RegionStep({ regionData, onSelectPredefined, onSearchManual, onPreviewText, isSearching, onContinue }: RegionStepProps) {
+export function RegionStep({ regionData, onSelectRegion, onSearchManual, onPreviewText, isSearching, onContinue }: RegionStepProps) {
   const { language, t } = useTranslation();
+  const backend = useBackend();
   const [query, setQuery] = useState("");
   const [notFound, setNotFound] = useState(false);
 
@@ -28,6 +33,13 @@ export function RegionStep({ regionData, onSelectPredefined, onSearchManual, onP
     if (!query.trim()) return;
     setNotFound(!(await onSearchManual(query.trim())));
   };
+
+  // Regions grouped by zone, in the backend's order.
+  const zones = backend.regions.reduce<Record<string, BackendRegion[]>>((acc, r) => {
+    (acc[r.zona] ??= []).push(r);
+    return acc;
+  }, {});
+  const activeZone = regionData?.backendId ? backend.regions.find((r) => r.id === regionData.backendId)?.zona : undefined;
 
   return (
     <div className="space-y-5 animate-in fade-in duration-300">
@@ -66,22 +78,49 @@ export function RegionStep({ regionData, onSelectPredefined, onSearchManual, onP
         </p>
       )}
 
-      <div className="space-y-2">
+      <div className="space-y-3">
         <p className="eyebrow">{t("regionStep.suggestedTitle")}</p>
-        <div className="grid grid-cols-2 gap-2">
-          {PREDEFINED_REGIONS.map((reg) => (
-            <ChoiceButton
-              key={reg.id}
-              selected={regionData?.regionName === reg.name[language]}
-              className="flex-col gap-0.5 !px-3 !py-2"
-              onClick={() => {
-                setNotFound(false);
-                onSelectPredefined(reg);
-              }}
-            >
-              <span className="line-clamp-2 text-xs font-medium leading-snug">{reg.name[language]}</span>
-              <span className="text-[11px] text-muted-foreground">{reg.area[language]}</span>
-            </ChoiceButton>
+        {backend.state === "offline" && (
+          <div className="space-y-2 rounded-2xl bg-muted p-4">
+            <p className="text-sm text-brand-red">{t("backend.offlineShort")}</p>
+            <Button size="sm" variant="outline" onClick={backend.recheck}>
+              {t("resultsStep.retry")}
+            </Button>
+          </div>
+        )}
+        <div className="space-y-2">
+          {Object.entries(zones).map(([zona, regs], i) => (
+            <Collapsible key={zona} defaultOpen={activeZone ? activeZone === zona : i === 0} className="group/zone rounded-3xl border border-border bg-card/60 p-1.5">
+              <CollapsibleTrigger
+                render={<Button variant="ghost" className="h-10 w-full justify-between rounded-full px-4 text-sm font-medium hover:bg-muted" />}
+              >
+                <span className="flex items-center gap-2">
+                  {ZONE_LABELS[zona]?.[language] ?? zona}
+                  <Badge variant="secondary" className="tabular-nums">
+                    {regs.length}
+                  </Badge>
+                </span>
+                <ChevronDownIcon className="size-4 text-muted-foreground transition-transform group-data-[open]/zone:rotate-180" />
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <div className="grid grid-cols-2 gap-2 px-1.5 pb-2 pt-2">
+                  {regs.map((r) => (
+                    <ChoiceButton
+                      key={r.id}
+                      selected={regionData?.backendId === r.id}
+                      className="min-h-16 flex-col justify-center gap-0.5 !px-3 !py-2.5"
+                      onClick={() => {
+                        setNotFound(false);
+                        onSelectRegion(r);
+                      }}
+                    >
+                      <span className="line-clamp-2 text-xs font-medium leading-snug">{r.nombre}</span>
+                      <span className="line-clamp-1 text-[11px] text-muted-foreground">{r.pais ?? r.zona}</span>
+                    </ChoiceButton>
+                  ))}
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
           ))}
         </div>
       </div>

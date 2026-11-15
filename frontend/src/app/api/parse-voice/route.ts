@@ -1,20 +1,10 @@
 import { NextResponse } from "next/server";
 import { Type } from "@google/genai";
 import { ai, generate } from "@/lib/gemini";
-import { findMatchingPredefinedRegion } from "@/components/nasa/PredefinedRegions";
+import { backendRegions } from "@/lib/serverRegions";
+import { matchRegion, payloadFromBackendRegion } from "@/lib/regionMatch";
+import { bboxFromPoints, outlineFromBBox } from "@/lib/api";
 import type { GeoPoint } from "@/types/geo";
-
-function toPolygon(v: GeoPoint[]) {
-  return {
-    type: "Polygon" as const,
-    coordinates: [[
-      [v[0].lng, v[0].lat],
-      [v[1].lng, v[1].lat],
-      [v[2].lng, v[2].lat],
-      [v[0].lng, v[0].lat],
-    ]],
-  };
-}
 
 const sideDeg = (p: GeoPoint, q: GeoPoint) =>
   Math.hypot(p.lat - q.lat, (p.lng - q.lng) * Math.cos(((p.lat + q.lat) / 2) * (Math.PI / 180)));
@@ -79,17 +69,11 @@ export async function POST(req: Request) {
     }
     const lang = locale === "en" ? "en" : "es";
 
-    // Curated regions answer instantly and exactly.
-    const preset = findMatchingPredefinedRegion(prompt);
-    if (preset) {
-      return NextResponse.json({
-        regionName: preset.name[lang],
-        description: preset.area[lang],
-        triangleVertices: preset.triangle,
-        geoJsonPolygon: toPolygon(preset.triangle),
-        suggestedVariables: [],
-        source: "curated",
-      });
+    // Official backend regions answer instantly and exactly (and reuse the backend's warm cache).
+    const official = matchRegion(prompt, await backendRegions());
+    if (official) {
+      const payload = payloadFromBackendRegion(official);
+      return NextResponse.json({ ...payload, suggestedVariables: [], source: "backend" });
     }
 
     if (ai) {
@@ -107,12 +91,15 @@ export async function POST(req: Request) {
         }
         if (validTriangle(parsed.triangleVertices)) {
           const v = parsed.triangleVertices.slice(0, 3);
+          // The backend analyses a bounding box, so that box (not the triangle) is what we show.
+          const box = bboxFromPoints(v);
+          const outline = outlineFromBBox([box.oeste, box.sur, box.este, box.norte]);
           return NextResponse.json({
             regionName: parsed.regionName,
             description: parsed.description,
             triangleVertices: v,
-            geoJsonPolygon: toPolygon(v),
-            suggestedVariables: [],
+            outline,
+            geoJsonPolygon: { type: "Polygon", coordinates: [[...outline.map((p) => [p.lng, p.lat]), [outline[0].lng, outline[0].lat]]] },
             source: "gemini",
           });
         }

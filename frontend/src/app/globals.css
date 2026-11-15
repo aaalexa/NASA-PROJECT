@@ -70,28 +70,28 @@
 }
 
 .dark {
-  --background: color-mix(in srgb, var(--deep-space-blue) 50%, #000);
+  --background: var(--deep-space-blue);
   --foreground: #ffffff;
-  --card: color-mix(in srgb, var(--deep-space-blue) 78%, #000);
+  --card: color-mix(in srgb, var(--deep-space-blue) 90%, var(--steel-blue));
   --card-foreground: #ffffff;
-  --popover: color-mix(in srgb, var(--deep-space-blue) 85%, #000);
+  --popover: color-mix(in srgb, var(--deep-space-blue) 86%, var(--steel-blue));
   --popover-foreground: #ffffff;
   --primary: var(--brick-red);
   --primary-foreground: #ffffff;
   --secondary: var(--palm-leaf);
   --secondary-foreground: #ffffff;
   --muted: color-mix(in srgb, var(--steel-blue) 14%, var(--deep-space-blue));
-  --muted-foreground: color-mix(in srgb, var(--steel-blue) 82%, #fff);
+  --muted-foreground: var(--steel-blue);
   --accent: color-mix(in srgb, var(--steel-blue) 24%, var(--deep-space-blue));
   --accent-foreground: #ffffff;
-  --destructive: color-mix(in srgb, var(--molten-lava) 50%, #fff);
+  --destructive: var(--brick-red);
   --destructive-foreground: #ffffff;
   --border: color-mix(in srgb, var(--steel-blue) 28%, var(--deep-space-blue));
   --input: color-mix(in srgb, var(--steel-blue) 34%, var(--deep-space-blue));
   --ring: var(--steel-blue);
-  --red: color-mix(in srgb, var(--brick-red) 72%, #fff);
+  --red: var(--brick-red);
   --blue: var(--steel-blue);
-  --olive: color-mix(in srgb, var(--palm-leaf) 88%, #fff);
+  --olive: var(--palm-leaf);
   --lava: color-mix(in srgb, var(--molten-lava) 70%, var(--brick-red));
 }
 
