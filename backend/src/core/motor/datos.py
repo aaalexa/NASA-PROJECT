@@ -163,7 +163,23 @@ def _fin_de_mes(mes: str) -> str:
 # ----------------------------------------------------------------------------------------------- Credenciales
 def iniciar_sesion():
     """Inicia sesión en Earthdata con variables de entorno o .netrc. Nunca pide la contraseña ni la muestra."""
+    import os
+    from pathlib import Path
     import earthaccess
+
+    usuario = os.environ.get("EARTHDATA_USERNAME", "").strip()
+    clave = os.environ.get("EARTHDATA_PASSWORD", "").strip()
+    if usuario and clave:
+        try:
+            ruta_netrc = Path.home() / ".netrc"
+            if not ruta_netrc.exists() or "urs.earthdata.nasa.gov" not in ruta_netrc.read_text(encoding="utf-8"):
+                ruta_netrc.write_text(
+                    f"machine urs.earthdata.nasa.gov\n    login {usuario}\n    password {clave}\n",
+                    encoding="utf-8",
+                )
+                ruta_netrc.chmod(0o600)
+        except Exception:  # noqa: BLE001
+            pass
 
     for estrategia in ("environment", "netrc"):
         try:
