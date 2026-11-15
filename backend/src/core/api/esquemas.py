@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class RegionDTO(BaseModel):
@@ -27,6 +27,9 @@ class CalidadDTO(BaseModel):
     fraccion_faltante: float
     motivo: str | None = None
     meses_poca_cobertura: list[int] | None = None
+    anual: dict[str, Any] | None = Field(
+        None, description="Control de calidad de la serie anual agregada (solo cuando se pide 'anual')."
+    )
 
 
 class PuntoSerieDTO(BaseModel):
@@ -141,3 +144,172 @@ class PeticionDescargaDTO(BaseModel):
     forzar: bool = Field(default=False, description="Si True, vuelve a descargar aunque exista en caché.")
     sincrono: bool = Field(default=False, description="Si True, espera a que termine la descarga antes de responder.")
 
+
+
+# ================================================================================================ Down to Earth (cálculo)
+class FilaMensualDTE(BaseModel):
+    """Una fila mensual regional. Valores en unidades finales (mm/mes, °C, m³/m³, mm/mes) u originales NASA."""
+
+    fecha: str = Field(..., description="Mes en formato AAAA-MM (también acepta AAAA-MM-DD).", examples=["2001-01"])
+    P: float | None = Field(None, description="Precipitación (mm/mes; o mm/día si unidades='originales').")
+    T: float | None = Field(None, description="Temperatura del aire a 2 m (°C; o K si unidades='originales').")
+    SM: float | None = Field(None, description="Humedad del suelo 0–10 cm (m³/m³; o kg/m² si unidades='originales').")
+    ET: float | None = Field(None, description="Evapotranspiración real (mm/mes; o kg/m²/s si unidades='originales').")
+
+
+class PeticionCalculoDTE(BaseModel):
+    """Serie mensual regional para calcular el análisis Down to Earth con el método fijo."""
+
+    serie: list[FilaMensualDTE] = Field(..., min_length=1, max_length=5000)
+    unidades: Literal["finales", "originales"] = Field(
+        "finales", description="'finales' (mm/mes, °C, m³/m³, mm/mes) u 'originales' NASA (mm/día, K, kg/m², kg/m²/s)."
+    )
+    inicio: str = Field("2001-01", description="Inicio del período de análisis (AAAA-MM).")
+    fin: str = Field("2024-12", description="Fin del período de análisis (AAAA-MM).")
+    alfa: float = Field(0.05, gt=0.0, lt=0.5, description="α fijado de antemano para la familia de Holm.")
+    region: str | None = Field(None, description="Id de región (solo metadatos; la serie ya es un promedio regional).")
+    simulado: bool = Field(False, description="Marca los resultados como datos simulados.")
+    incluir_tablas: bool = Field(False, description="Añade 'tablas' (mensual, anual, diccionario) con formato.")
+
+
+class PeticionTrabajoDTE(BaseModel):
+    """Análisis Down to Earth de una región con datos reales de NASA (descarga OPeNDAP en segundo plano)."""
+
+    region: str | None = Field("corredor_seco_centroamericano", description="Id de región predefinida.")
+    bbox: list[float] | None = Field(None, min_length=4, max_length=4, description="[oeste, sur, este, norte].")
+    inicio: str = Field("2001-01", description="Inicio (AAAA-MM).")
+    fin: str = Field("2024-12", description="Fin (AAAA-MM).")
+    alfa: float = Field(0.05, gt=0.0, lt=0.5)
+    forzar: bool = Field(False, description="Crea un trabajo nuevo aunque exista uno igual (por defecto se reutiliza).")
+    sincrono: bool = Field(False, description="Solo pruebas: espera a que termine antes de responder.")
+
+
+class _Abierto(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
+
+class TramoDTE(_Abierto):
+    start: int
+    end: int
+    n_years: int
+    criterion: str
+
+
+class MetadataDTE(_Abierto):
+    project: str
+    region: dict[str, Any] | None = None
+    period: list[str]
+    months_total: int
+    years_expected: int
+    years_complete_count: int
+    trend_span: TramoDTE | None = Field(None, description="Tramo común de años completos usado en las 4 tendencias.")
+    simulated: bool = Field(..., description="True si algún dato es sintético o simulado: rotular la vista.")
+    warnings: list[str] = Field(default_factory=list)
+    spatial_weighting: str
+    alpha: float
+    method: dict[str, Any]
+    source: str
+
+
+class UnidadesDTE(_Abierto):
+    monthly: str
+    annual: str
+    slope_decade: str
+
+
+class PuntoMensualDTE(_Abierto):
+    date: str
+    value: float | None = None
+    z: float | None = None
+
+
+class PuntoAnualDTE(_Abierto):
+    year: int
+    value: float | None = None
+    fitted: float | None = None
+
+
+class VariableDTE(_Abierto):
+    id: str
+    code: Literal["P", "T", "SM", "ET"]
+    name: str
+    units: UnidadesDTE
+    monthly: list[PuntoMensualDTE]
+    annual: list[PuntoAnualDTE]
+    slope_decade: float | None = Field(None, description="Pendiente × 10 (por década).")
+    ci95: list[float | None] | None = Field(None, description="IC95 % individual por década (b ± 1.96·SE) × 10.")
+    p_raw: float | None = Field(None, description="p de Wald bilateral (HAC, rezago 1), sin ajustar.")
+    p_holm: float | None = Field(None, description="p ajustado por Holm sobre [P, T, SM, ET]: decide la etiqueta.")
+    significant: bool | None = None
+    direction: Literal["aumento", "disminucion"] | None = Field(None, description="Solo con evidencia; si no, null.")
+    estimate_sign: Literal["positiva", "negativa", "nula"] | None = None
+    label: str = Field(..., description="Etiqueta oficial (nunca 'sin cambio').")
+    summary_text: str
+    sensible_al_rezago: bool | None = None
+    sensitivity: dict[str, dict[str, Any]] | None = None
+    quality: dict[str, Any]
+
+
+class ParDTE(_Abierto):
+    pair: str
+    var_x: str
+    var_y: str
+    r: float | None = Field(None, description="Pearson entre residuos z sin estación ni tendencia (exploratorio).")
+    n: int
+    common_period: list[str] | None = None
+    summary_text: str
+
+
+class ConjuntoDTE(_Abierto):
+    preprocessing: dict[str, str]
+    standardized_anomalies: list[dict[str, Any]]
+    pairs: dict[str, ParDTE]
+    pairs_list: list[ParDTE]
+
+
+class EntradaLimpiezaDTE(BaseModel):
+    fecha: str | None
+    variable: str | None
+    valor_original: float | None
+    accion: str
+    motivo: str
+
+
+class LimpiezaDTE(_Abierto):
+    steps: list[str]
+    summary: dict[str, dict[str, Any]]
+    log: list[EntradaLimpiezaDTE]
+
+
+class ResultadoDTE(_Abierto):
+    """Resultado completo Down to Earth: metadatos, 4 variables, limpieza, análisis conjunto y conclusión."""
+
+    metadata: MetadataDTE
+    variables: dict[str, VariableDTE]
+    data_cleaning: LimpiezaDTE
+    joint: ConjuntoDTE
+    conclusion: dict[str, Any]
+    tablas: dict[str, list[dict[str, Any]]] | None = Field(
+        None, description="Solo si se pide: tablas mensual, anual y diccionario con formato de presentación."
+    )
+
+
+class TrabajoDTEDTO(_Abierto):
+    id: str
+    region: str
+    bbox: list[float]
+    inicio: str
+    fin: str
+    alfa: float
+    estado: Literal["pendiente", "ejecutando", "completado", "error"]
+    etapa: str
+    paso_actual: int
+    total_pasos: int
+    porcentaje: float
+    mensaje: str
+    etapas: list[str]
+    etapas_completadas: list[str]
+    creado_en: str
+    actualizado_en: str
+    error: str | None = None
+    enlaces: dict[str, Any]

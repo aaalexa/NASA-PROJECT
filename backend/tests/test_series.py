@@ -181,3 +181,39 @@ def test_serie_region_y_preparar_para_motor(serie_ar1):
     assert res["veredicto"] == "significativo"
     assert res["cambio_pct_decada"] is not None
 
+
+
+def test_serie_region_anual_rechaza_si_faltan_anios():
+    """10 % de meses faltantes (aceptado en mensual) repartidos uno por año anulan todos los años.
+
+    La serie anual tiene 10/10 años NaN: debe rechazarse aunque el control mensual la acepte.
+    """
+    tiempo = pd.date_range("2001-01-01", "2010-12-01", freq="MS")
+    valores = np.full(tiempo.size, 50.0)
+    valores[[a * 12 + 5 for a in range(10)] + [3, 15]] = np.nan  # 12/120 = 10 % exacto
+    cubo = xr.DataArray(
+        valores[:, None, None] * np.ones((1, 2, 2)),
+        dims=("time", "lat", "lon"),
+        coords={"time": tiempo, "lat": [10.0, 10.5], "lon": [0.0, 0.5]},
+        attrs={"units": "mm/mes"},
+    )
+    _, reporte_mensual = serie_region(cubo, None, "2001-01", "2010-12")
+    assert reporte_mensual["aceptada"]
+
+    with pytest.raises(SerieRechazada) as exc:
+        serie_region(cubo, None, "2001-01", "2010-12", anual="suma")
+    assert exc.value.reporte["n_faltantes"] == 10
+
+
+def test_serie_region_anual_aceptada_incluye_reporte_anual():
+    tiempo = pd.date_range("2001-01-01", "2010-12-01", freq="MS")
+    cubo = xr.DataArray(
+        np.full((tiempo.size, 1, 1), 2.0),
+        dims=("time", "lat", "lon"),
+        coords={"time": tiempo, "lat": [10.0], "lon": [0.0]},
+        attrs={"units": "mm/dia"},
+    )
+    serie, reporte = serie_region(cubo, None, "2001-01", "2010-12", anual="suma")
+    assert reporte["anual"]["aceptada"] and reporte["anual"]["n_faltantes"] == 0
+    assert serie.attrs["units"] == "mm/anio"
+    assert float(serie.sel(anio=2004)) == pytest.approx(2.0 * 366)

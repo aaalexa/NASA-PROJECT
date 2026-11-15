@@ -1,7 +1,9 @@
 """Aplicación FastAPI principal para "Las dos caras de la lluvia" (GPCP, MERRA-2 y GPM IMERG vía OPeNDAP)."""
 from __future__ import annotations
 
+import logging
 import os
+from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any
 
@@ -9,11 +11,15 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from core.api.rutas import analisis, catalogo, datos
+from core.api.rutas import analisis, catalogo, datos, down_to_earth
 from core.config import obtener_ajustes
 from core.motor.datos import DatosNoDisponibles, inventario_cache
+from core.motor.down_to_earth import PERIODO_DTE_DEFECTO
 from core.motor.series import SerieRechazada
 from core.servicios.consultas import obtener_catalogo, obtener_datasets
+from core.servicios.trabajos_dte import obtener_gestor_trabajos_dte
+
+logger = logging.getLogger(__name__)
 
 
 def _credenciales_configuradas() -> dict[str, bool]:
@@ -23,15 +29,33 @@ def _credenciales_configuradas() -> dict[str, bool]:
     return {"variables_entorno": env_ok, "netrc": netrc_ok, "listo": env_ok or netrc_ok}
 
 
+@asynccontextmanager
+async def _ciclo_de_vida(_app: FastAPI):
+    """Al arrancar: precarga en segundo plano los análisis Down to Earth de NASA_DTE_PRECARGA (si hay credenciales)."""
+    regiones = obtener_ajustes().dte_precarga
+    if regiones:
+        if _credenciales_configuradas()["listo"]:
+            lanzados = obtener_gestor_trabajos_dte().precargar(regiones, *PERIODO_DTE_DEFECTO)
+            logger.info("NASA_DTE_PRECARGA: %d trabajos lanzados (%s)", len(lanzados), ", ".join(regiones))
+        else:
+            logger.warning("NASA_DTE_PRECARGA definido pero sin credenciales de Earthdata: no se precarga nada.")
+    yield
+
+
 def crear_app() -> FastAPI:
     ajustes = obtener_ajustes()
     app = FastAPI(
+        lifespan=_ciclo_de_vida,
         title="NASA Space Apps — Las Dos Caras de la Lluvia API (OPeNDAP en Memoria)",
         description=(
             "API REST con **OPeNDAP en memoria RAM (0 archivos NetCDF/HDF en disco)** para consultar los datasets "
             "de NASA **GPCP mensual (v3.3)**, **MERRA-2 (v5.12.4)** y **GPM IMERG Final (v07)**, calcular anomalías, "
             "extremos de lluvia (CDD, R20mm, W, PRCPTOT, SDII), tendencias estadísticas con corrección por "
-            "autocorrelación (OLS + n efectivo y Mann-Kendall Hamed-Rao) y mapas por píxel para consumo del frontend."
+            "autocorrelación (OLS + n efectivo y Mann-Kendall Hamed-Rao) y mapas por píxel para consumo del frontend.\n\n"
+            "**Down to Earth (P, T, SM, ET)**: limpieza estructural + OLS anual + HAC/Newey–West (rezago 1) + Holm "
+            "sobre la familia fija [P, T, SM, ET] + sensibilidad con rezagos 2 y 3, y análisis conjunto exploratorio. "
+            "Cálculo exacto desde datos del cliente (`POST /api/v1/down-to-earth/calcular`, `/calcular/csv`) y "
+            "trabajos con datos reales de NASA (`POST /api/v1/down-to-earth/trabajos`)."
         ),
         version="0.2.0",
         docs_url="/docs",
@@ -117,11 +141,13 @@ def crear_app() -> FastAPI:
             "kb_en_memoria_ram": round(sum(float(i.get("kb_ram", 0.0)) for i in entradas_ram), 2),
             "max_cubos_ram": obtener_ajustes().cache_memoria_max,
             "credenciales_earthdata": _credenciales_configuradas(),
+            "dte_precarga": obtener_gestor_trabajos_dte().estado_precarga(),
         }
 
     app.include_router(catalogo.router, prefix="/api/v1")
     app.include_router(analisis.router, prefix="/api/v1")
     app.include_router(datos.router, prefix="/api/v1")
+    app.include_router(down_to_earth.router, prefix="/api/v1")
 
     # Endpoints raíz directos especificados en la guía "Down to Earth" (§05)
     app.add_api_route(

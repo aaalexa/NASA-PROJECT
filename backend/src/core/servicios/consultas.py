@@ -434,6 +434,8 @@ def _construir_serie_y_motor(
         )
         serie_anual = agregar_anual(fuente_anual, metodo_agg)
         serie_anual = reindexar_calendario(serie_anual, inicio[:4], fin[:4])
+        # Un mes faltante anula su año: la serie anual necesita su propio control de calidad.
+        calidad = {**calidad, "anual": control_calidad(serie_anual, inicio[:4], fin[:4], lanzar=True)}
         vals = serie_anual.values.astype(float)
         media_clim = float(np.nanmean(vals)) if np.isfinite(vals).any() else None
         serie_anual.attrs["media_climatologia"] = media_clim
@@ -653,6 +655,9 @@ def consultar_indicadores(
     for ind_key, vid in mapa_ids.items():
         da_ind = promedio_area(ds_pixel[ind_key]) if ("lat" in ds_pixel.dims and "lon" in ds_pixel.dims) else ds_pixel[ind_key]
         da_ind = reindexar_calendario(da_ind, inicio[:4], fin[:4])
+        da_ind.name = vid
+        # Misma regla que /tendencias/{indicador}: más de 10 % de años faltantes → SerieRechazada (HTTP 422).
+        calidad = control_calidad(da_ind, inicio[:4], fin[:4], lanzar=True)
         vals = da_ind.values.astype(float)
         media_clim = float(np.nanmean(vals)) if np.isfinite(vals).any() else None
         em = preparar_para_motor(da_ind, media_climatologia=media_clim)
@@ -679,6 +684,7 @@ def consultar_indicadores(
                 for a, v in zip(da_ind["anio"].values, vals)
             ],
             "tendencia": tend,
+            "calidad": calidad,
         }
 
     # ¿Se alargan las rachas secas a la vez que cambian los días de tormenta?
@@ -848,12 +854,14 @@ def consultar_mapa_tendencias(
         if mascara == "tierra":
             cubo_d = aplicar_mascara(cubo_d, "tierra")
         ds_ind = indicadores_anuales(cubo_d)
-        cubo_motor = ds_ind[entrada["indicador"]].sel(anio=slice(int(inicio[:4]), int(fin[:4])))
+        cubo_motor = reindexar_calendario(ds_ind[entrada["indicador"]], inicio[:4], fin[:4])
         unidad_tiempo: Literal["mes", "anio"] = "anio"
     else:
         cubo_m, fuente = _obtener_cubo(variable, reg, inicio, fin, descargar=descargar, sintetico=sintetico)
         if mascara == "tierra":
             cubo_m = aplicar_mascara(cubo_m, "tierra")
+        # Meses ausentes como NaN para que el límite de 10 % faltante por píxel los cuente.
+        cubo_m = reindexar_calendario(cubo_m, inicio, fin)
         cubo_motor = anomalias(cubo_m, base=(inicio, fin))
         unidad_tiempo = "mes"
 
@@ -948,7 +956,20 @@ def consultar_catalogo_dte() -> dict[str, Any]:
         "collections": colecciones_dte,
         "variables": variables_dte,
         "method": {
-            "trend": "OLS lineal con constante sobre años completos (t = anio - anio_inicial)",
+            "trend": (
+                "OLS lineal con constante sobre el tramo común más largo de años completos y consecutivos "
+                "de las cuatro variables (t = anio - anio_inicial)"
+            ),
+            "spatial_average": (
+                "X = Σ(Aᵢ·Xᵢ)/Σ(Aᵢ), Aᵢ = área esférica de la celda dentro de la región × fracción de tierra "
+                "según la huella de GLDAS (mismo territorio terrestre para GPCP, MERRA-2 y GLDAS)"
+            ),
+            "labels": [
+                "aumento con evidencia estadística según este método",
+                "disminución con evidencia estadística según este método",
+                "evidencia insuficiente",
+                "evidencia insuficiente tras el ajuste",
+            ],
             "uncertainty": "HAC / Newey-West (maxlags=1, kernel='bartlett', use_correction=True)",
             "test": "Wald bilateral normal (use_t=False), H0: b = 0 vs H1: b != 0, alpha = 0.05",
             "multiple_testing": "Holm sobre la familia fija de 4 tendencias [P, T, SM, ET]",

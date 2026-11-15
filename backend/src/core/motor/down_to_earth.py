@@ -18,6 +18,7 @@ Implementa fielmente las secciones §01–§06 de la guía práctica Down to Ear
 """
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import Any
 
 import numpy as np
@@ -26,9 +27,19 @@ import statsmodels.api as sm
 from statsmodels.stats.multitest import multipletests
 import xarray as xr
 
-from core.motor.series import agregar_anual, anomalias_estandarizadas, promedio_area, reindexar_calendario
+from core.motor.limpieza_dte import limpiar_series_dte
+from core.motor.series import (
+    agregar_anual,
+    anomalias_estandarizadas,
+    fraccion_tierra_desde_malla,
+    pesos_area_region,
+    promedio_area,
+    reindexar_calendario,
+)
 
 PERIODO_DTE_DEFECTO: tuple[str, str] = ("2001-01", "2024-12")
+MIN_VALORES_CLIMATOLOGIA: int = 10  # valores mínimos por mes calendario para calcular μ_mes y s_mes (z)
+ANIOS_ADVERTENCIA_DTE: int = 10  # por debajo se advierte que la inferencia HAC es frágil
 ORDEN_FAMILIA_DTE: tuple[str, str, str, str] = ("P", "T", "SM", "ET")
 ORDEN_VARIABLES_DTE: tuple[str, str, str, str] = ORDEN_FAMILIA_DTE
 
@@ -41,21 +52,22 @@ MAPA_CODIGO_A_VARIABLE: dict[str, str] = {
 
 MAPA_VARIABLE_A_CODIGO: dict[str, str] = {v: k for k, v in MAPA_CODIGO_A_VARIABLE.items()}
 
-INFO_VARIABLES_DTE: dict[str, dict[str, str]] = {
+INFO_VARIABLES_DTE: dict[str, dict[str, Any]] = {
     "P": {
         "id": "lluvia_gpcp",
         "code": "P",
         "nombre": "Precipitación (P)",
         "pregunta": "¿Está llegando más o menos agua?",
         "por_que_elegirla": "Es el fenómeno principal del proyecto.",
-        "coleccion": "GPCP mensual v3.2 / v3.3",
+        "coleccion": "GPCP mensual v3.3 (la v3.2 termina en 2023-12; v3.3 conserva sat_gauge_precip)",
         "short_name": "GPCPMON",
         "campo": "sat_gauge_precip",
         "conversion_texto": "mm/día × días del mes → mm/mes",
         "agregacion_anual": "suma",
         "unidad_mensual": "mm/mes",
-        "unidad_anual": "mm",
-        "unidad_decada": "mm por década",
+        "unidad_anual": "mm/anio",
+        "unidad_decada": "mm por década (total anual)",
+        "decimales": 1,
     },
     "T": {
         "id": "temp_aire",
@@ -71,6 +83,7 @@ INFO_VARIABLES_DTE: dict[str, dict[str, str]] = {
         "unidad_mensual": "°C",
         "unidad_anual": "°C",
         "unidad_decada": "°C por década",
+        "decimales": 2,
     },
     "SM": {
         "id": "humedad_suelo",
@@ -86,6 +99,7 @@ INFO_VARIABLES_DTE: dict[str, dict[str, str]] = {
         "unidad_mensual": "m³/m³",
         "unidad_anual": "m³/m³",
         "unidad_decada": "m³/m³ por década",
+        "decimales": 4,
     },
     "ET": {
         "id": "evapotranspiracion",
@@ -99,8 +113,9 @@ INFO_VARIABLES_DTE: dict[str, dict[str, str]] = {
         "conversion_texto": "kg/m²/s × 86 400 × días del mes → mm/mes",
         "agregacion_anual": "suma",
         "unidad_mensual": "mm/mes",
-        "unidad_anual": "mm",
-        "unidad_decada": "mm por década",
+        "unidad_anual": "mm/anio",
+        "unidad_decada": "mm por década (total anual)",
+        "decimales": 1,
     },
 }
 
@@ -169,6 +184,57 @@ def tramo_anios_completos_consecutivos(anios: np.ndarray, valores: np.ndarray) -
             f"{int(mejor_a[0])}–{int(mejor_a[-1])} ({mejor_a.size} años)."
         )
     return mejor_a, mejor_v, advertencias
+
+
+def tramo_comun_anios_completos(
+    series_anuales: dict[str, tuple[np.ndarray, np.ndarray]],
+) -> tuple[int, int] | None:
+    """Tramo común más largo de años completos y consecutivos para las variables evaluables (§02).
+
+    Una variable es evaluable si tiene al menos un año completo; las que no tienen ninguno no recortan el tramo de
+    las demás (se publican como null). El tramo es el mismo para las cuatro variables, de modo que la familia de
+    Holm compara pendientes del mismo período. Los huecos no se comprimen. Empate → el tramo más reciente.
+    """
+    completos: list[set[int]] = []
+    todos: set[int] = set()
+    for cod in ORDEN_FAMILIA_DTE:
+        if cod not in series_anuales:
+            continue
+        anios, vals = series_anuales[cod]
+        anios_i = np.asarray(anios, dtype=int).ravel()
+        vals_f = np.asarray(vals, dtype=np.float64).ravel()
+        todos |= set(anios_i.tolist())
+        ok = set(anios_i[np.isfinite(vals_f)].tolist())
+        if ok:
+            completos.append(ok)
+    if not completos:
+        return None
+    comunes = set.intersection(*completos)
+    mejor: tuple[int, int] | None = None
+    ini: int | None = None
+    prev: int | None = None
+    for a in [*sorted(todos), None]:  # None = centinela que cierra el último bloque
+        if a is not None and a in comunes and prev is not None and a == prev + 1:
+            prev = a
+            continue
+        if ini is not None and prev is not None:
+            if mejor is None or (prev - ini) >= (mejor[1] - mejor[0]):  # >= → empate gana el más reciente
+                mejor = (ini, prev)
+        if a is not None and a in comunes:
+            ini = prev = a
+        else:
+            ini = prev = None
+    return mejor
+
+
+def _fmt_signo(x: float | None, dec: int) -> str:
+    return "null" if x is None or not np.isfinite(x) else f"{x:+.{dec}f}"
+
+
+def _fmt_p(p: float | None) -> str:
+    if p is None or not np.isfinite(p):
+        return "null"
+    return "< 0.001" if p < 0.001 else f"{p:.3f}"
 
 
 def ajustar_ols_hac_anual(
@@ -284,11 +350,20 @@ def _etiqueta_y_mensaje_dte(
     p_holm: float | None,
     sensible_al_rezago: bool,
     alfa: float = 0.05,
-) -> tuple[str, str | None, str]:
-    """Construye la etiqueta oficial y el texto de pantalla según la plantilla de §03.2."""
+) -> tuple[str, str | None, str | None, str]:
+    """Etiqueta, dirección, signo de la estimación y texto de pantalla según las reglas de comunicación (§03.2).
+
+    - La etiqueta la decide el p ajustado por Holm, no el IC individual ni el p sin ajustar.
+    - p_holm ≤ α → "aumento/disminución con evidencia estadística según este método".
+    - p_holm > α → "evidencia insuficiente" (no significa "no cambió"); "tras el ajuste" solo si p_raw ≤ α.
+    - Nunca se emite "sin cambio".
+    Devuelve (etiqueta, direction, estimate_sign, texto). `direction` solo es "aumento"/"disminucion" cuando hay
+    evidencia; si no, None. `estimate_sign` describe el signo de la pendiente estimada (positiva/negativa/nula).
+    """
     info = INFO_VARIABLES_DTE[codigo]
     nombre = info["nombre"]
     unidad_dec = info["unidad_decada"]
+    dec = int(info.get("decimales", 3))
     b_dec = ajuste.get("slope_decade")
     ci95 = ajuste.get("ci95")
     p_raw = ajuste.get("p_raw")
@@ -297,44 +372,37 @@ def _etiqueta_y_mensaje_dte(
     per_txt = f"{per[0]}–{per[1]}" if per else "sin período válido"
 
     if b_dec is None:
-        motivo = "; ".join(ajuste.get("advertencias") or ["Datos insuficientes para estimar tendencia."])
-        return "No evaluable", None, f"{nombre}: no se pudo evaluar ({motivo})."
+        motivo = "; ".join(ajuste.get("advertencias") or ["datos insuficientes para estimar tendencia"])
+        return f"no evaluable: {motivo}", None, None, f"{nombre}: no evaluable ({motivo})."
 
-    direccion = "aumento" if b_dec > 0 else ("disminucion" if b_dec < 0 else "estable")
+    signo = "positiva" if b_dec > 0 else ("negativa" if b_dec < 0 else "nula")
     if p_holm is None or p_raw is None or ci95 is None:
-        etiqueta = "Pendiente calculada sin inferencia automática (SE nulo o serie determinista)."
+        etiqueta = "sin inferencia: SE cero o no finito (serie sin variación residual)"
         texto = (
-            f"{nombre} cambió aproximadamente {b_dec:+.3g} {unidad_dec}; "
-            f"IC95 % [null, null]; p ajustado null; {etiqueta} "
+            f"{nombre} cambió aproximadamente {_fmt_signo(b_dec, dec)} {unidad_dec}; {etiqueta}. "
             f"Período {per_txt}, {n} años válidos."
         )
-        return etiqueta, direccion, texto
+        return etiqueta, None, signo, texto
 
+    direccion: str | None = None
     if p_holm <= alfa:
-        etiqueta = (
-            "Aumento con evidencia estadística."
-            if b_dec > 0
-            else ("Disminución con evidencia estadística." if b_dec < 0 else "Sin cambio con evidencia estadística.")
-        )
-    else:
-        sentido = "positiva" if b_dec > 0 else ("negativa" if b_dec < 0 else "nula")
-        if p_raw <= alfa:
-            etiqueta = f"Estimación {sentido}, pero evidencia insuficiente tras el ajuste."
+        if b_dec > 0:
+            etiqueta, direccion = "aumento con evidencia estadística según este método", "aumento"
         else:
-            etiqueta = f"Estimación {sentido}; evidencia insuficiente."
-
-    notas_extra: list[str] = []
+            etiqueta, direccion = "disminución con evidencia estadística según este método", "disminucion"
+    elif p_raw <= alfa:
+        etiqueta = "evidencia insuficiente tras el ajuste"
+    else:
+        etiqueta = "evidencia insuficiente"
     if sensible_al_rezago:
-        notas_extra.append("resultado sensible al rezago")
-    notas_extra.extend(ajuste.get("advertencias") or [])
-    sufijo = f" ({'; '.join(notas_extra)})" if notas_extra else ""
+        etiqueta += "; resultado sensible al rezago"
 
     texto = (
-        f"{nombre} cambió aproximadamente {b_dec:+.3g} {unidad_dec}; "
-        f"IC95 % [{ci95[0]:+.3g}, {ci95[1]:+.3g}]; p ajustado {p_holm:.3f}; {etiqueta} "
-        f"Período {per_txt}, {n} años válidos.{sufijo}"
+        f"{nombre} cambió aproximadamente {_fmt_signo(b_dec, dec)} {unidad_dec}; "
+        f"IC95 % [{_fmt_signo(ci95[0], dec)}, {_fmt_signo(ci95[1], dec)}]; p ajustado {_fmt_p(p_holm)}; {etiqueta}. "
+        f"Período {per_txt}, {n} años válidos."
     )
-    return etiqueta, direccion, texto
+    return etiqueta, direccion, signo, texto
 
 
 def evaluar_cuatro_tendencias_holm(
@@ -346,7 +414,20 @@ def evaluar_cuatro_tendencias_holm(
 
     Si una variable no puede evaluarse, se coloca internamente `p=1.0` en su posición solo para conservar las
     cuatro hipótesis en `multipletests(..., method='holm')`, pero se publica `p_raw=None` y `p_holm=None`.
+
+    Las cuatro pendientes se estiman en el mismo tramo: el tramo común más largo de años completos y consecutivos
+    (`tramo_comun_anios_completos`). Cada resultado incluye `tramo_comun` ([inicio, fin] o None).
     """
+    tramo = tramo_comun_anios_completos(series_anuales)
+    series_tramo: dict[str, tuple[np.ndarray, np.ndarray]] = {}
+    for cod, (anios, vals) in series_anuales.items():
+        anios_i = np.asarray(anios, dtype=int).ravel()
+        vals_f = np.asarray(vals, dtype=np.float64).ravel()
+        if tramo is None or not np.any(np.isfinite(vals_f)):
+            continue  # no evaluable: se publica null con motivo
+        sel = (anios_i >= tramo[0]) & (anios_i <= tramo[1])
+        series_tramo[cod] = (anios_i[sel], vals_f[sel])
+
     por_rezago: dict[int, dict[str, dict[str, Any]]] = {}
     decision_por_rezago: dict[int, dict[str, bool | None]] = {}
 
@@ -356,11 +437,15 @@ def evaluar_cuatro_tendencias_holm(
         tiene_p_real: dict[str, bool] = {}
 
         for cod in ORDEN_FAMILIA_DTE:
-            if cod in series_anuales:
-                anios, vals = series_anuales[cod]
+            if cod in series_tramo:
+                anios, vals = series_tramo[cod]
                 aj = ajustar_ols_hac_anual(anios, vals, maxlags=lag, alfa=alfa)
             else:
                 aj = ajustar_ols_hac_anual(np.array([]), np.array([]), maxlags=lag, alfa=alfa)
+                if cod not in series_anuales:
+                    aj["advertencias"] = ["variable ausente en la entrada"]
+                else:
+                    aj["advertencias"] = ["sin años completos (12 meses válidos) en el período"]
             ajustes_lag[cod] = aj
             p_r = aj.get("p_raw")
             if p_r is not None and np.isfinite(p_r):
@@ -400,13 +485,15 @@ def evaluar_cuatro_tendencias_holm(
         if sensible and "resultado sensible al rezago" not in principal["advertencias"]:
             principal["advertencias"] = [*principal["advertencias"], "resultado sensible al rezago"]
 
-        etiqueta, direccion, texto = _etiqueta_y_mensaje_dte(
+        etiqueta, direccion, signo, texto = _etiqueta_y_mensaje_dte(
             cod, principal, principal.get("p_holm"), sensible, alfa=alfa
         )
         principal["label"] = etiqueta
         principal["direction"] = direccion
+        principal["estimate_sign"] = signo
         principal["summary_text"] = texto
         principal["sensible_al_rezago"] = sensible
+        principal["tramo_comun"] = [int(tramo[0]), int(tramo[1])] if tramo else None
         principal["sensibilidad_rezagos"] = {
             f"lag_{lag}": {
                 "maxlags": lag,
@@ -441,12 +528,13 @@ def correlacion_exploratoria_sin_tendencia(
 ) -> dict[str, Any]:
     """Calcula la correlación de Pearson descriptiva `r` entre residuos sin tendencia lineal de dos series `z` (§04).
 
-    Une por fecha mensual exacta (`time`), filtra los meses válidos comunes, quita la tendencia lineal de cada
-    serie `z` usando el tiempo real `t` en meses desde el inicio, y aplica:
+    Une por fecha mensual exacta (`time`). Primero quita la tendencia lineal de **cada** serie `z` con todos sus
+    meses válidos y el tiempo real (meses desde el inicio); después calcula Pearson entre los residuos en las
+    fechas comunes:
         r = Σ(u − ū)(v − v̄) / √[Σ(u − ū)² × Σ(v − v̄)²]
     Si algún residuo no varía o hay menos de 3 meses comunes, devuelve `r = None`.
     """
-    al_x, al_y = xr.align(z_x, z_y, join="inner")
+    al_x, al_y = xr.align(z_x, z_y, join="outer")
     if al_x.sizes.get("time", 0) == 0:
         return {"r": None, "n": 0, "periodo_comun": None}
 
@@ -455,20 +543,25 @@ def correlacion_exploratoria_sin_tendencia(
     vx = np.asarray(al_x.values, dtype=np.float64).ravel()
     vy = np.asarray(al_y.values, dtype=np.float64).ravel()
 
-    comun = np.isfinite(vx) & np.isfinite(vy) & np.isfinite(t_real)
+    def _sin_tendencia(v: np.ndarray) -> np.ndarray:
+        ok = np.isfinite(v)
+        out = np.full(v.shape, np.nan)
+        if ok.sum() >= 3:
+            res = _residuos_ols_tiempo_real(t_real[ok], v[ok])
+            if res is not None:
+                out[ok] = res
+        return out
+
+    ux_all = _sin_tendencia(vx)
+    vy_all = _sin_tendencia(vy)
+    comun = np.isfinite(ux_all) & np.isfinite(vy_all)
     n = int(np.sum(comun))
     if n < 3:
         return {"r": None, "n": n, "periodo_comun": None}
 
-    t_c = t_real[comun]
-    zx_c = vx[comun]
-    zy_c = vy[comun]
     fechas_c = fechas[comun]
-
-    u = _residuos_ols_tiempo_real(t_c, zx_c)
-    v = _residuos_ols_tiempo_real(t_c, zy_c)
-    if u is None or v is None:
-        return {"r": None, "n": n, "periodo_comun": [fechas_c[0].strftime("%Y-%m"), fechas_c[-1].strftime("%Y-%m")]}
+    u = ux_all[comun]
+    v = vy_all[comun]
 
     du = u - np.mean(u)
     dv = v - np.mean(v)
@@ -495,18 +588,47 @@ def analizar_cuatro_variables_dte(
     alfa: float = 0.05,
     region_meta: dict[str, Any] | None = None,
     fuente_datos: str = "opendap_memoria",
+    bbox: Sequence[float] | None = None,
+    huella_tierra: bool = True,
+    simulado: bool | None = None,
+    registro_entrada: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Ejecuta el flujo completo de Down to Earth (§02, §03, §04 y §05) sobre las 4 variables mensuales.
 
     Entrada:
         `series_mensuales`: diccionario `{"P": da_p, "T": da_t, "SM": da_sm, "ET": da_et}` ya convertidas a sus
-        unidades mensuales finales (`mm/mes`, `degC`, `m3/m3`, `mm/mes`). Acepta tanto cubos 3-D `(time, lat, lon)`
-        en su propia grilla nativa (los promedia por área ponderando por cos(lat)) como series 1-D `(time,)`.
+        unidades mensuales finales (`mm/mes`, `degC`, `m3/m3`, `mm/mes`). Acepta cubos 3-D `(time, lat, lon)` en
+        su propia grilla nativa o series regionales 1-D `(time,)`.
+
+    Promedio regional de los cubos 3-D (§02): X = Σ(Aᵢ·Xᵢ)/Σ(Aᵢ), con Aᵢ = área esférica de la celda dentro de la
+    región (`bbox`, o `region_meta["bbox"]`). Con `huella_tierra=True`, el mismo territorio terrestre para las tres
+    fuentes: las celdas de tierra de GLDAS (cubo de SM) definen la huella y P (GPCP) y T (MERRA-2) se ponderan por
+    la fracción de cada celda cubierta por esa huella.
+
+    `simulado` fuerza la marca `metadata.simulated` (por defecto: True solo si `fuente_datos == "sintetico"`).
+    `registro_entrada` antepone al registro de limpieza las acciones previas (lectura de tabla, conversión de unidades).
     """
     calendario = pd.date_range(f"{inicio[:7]}-01", f"{fin[:7]}-01", freq="MS")
     n_meses_esperados = len(calendario)
     anios_esperados = np.arange(int(inicio[:4]), int(fin[:4]) + 1, dtype=int)
     n_anios_esperados = int(anios_esperados.size)
+    advertencias_globales: list[str] = []
+    simulado = (fuente_datos == "sintetico") if simulado is None else bool(simulado)
+    if simulado:
+        advertencias_globales.append(
+            "DATOS SIMULADOS: al menos una variable es sintética; las cifras no describen la región real."
+        )
+
+    if bbox is None and region_meta and region_meta.get("bbox"):
+        bbox = region_meta["bbox"]
+    es_cubo = {c: ("lat" in series_mensuales[c].dims and "lon" in series_mensuales[c].dims) for c in ORDEN_FAMILIA_DTE}
+    huella: xr.DataArray | None = None
+    if huella_tierra and es_cubo.get("SM"):
+        huella = series_mensuales["SM"]  # GLDAS: solo tiene datos sobre tierra
+    ponderacion_txt = (
+        "área esférica de cada celda dentro de la región"
+        + (" × fracción de tierra según la huella de GLDAS" if huella is not None else "")
+    )
 
     reind_mensual: dict[str, xr.DataArray] = {}
     series_z: dict[str, xr.DataArray] = {}
@@ -514,20 +636,46 @@ def analizar_cuatro_variables_dte(
     series_anuales_tuplas: dict[str, tuple[np.ndarray, np.ndarray]] = {}
     calidad_por_cod: dict[str, dict[str, Any]] = {}
 
+    # 1) Promedio regional ponderado por área de cada variable (serie 1-D mensual)
+    regionales: dict[str, xr.DataArray] = {}
+    for cod in ORDEN_FAMILIA_DTE:
+        da_in = series_mensuales[cod]
+        if es_cubo[cod]:
+            pesos = pesos_area_region(da_in, bbox)
+            if huella is not None:
+                pesos = pesos * fraccion_tierra_desde_malla(da_in, huella)
+            regionales[cod] = promedio_area(da_in, pesos=pesos)
+        else:
+            regionales[cod] = da_in
+
+    # 2) Limpieza estructural (pandas/numpy): tipos, fechas, duplicados, relleno, límites físicos, calendario
+    limpieza = limpiar_series_dte(
+        {c: regionales[c].to_series() for c in ORDEN_FAMILIA_DTE}, inicio, fin
+    )
+    for cod, res_c in limpieza.resumen.items():
+        if res_c["fuera_de_rango"] or res_c["relleno"] or res_c["no_finitos"] or res_c["duplicados_contradictorios"]:
+            advertencias_globales.append(
+                f"{cod}: limpieza → {res_c['relleno']} relleno, {res_c['fuera_de_rango']} fuera de rango físico, "
+                f"{res_c['no_finitos']} no finitos, {res_c['duplicados_contradictorios']} duplicados contradictorios "
+                "pasados a faltante (ver data_cleaning.log)."
+            )
+
+    # 3) Análisis por variable sobre la serie limpia
     for cod in ORDEN_FAMILIA_DTE:
         info = INFO_VARIABLES_DTE[cod]
-        da_in = series_mensuales[cod]
-        if "lat" in da_in.dims and "lon" in da_in.dims:
-            da_1d = promedio_area(da_in)
-        else:
-            da_1d = da_in
-        da_m = reindexar_calendario(da_1d, inicio, fin)
-        da_m.attrs.update(da_1d.attrs)
+        da_1d = regionales[cod]
+        da_m = xr.DataArray(
+            limpieza.mensual[cod].to_numpy(dtype=np.float64),
+            coords={"time": limpieza.mensual.index.values},
+            dims=("time",),
+            attrs={**da_1d.attrs, "units": da_1d.attrs.get("units", info["unidad_mensual"])},
+            name=da_1d.name,
+        )
         reind_mensual[cod] = da_m
 
         # Anomalías mensuales estandarizadas z = (X - μ_mes) / s_mes en el periodo de referencia (§04 pasos 1 y 2)
         try:
-            da_z = anomalias_estandarizadas(da_m, base=(inicio, fin))
+            da_z = anomalias_estandarizadas(da_m, base=(inicio, fin), min_valores=MIN_VALORES_CLIMATOLOGIA)
         except Exception:  # noqa: BLE001
             da_z = xr.DataArray(np.full(da_m.shape, np.nan), coords=da_m.coords, dims=da_m.dims)
         series_z[cod] = da_z
@@ -549,8 +697,19 @@ def analizar_cuatro_variables_dte(
         cob_media = _limpiar_num(da_m.attrs.get("cobertura_area_media", 1.0))
         cob_min = _limpiar_num(da_m.attrs.get("cobertura_area_min", 1.0))
         cob_estable = bool(da_m.attrs.get("cobertura_estable", True))
+        if not cob_estable:
+            advertencias_globales.append(
+                f"{cod}: la fracción de área válida cambia con el tiempo ({cob_min:.2f}–1): parte de la tendencia "
+                "puede ser un artefacto de cobertura."
+            )
+        n_ceros = int(np.sum(vals_m == 0.0))
+        if cod in ("P", "SM", "ET") and n_ceros:
+            advertencias_globales.append(
+                f"{cod}: {n_ceros} ceros exactos en el promedio regional; suelen ser faltantes disfrazados, comprobar."
+            )
 
         calidad_por_cod[cod] = {
+            "n_exact_zeros": n_ceros,
             "n_months_expected": n_meses_esperados,
             "n_months_valid": n_m_val,
             "n_months_missing": n_meses_esperados - n_m_val,
@@ -565,6 +724,27 @@ def analizar_cuatro_variables_dte(
 
     # Evaluar las 4 tendencias juntas con OLS + HAC (Newey-West) y ajuste de Holm (§03 y §03.1)
     resultados_holm = evaluar_cuatro_tendencias_holm(series_anuales_tuplas, alfa=alfa)
+    tramo = next((resultados_holm[c].get("tramo_comun") for c in ORDEN_FAMILIA_DTE
+                  if resultados_holm[c].get("tramo_comun")), None)
+    if tramo is None:
+        advertencias_globales.append("No hay ningún año completo común a las variables evaluables: sin tendencias.")
+    else:
+        n_tramo = tramo[1] - tramo[0] + 1
+        if n_tramo < n_anios_esperados:
+            advertencias_globales.append(
+                f"Tendencias calculadas en el tramo común {tramo[0]}–{tramo[1]} ({n_tramo} de {n_anios_esperados} "
+                "años): hay años incompletos fuera de él. Los huecos no se comprimen ni se rellenan."
+            )
+        if n_tramo < ANIOS_ADVERTENCIA_DTE:
+            advertencias_globales.append(
+                f"Solo {n_tramo} años en el tramo: la inferencia HAC es frágil con tan pocos datos."
+            )
+    for cod in ORDEN_FAMILIA_DTE:
+        if resultados_holm[cod].get("sensible_al_rezago"):
+            advertencias_globales.append(
+                f"{cod}: la decisión cambia con el rezago 2 o 3 → resultado sensible al rezago (el rezago 1 sigue "
+                "siendo el principal)."
+            )
 
     # Construir salida de variables[P, T, SM, ET] (§05)
     variables_out: dict[str, dict[str, Any]] = {}
@@ -623,6 +803,7 @@ def analizar_cuatro_variables_dte(
             "p_holm": est.get("p_holm"),
             "significant": est.get("significant"),
             "direction": est.get("direction"),
+            "estimate_sign": est.get("estimate_sign"),
             "label": est.get("label"),
             "summary_text": est.get("summary_text"),
             "sensible_al_rezago": est.get("sensible_al_rezago"),
@@ -710,6 +891,19 @@ def analizar_cuatro_variables_dte(
             "months_total": n_meses_esperados,
             "years_expected": n_anios_esperados,
             "years_complete_count": anios_completos_comunes,
+            "trend_span": (
+                {
+                    "start": int(tramo[0]),
+                    "end": int(tramo[1]),
+                    "n_years": int(tramo[1] - tramo[0] + 1),
+                    "criterion": "tramo común más largo de años completos y consecutivos (empate → el más reciente)",
+                }
+                if tramo
+                else None
+            ),
+            "simulated": simulado,
+            "warnings": advertencias_globales,
+            "spatial_weighting": ponderacion_txt,
             "alpha": float(alfa),
             "method": {
                 "ols_formula": "y = a + b * t, donde t = anio - anio_inicial",
@@ -724,6 +918,19 @@ def analizar_cuatro_variables_dte(
             "almacenamiento_disco": False,
         },
         "variables": variables_out,
+        "data_cleaning": {
+            "steps": [
+                "valores a float64 y fechas normalizadas al primer día del mes",
+                "fechas duplicadas: valor idéntico → se conserva uno; valores distintos → faltante",
+                "±inf → faltante",
+                "relleno (≤ −999 o |x| ≥ 1e15) → faltante; nunca 0 ni interpolación",
+                "fuera de límites físicos (unidades finales) → faltante",
+                "calendario mensual completo: meses ausentes → faltante",
+                "ceros exactos en P, SM y ET: se conservan y se advierten",
+            ],
+            "summary": limpieza.resumen,
+            "log": [*_registro_json(registro_entrada or []), *limpieza.registro_lista()],
+        },
         "joint": {
             "preprocessing": {
                 "seasonal_removal": (
@@ -757,6 +964,21 @@ def analizar_cuatro_variables_dte(
     }
 
 
+def _registro_json(registro: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Normaliza entradas de registro (valor_original NaN → None) para la respuesta JSON."""
+    out = []
+    for e in registro:
+        v = e.get("valor_original")
+        out.append({
+            "fecha": e.get("fecha"),
+            "variable": e.get("variable"),
+            "valor_original": None if v is None or not np.isfinite(float(v)) else float(v),
+            "accion": e.get("accion"),
+            "motivo": e.get("motivo"),
+        })
+    return out
+
+
 def _redactar_lectura_conjunta(
     variables_out: dict[str, dict[str, Any]],
     pares_lista: list[dict[str, Any]],
@@ -777,7 +999,8 @@ def _redactar_lectura_conjunta(
             frases_sig.append(f"{accion} ({v['slope_decade']:+.3g} {v['units']['slope_decade']}, p_Holm={v['p_holm']:.3f})")
 
     insuf = [
-        f"{cod} ({variables_out[cod]['slope_decade']:+.3g} {variables_out[cod]['units']['slope_decade']}, evidencia insuficiente tras Holm)"
+        f"{cod} ({variables_out[cod]['slope_decade']:+.3g} {variables_out[cod]['units']['slope_decade']}, "
+        f"{variables_out[cod]['label']})"
         for cod in ORDEN_FAMILIA_DTE
         if variables_out[cod].get("significant") is False and variables_out[cod].get("slope_decade") is not None
     ]

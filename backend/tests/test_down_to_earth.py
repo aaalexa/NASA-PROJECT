@@ -21,8 +21,16 @@ from motor.down_to_earth import (
     generar_csv_anual_dte,
     generar_csv_mensual_dte,
     tramo_anios_completos_consecutivos,
+    tramo_comun_anios_completos,
 )
-from motor.series import agregar_anual, anomalias_estandarizadas, promedio_area
+from motor.down_to_earth import _etiqueta_y_mensaje_dte
+from motor.series import (
+    agregar_anual,
+    anomalias_estandarizadas,
+    fraccion_tierra_desde_malla,
+    pesos_area_region,
+    promedio_area,
+)
 
 RUTA_CATALOGO = DIR_RECURSOS / "catalogo.yaml"
 
@@ -144,14 +152,124 @@ def test_familia_holm_cuatro_variables_y_placeholder_p1():
     # P y T tienen tendencia fuerte -> significativos tras Holm
     assert res["P"]["p_holm"] is not None and res["P"]["p_holm"] < 0.05
     assert res["P"]["significant"] is True
-    assert res["P"]["label"] == "Disminución con evidencia estadística."
+    assert res["P"]["label"].startswith("disminución con evidencia estadística según este método")
+    assert res["P"]["direction"] == "disminucion"
 
     assert res["T"]["p_holm"] is not None and res["T"]["p_holm"] < 0.05
     assert res["T"]["significant"] is True
-    assert res["T"]["label"] == "Aumento con evidencia estadística."
+    assert res["T"]["label"].startswith("aumento con evidencia estadística según este método")
+    assert res["T"]["direction"] == "aumento"
+
+    # ET sin evidencia: "evidencia insuficiente", nunca "sin cambio"; direction null y signo de la estimación
+    assert res["ET"]["significant"] is False
+    assert res["ET"]["label"].startswith("evidencia insuficiente")
+    assert res["ET"]["direction"] is None
+    assert res["ET"]["estimate_sign"] in {"positiva", "negativa"}
+    for cod in ("P", "T", "SM", "ET"):
+        assert "sin cambio" not in res[cod]["label"].lower()
+        assert res[cod]["tramo_comun"] == [2001, 2024]
 
     # Todos incluyen sensibilidad para rezagos 1, 2 y 3
     assert set(res["P"]["sensibilidad_rezagos"].keys()) == {"lag_1", "lag_2", "lag_3"}
+
+
+def test_etiqueta_tras_el_ajuste_solo_si_p_sin_ajustar_era_significativo():
+    """§05: 'tras el ajuste' solo cuando p_raw ≤ 0.05 y p_holm > 0.05."""
+    aj = {"slope_decade": 1.0, "ci95": [0.1, 1.9], "p_raw": 0.03, "n_anios": 24, "periodo_anual": [2001, 2024]}
+    etiqueta, direccion, signo, texto = _etiqueta_y_mensaje_dte("P", aj, 0.09, False)
+    assert etiqueta == "evidencia insuficiente tras el ajuste"
+    assert direccion is None and signo == "positiva"
+    assert "p ajustado 0.090" in texto and "24 años válidos" in texto
+    etiqueta2, *_ = _etiqueta_y_mensaje_dte("P", {**aj, "p_raw": 0.2}, 0.6, True)
+    assert etiqueta2 == "evidencia insuficiente; resultado sensible al rezago"
+
+
+def test_tramo_comun_para_las_cuatro_variables():
+    """§02: el tramo es común a las cuatro variables (no uno por variable) y no comprime huecos."""
+    anios = np.arange(2001, 2025, dtype=int)
+    rng = np.random.default_rng(1)
+    base = {c: rng.normal(size=anios.size) + 0.1 * (anios - 2001) for c in ("P", "T", "SM", "ET")}
+    base["T"][anios == 2001] = np.nan   # T sin 2001
+    base["P"][anios == 2013] = np.nan   # P sin 2013
+    base["SM"][anios == 2024] = np.nan  # SM sin 2024
+    series = {c: (anios, v) for c, v in base.items()}
+    assert tramo_comun_anios_completos(series) == (2002, 2012)
+    res = evaluar_cuatro_tendencias_holm(series)
+    for cod in ("P", "T", "SM", "ET"):
+        assert res[cod]["n_anios"] == 11
+        assert res[cod]["periodo_anual"] == [2002, 2012]
+    # Empate entre tramos → el más reciente
+    v = np.ones(10)
+    v[4] = np.nan  # 2001-2004 (4) y 2006-2010 (5) → 2006-2010; con 2001-2005 vs 2007-2011 empate
+    a = np.arange(2001, 2011)
+    assert tramo_comun_anios_completos({"P": (a, v)}) == (2006, 2010)
+    v2 = np.ones(11)
+    v2[5] = np.nan
+    assert tramo_comun_anios_completos({"P": (np.arange(2001, 2012), v2)}) == (2007, 2011)
+    # Una variable sin ningún año completo no recorta el tramo de las demás y se publica no evaluable
+    series["ET"] = (anios, np.full(anios.size, np.nan))
+    res2 = evaluar_cuatro_tendencias_holm(series)
+    assert res2["ET"]["p_holm"] is None and res2["ET"]["label"].startswith("no evaluable")
+    assert res2["P"]["periodo_anual"] == [2002, 2012]
+
+
+def test_pesos_area_region_y_fraccion_tierra():
+    """§02: Aᵢ = área esférica dentro de la caja; P y T usan la huella de tierra de GLDAS."""
+    malla = xr.DataArray(np.zeros((2, 2)), coords={"lat": [0.25, 0.75], "lon": [0.25, 0.75]}, dims=("lat", "lon"))
+    w = pesos_area_region(malla, (0.0, 0.0, 1.0, 1.0))
+    # Celdas completas: ancho 0.5° y franja sin(0.5°)-sin(0°) vs sin(1°)-sin(0.5°)
+    franja0 = np.sin(np.deg2rad(0.5))
+    franja1 = np.sin(np.deg2rad(1.0)) - np.sin(np.deg2rad(0.5))
+    assert float(w[0, 0]) == pytest.approx(franja0 * np.deg2rad(0.5))
+    assert float(w[1, 0] / w[0, 0]) == pytest.approx(franja1 / franja0)
+    # Caja que corta la columna de la derecha a la mitad → esa columna pesa la mitad
+    w_mitad = pesos_area_region(malla, (0.0, 0.0, 0.75, 1.0))
+    assert float(w_mitad[0, 1] / w_mitad[0, 0]) == pytest.approx(0.5)
+
+    # Huella GLDAS 0.25°: en la celda gruesa (0.25, 0.75) solo 1 de 4 subceldas es tierra
+    fechas = pd.date_range("2001-01-01", periods=2, freq="MS")
+    lat_f = np.array([0.125, 0.375, 0.625, 0.875])
+    sm = np.full((2, 4, 4), 0.2)
+    sm[:, 0:2, 2:4] = np.nan
+    sm[:, 0, 2] = 0.2
+    huella = xr.DataArray(sm, coords={"time": fechas, "lat": lat_f, "lon": lat_f}, dims=("time", "lat", "lon"))
+    frac = fraccion_tierra_desde_malla(malla, huella)
+    assert float(frac.sel(lat=0.25, lon=0.75)) == pytest.approx(0.25)
+    assert float(frac.sel(lat=0.25, lon=0.25)) == pytest.approx(1.0)
+
+    # El promedio con pesos ignora el océano: P vale 100 en tierra y 0 sobre el mar
+    p = xr.DataArray(np.array([[[100.0, 0.0], [100.0, 100.0]]] * 2),
+                     coords={"time": fechas, "lat": [0.25, 0.75], "lon": [0.25, 0.75]}, dims=("time", "lat", "lon"),
+                     attrs={"units": "mm/mes"})
+    frac_mar = xr.zeros_like(frac) + 1.0
+    frac_mar.loc[{"lat": 0.25, "lon": 0.75}] = 0.0
+    serie = promedio_area(p, pesos=w * frac_mar)
+    assert np.allclose(serie.values, 100.0)
+
+
+def test_metadata_simulado_tramo_y_advertencia_de_ceros():
+    """§05: rótulo de datos simulados, tramo usado y advertencia de ceros exactos en promedios regionales."""
+    fechas = pd.date_range("2001-01-01", "2024-12-01", freq="MS")
+    rng = np.random.default_rng(5)
+
+    def serie(v, u):
+        return xr.DataArray(v, coords={"time": fechas}, dims=("time",), attrs={"units": u})
+
+    p = 50 + 10 * rng.random(fechas.size)
+    p[30] = 0.0
+    entradas = {
+        "P": serie(p, "mm/mes"),
+        "T": serie(20 + rng.normal(size=fechas.size), "degC"),
+        "SM": serie(0.2 + 0.01 * rng.normal(size=fechas.size), "m3/m3"),
+        "ET": serie(40 + rng.normal(size=fechas.size), "mm/mes"),
+    }
+    res = analizar_cuatro_variables_dte(entradas, fuente_datos="sintetico")
+    md = res["metadata"]
+    assert md["simulated"] is True and any("SIMULADOS" in w for w in md["warnings"])
+    assert md["trend_span"] == {"start": 2001, "end": 2024, "n_years": 24, "criterion": md["trend_span"]["criterion"]}
+    assert any("ceros exactos" in w and w.startswith("P") for w in md["warnings"])
+    assert res["variables"]["P"]["units"]["annual"] == "mm/anio"
+    assert res["variables"]["ET"]["units"]["annual"] == "mm/anio"
 
 
 def test_anomalias_estandarizadas_y_correlacion_sin_tendencia():
