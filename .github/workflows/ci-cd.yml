@@ -154,6 +154,8 @@ jobs:
           VM_PORT: ${{ secrets.AZURE_VM_PORT || '22' }}
           VM_PATH: ${{ secrets.AZURE_VM_APP_DIR || '/opt/nasa-down-to-earth' }}
           SSH_KEY: ${{ secrets.AZURE_VM_SSH_KEY }}
+          ED_USER: ${{ secrets.EARTHDATA_USERNAME }}
+          ED_PASS: ${{ secrets.EARTHDATA_PASSWORD }}
         run: |
           ls -lh nasa-down-to-earth-api.tar.gz
           install -m 600 -D /dev/null ~/.ssh/id_deploy
@@ -165,7 +167,8 @@ jobs:
           scp -i ~/.ssh/id_deploy -P "${VM_PORT}" deploy/Caddyfile deploy/setup-debian12-docker.sh "${VM_USER}@${VM_HOST}:${VM_PATH}/deploy/"
           scp -i ~/.ssh/id_deploy -P "${VM_PORT}" nasa-down-to-earth-api.tar.gz "${VM_USER}@${VM_HOST}:${VM_PATH}/"
 
-          ssh -i ~/.ssh/id_deploy -p "${VM_PORT}" "${VM_USER}@${VM_HOST}" <<EOF
+          ssh -i ~/.ssh/id_deploy -p "${VM_PORT}" "${VM_USER}@${VM_HOST}" \
+            ED_USER="${ED_USER}" ED_PASS="${ED_PASS}" VM_PATH="${VM_PATH}" 'bash -s' <<'EOF'
             set -euo pipefail
             cd "${VM_PATH}"
             chmod +x deploy/setup-debian12-docker.sh
@@ -173,9 +176,16 @@ jobs:
               sudo ./deploy/setup-debian12-docker.sh
             fi
             [ -f .env ] || cp .env.example .env
+            if [ -n "${ED_USER:-}" ] && [ -n "${ED_PASS:-}" ]; then
+              grep -v '^EARTHDATA_USERNAME=' .env | grep -v '^EARTHDATA_PASSWORD=' > .env.tmp
+              printf 'EARTHDATA_USERNAME=%s\nEARTHDATA_PASSWORD=%s\n' "${ED_USER}" "${ED_PASS}" >> .env.tmp
+              mv .env.tmp .env
+              chmod 600 .env
+            fi
             gunzip -c nasa-down-to-earth-api.tar.gz | sudo docker load
             rm -f nasa-down-to-earth-api.tar.gz
-            sudo docker compose up -d
+            sudo docker compose up -d --force-recreate api
+            sudo docker compose up -d caddy
             sudo docker compose ps
           EOF
 
