@@ -1,0 +1,15 @@
+{
+  "eval_id": 2,
+  "eval_name": "csv-unidades-originales-con-huecos",
+  "prompt": "me pasaron este csv con las series tal cual salen de NASA para la region (sat_gauge_precip de GPCP en mm/dia, T2M de MERRA-2 en kelvin, SoilMoi0_10cm_inst y Evap_tavg de GLDAS): evals/files/dte_simulado_originales.csv — es simulado, para probar. creo que tiene huecos. conviértelo y sácame las tendencias por década de las cuatro con su p-valor y las correlaciones, y dime qué años usaste. guarda lo que generes en la carpeta de salida",
+  "assertions": [
+    "Los valores mensuales convertidos coinciden con mm/día×días, K−273.15, kg/m²÷100 y kg/m²/s×86400×días (tolerancia 0.5 %)",
+    "El −9999 de T2M (2001-03) se trata como faltante, no como valor ni como 0",
+    "Ningún mes faltante aparece como 0 ni interpolado en la serie mensual de salida",
+    "Identifica 2001, 2013 y 2024 como años incompletos",
+    "Usa para las tendencias el tramo común 2002–2012 (11 años) y lo dice",
+    "Las pendientes por década en el tramo 2002–2012 coinciden con la referencia (tolerancia 2 %)",
+    "Usa Holm sobre las cuatro variables (p ajustados coinciden con la referencia, tolerancia 0.01)",
+    "El año 2010 (filas al final del archivo) queda en su lugar: valores anuales de 2010 correctos"
+  ]
+}

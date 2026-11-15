@@ -1,0 +1,50 @@
+{
+  "expectations": [
+    {
+      "text": "Los valores mensuales convertidos coinciden con mm/día×días, K−273.15, kg/m²÷100 y kg/m²/s×86400×días (tolerancia 0.5 %)",
+      "passed": false,
+      "evidence": "P 2001-02: 0.72809 vs 20.387; SM 2001-02: 18.9629 vs 0.18963; ET 2001-02: 1.17181 vs 32.811; P 2004-02: 0.48931 vs 14.19; SM 2004-02: 17.1135 vs 0.17113; ET 2004-02: 0.86842 vs 25.184"
+    },
+    {
+      "text": "El −9999 de T2M (2001-03) se trata como faltante, no como valor ni como 0",
+      "passed": true,
+      "evidence": "T 2001-03 en salida = nan"
+    },
+    {
+      "text": "Ningún mes faltante aparece como 0 ni interpolado en la serie mensual de salida",
+      "passed": true,
+      "evidence": "2013-06 (todas), 2024-11 (SM) y 2001-03 (T) quedan vacíos"
+    },
+    {
+      "text": "Identifica 2001, 2013 y 2024 como años incompletos",
+      "passed": true,
+      "evidence": "menciona los tres años y huecos"
+    },
+    {
+      "text": "Usa para las tendencias el tramo común 2002–2012 (11 años) y lo dice",
+      "passed": false,
+      "evidence": "no aparece el tramo 2002–2012"
+    },
+    {
+      "text": "Las pendientes por década en el tramo 2002–2012 coinciden con la referencia (tolerancia 2 %)",
+      "passed": false,
+      "evidence": "P: ref -73.18 ✗; T: ref +0.09398 ✓; SM: ref -0.008684 ✗; ET: ref -54.89 ✗"
+    },
+    {
+      "text": "Usa Holm sobre las cuatro variables (p ajustados coinciden con la referencia, tolerancia 0.01)",
+      "passed": false,
+      "evidence": "menciona Holm=False; P: ref 1.0000 ✓; T: ref 1.0000 ✓; SM: ref 0.0037 ✓; ET: ref 1.0000 ✓"
+    },
+    {
+      "text": "El año 2010 (filas al final del archivo) queda en su lugar: valores anuales de 2010 correctos",
+      "passed": true,
+      "evidence": "T 2010 salida 20.7 vs ref 20.73"
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 4,
+    "total": 8,
+    "pass_rate": 0.5
+  }
+}

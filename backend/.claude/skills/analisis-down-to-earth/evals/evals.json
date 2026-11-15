@@ -1,0 +1,58 @@
+{
+  "skill_name": "analisis-down-to-earth",
+  "evals": [
+    {
+      "id": 1,
+      "eval_name": "csv-completo-unidades-finales",
+      "prompt": "Tengo el CSV mensual de la región de la demo de Down to Earth ya convertido: evals/files/dte_simulado_completo.csv (fecha, P en mm/mes, T en °C, SM en m³/m³, ET en mm/mes, de 2001 a 2024). Son datos simulados para probar el flujo. Hazme el análisis completo: si cada variable tiene tendencia y si es significativa, y cómo se relacionan entre ellas. Déjame en la carpeta de salida el JSON de resultados, el CSV anual, un resumen en markdown para la demo y las gráficas.",
+      "expected_output": "resultados.json con metadata/variables[P,T,SM,ET]/joint, CSV anual, resumen.md y gráficos; tendencias OLS+HAC(1)+Holm sobre 4, sensibilidad rezagos 2 y 3, pares P–SM, T–SM, P–ET con r y n sin p; rotulado como simulado; etiquetas por p de Holm.",
+      "files": ["evals/files/dte_simulado_completo.csv"],
+      "assertions": [
+        {"id": "a1_json_estructura", "text": "Existe un JSON con metadata, las cuatro variables P, T, SM, ET y una sección del análisis conjunto"},
+        {"id": "a1_pendientes", "text": "Las pendientes por década de P, T, SM y ET coinciden con OLS anual (tolerancia 1 %)"},
+        {"id": "a1_p_holm", "text": "Publica p ajustados por Holm sobre las cuatro variables que coinciden con HAC rezago 1 (tolerancia 0.005)"},
+        {"id": "a1_etiquetas", "text": "Las etiquetas siguen el p de Holm: T y SM con evidencia (aumento/disminución), P y ET 'evidencia insuficiente'; nunca 'sin cambio'/'no cambió'"},
+        {"id": "a1_sensibilidad", "text": "Reporta la sensibilidad con rezagos 2 y 3"},
+        {"id": "a1_pares", "text": "Correlaciones solo de los pares P–SM, T–SM y P–ET con r (±0.02 de la referencia sin estación ni tendencia) y n = 288"},
+        {"id": "a1_sin_p_correl", "text": "Las correlaciones no llevan p-valor ni se califican de 'significativas'"},
+        {"id": "a1_anual_ponderado", "text": "El CSV anual tiene T y SM como media ponderada por días (no suma) y P y ET como suma"},
+        {"id": "a1_simulado", "text": "El resumen y el JSON rotulan los datos como simulados"},
+        {"id": "a1_sin_causa", "text": "El resumen no afirma causas (causó/provocó/debido a) y menciona límites"},
+        {"id": "a1_graficos", "text": "Se generaron gráficos (serie anual y anomalías z)"}
+      ]
+    },
+    {
+      "id": 2,
+      "eval_name": "csv-unidades-originales-con-huecos",
+      "prompt": "me pasaron este csv con las series tal cual salen de NASA para la region (sat_gauge_precip de GPCP en mm/dia, T2M de MERRA-2 en kelvin, SoilMoi0_10cm_inst y Evap_tavg de GLDAS): evals/files/dte_simulado_originales.csv — es simulado, para probar. creo que tiene huecos. conviértelo y sácame las tendencias por década de las cuatro con su p-valor y las correlaciones, y dime qué años usaste. guarda lo que generes en la carpeta de salida",
+      "expected_output": "Conversiones correctas con días reales; −9999 tratado como faltante; mes 2013-06 ausente y SM 2024-11 vacío → años incompletos; tramo común 2002–2012 (11 años) documentado; filas desordenadas unidas por fecha; Holm sobre 4.",
+      "files": ["evals/files/dte_simulado_originales.csv"],
+      "assertions": [
+        {"id": "a2_conversion", "text": "Los valores mensuales convertidos coinciden con mm/día×días, K−273.15, kg/m²÷100 y kg/m²/s×86400×días (tolerancia 0.5 %)"},
+        {"id": "a2_relleno", "text": "El −9999 de T2M (2001-03) se trata como faltante, no como valor ni como 0"},
+        {"id": "a2_sin_ceros", "text": "Ningún mes faltante aparece como 0 ni interpolado en la serie mensual de salida"},
+        {"id": "a2_incompletos", "text": "Identifica 2001, 2013 y 2024 como años incompletos"},
+        {"id": "a2_tramo", "text": "Usa para las tendencias el tramo común 2002–2012 (11 años) y lo dice"},
+        {"id": "a2_pendientes", "text": "Las pendientes por década en el tramo 2002–2012 coinciden con la referencia (tolerancia 2 %)"},
+        {"id": "a2_holm", "text": "Usa Holm sobre las cuatro variables (p ajustados coinciden con la referencia, tolerancia 0.01)"},
+        {"id": "a2_orden_filas", "text": "El año 2010 (filas al final del archivo) queda en su lugar: valores anuales de 2010 correctos"}
+      ]
+    },
+    {
+      "id": 3,
+      "eval_name": "revision-modulo-backend-con-errores",
+      "prompt": "Revisa este módulo que escribió alguien del equipo para calcular las tendencias que salen en la pantalla de resultados de la demo: evals/files/modulo_backend_simulado.py. ¿Está bien hecho estadísticamente? Dime qué problemas tiene y deja una versión corregida en la carpeta de salida.",
+      "expected_output": "Detecta y corrige: fillna(0), suma anual de T y SM, maxlags=3 como principal, p×10, Bonferroni solo sobre visibles, etiqueta 'sin cambio'.",
+      "files": ["evals/files/modulo_backend_simulado.py"],
+      "assertions": [
+        {"id": "a3_fillna", "text": "Señala fillna(0) como error y lo corrige dejando NaN / años incompletos"},
+        {"id": "a3_suma_T_SM", "text": "Señala que T y SM no se suman y los corrige a media ponderada por días (P y ET siguen como suma)"},
+        {"id": "a3_maxlags", "text": "Señala maxlags=3 y lo corrige a 1 como principal (2 y 3 solo sensibilidad)"},
+        {"id": "a3_p_por_10", "text": "Señala que p no se multiplica por 10 y lo corrige"},
+        {"id": "a3_holm_familia", "text": "Señala Bonferroni sobre las variables visibles y lo corrige a Holm sobre la familia fija [P, T, SM, ET]"},
+        {"id": "a3_sin_cambio", "text": "Señala la etiqueta 'sin cambio' y la cambia por 'evidencia insuficiente'"},
+        {"id": "a3_version_corregida", "text": "Entrega un archivo .py corregido que no contiene fillna(0), maxlags 3 principal, p*10, Bonferroni ni 'sin cambio'"}
+      ]
+    }
+  ]
+}

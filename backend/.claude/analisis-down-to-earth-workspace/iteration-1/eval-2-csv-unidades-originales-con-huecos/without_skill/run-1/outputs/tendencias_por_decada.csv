@@ -1,0 +1,5 @@
+variable,unidad_por_decada,n_anios,pendiente_por_decada,ic95_inf,ic95_sup,p_valor,p_valor_ols_sin_corregir,r1_residuos,n_efectivo,sen_por_decada,mann_kendall_tau,mann_kendall_p,media,cambio_pct_por_decada,anios_usados,anios_excluidos
+Precipitación (GPCP) [mm/día],mm/día/década,23,-0.0919826,-0.287006,0.103041,0.337834,0.337834,-0.0910271,23,-0.0937454,-0.162055,0.294366,1.29408,-7.10796,2001-2024,2013
+Temperatura 2 m (MERRA-2) [°C],°C/década,22,0.361516,0.12636,0.596671,0.00442649,0.00442649,-0.256372,22,0.325033,0.419913,0.00575928,21.225,1.70325,2002-2024,"2001,2013"
+Humedad del suelo 0-10 cm (GLDAS) [kg/m²],kg/m²/década,22,-0.889703,-1.0628,-0.716604,1.81402e-09,5.17819e-10,0.0290162,20.7593,-0.865456,-0.835498,1.50541e-10,19.9197,-4.46645,2001-2023,"2013,2024"
+Evapotranspiración (GLDAS) [mm/día],mm/día/década,23,-0.0654908,-0.149975,0.018993,0.121871,0.121871,-0.00957144,23,-0.0602017,-0.264822,0.081218,1.26471,-5.17833,2001-2024,2013

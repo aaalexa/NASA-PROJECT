@@ -1,0 +1,7914 @@
+{
+  "metadata": {
+    "proyecto": "Down to Earth (NASA Space Apps)",
+    "region": null,
+    "simulado": true,
+    "aviso": "DATOS SIMULADOS: las cifras no describen ninguna región real.",
+    "fuente_entrada": "dte_simulado_originales.csv",
+    "unidades_entrada": "originales",
+    "periodo_solicitado": {
+      "inicio": "2001-01",
+      "fin": "2024-12",
+      "n_meses": 288,
+      "n_anios": 24
+    },
+    "tramo_tendencias": {
+      "inicio": 2002,
+      "fin": 2012,
+      "n_anios": 11,
+      "criterio": "tramo común más largo de años completos y consecutivos (empate → el más reciente)"
+    },
+    "metodo": {
+      "tendencia": "OLS con constante sobre valores anuales, X = a + b·t, t = año − año inicial",
+      "incertidumbre": "HAC / Newey–West",
+      "statsmodels": "sm.OLS(y, sm.add_constant(t)).fit(cov_type='HAC', cov_kwds={'maxlags': 1, 'kernel': 'bartlett', 'use_correction': True}, use_t=False)",
+      "prueba": "Wald bilateral, aproximación normal; H0: b = 0; z = b/SE; p = 2·Φ(−|z|)",
+      "alfa": 0.05,
+      "ic95": "b ± 1.96·SE (individual, no simultáneo)",
+      "escala_decada": "b y límites del IC × 10; p nunca se multiplica",
+      "multiplicidad": {
+        "metodo": "holm",
+        "familia": [
+          "P",
+          "T",
+          "SM",
+          "ET"
+        ],
+        "nota": "familia fija aunque se oculten variables; una variable no evaluable entra con p = 1 interno, que no se publica"
+      },
+      "rezago_principal": 1,
+      "sensibilidad_rezagos": [
+        2,
+        3
+      ],
+      "implementacion": "statsmodels 0.15.0"
+    },
+    "advertencias": [
+      "No se recibió la fracción de área válida: no se puede comprobar que el polígono tenga la misma cobertura en todo el período.",
+      "Tendencias calculadas solo en el tramo común 2002–2012 (11 de 24 años): hay años incompletos fuera de él. Los huecos no se comprimen ni se rellenan."
+    ],
+    "limites": [
+      "SM describe solo la capa 0–10 cm del suelo, no la zona de raíces.",
+      "ET de GLDAS es evapotranspiración real, no potencial: no sirve como PET para SPEI.",
+      "SM y ET salen del mismo modelo GLDAS Noah con las mismas entradas: no son pruebas independientes entre sí.",
+      "ET no sube necesariamente con el calor: si falta agua en el suelo puede bajar aunque T suba.",
+      "T es temperatura del aire a 2 m (MERRA-2), no temperatura de la superficie.",
+      "El período 2001–2024 (24 años) no es una normal climatológica de 30 años.",
+      "Una correlación describe coincidencia temporal; no demuestra causa.",
+      "No se clasifican sequías ni inundaciones con estos datos, y P − ET no es un balance hídrico cerrado (fuentes distintas; faltan escorrentía y almacenamiento).",
+      "El IC95 % es individual para cada variable, no simultáneo para las cuatro, y no incluye la incertidumbre del satélite ni del modelo.",
+      "HAC corrige la autocorrelación del error, no datos malos, cambios abruptos ni un modelo lineal inadecuado."
+    ],
+    "generado": "2026-11-14T20:17:52"
+  },
+  "variables": [
+    {
+      "id": "P",
+      "nombre": "Precipitación",
+      "producto": "GPCP mensual v3.2",
+      "campo": "sat_gauge_precip",
+      "conversion": "mm/día × días del mes → mm/mes",
+      "units": {
+        "monthly": "mm/mes",
+        "annual": "mm/año",
+        "slope_decade": "mm por década (total anual)"
+      },
+      "annual_aggregation": "suma de 12 meses",
+      "monthly": [
+        {
+          "fecha": "2001-01",
+          "valor": 15.867474000000001
+        },
+        {
+          "fecha": "2001-02",
+          "valor": 20.386632
+        },
+        {
+          "fecha": "2001-03",
+          "valor": 19.651426999999998
+        },
+        {
+          "fecha": "2001-04",
+          "valor": 16.28475
+        },
+        {
+          "fecha": "2001-05",
+          "valor": 51.435014
+        },
+        {
+          "fecha": "2001-06",
+          "valor": 105.18099
+        },
+        {
+          "fecha": "2001-07",
+          "valor": 122.65060100000001
+        },
+        {
+          "fecha": "2001-08",
+          "valor": 91.497213
+        },
+        {
+          "fecha": "2001-09",
+          "valor": 55.63524
+        },
+        {
+          "fecha": "2001-10",
+          "valor": 17.679548
+        },
+        {
+          "fecha": "2001-11",
+          "valor": 14.305769999999999
+        },
+        {
+          "fecha": "2001-12",
+          "valor": 13.144836999999999
+        },
+        {
+          "fecha": "2002-01",
+          "valor": 25.221786
+        },
+        {
+          "fecha": "2002-02",
+          "valor": 23.190047999999997
+        },
+        {
+          "fecha": "2002-03",
+          "valor": 16.172824
+        },
+        {
+          "fecha": "2002-04",
+          "valor": 7.26234
+        },
+        {
+          "fecha": "2002-05",
+          "valor": 57.855238
+        },
+        {
+          "fecha": "2002-06",
+          "valor": 100.62708
+        },
+        {
+          "fecha": "2002-07",
+          "valor": 132.574011
+        },
+        {
+          "fecha": "2002-08",
+          "valor": 107.096041
+        },
+        {
+          "fecha": "2002-09",
+          "valor": 181.88097000000002
+        },
+        {
+          "fecha": "2002-10",
+          "valor": 47.966238000000004
+        },
+        {
+          "fecha": "2002-11",
+          "valor": 19.59186
+        },
+        {
+          "fecha": "2002-12",
+          "valor": 17.857208999999997
+        },
+        {
+          "fecha": "2003-01",
+          "valor": 24.407292
+        },
+        {
+          "fecha": "2003-02",
+          "valor": 14.734103999999999
+        },
+        {
+          "fecha": "2003-03",
+          "valor": 17.797906
+        },
+        {
+          "fecha": "2003-04",
+          "valor": 17.11806
+        },
+        {
+          "fecha": "2003-05",
+          "valor": 97.236925
+        },
+        {
+          "fecha": "2003-06",
+          "valor": 55.820820000000005
+        },
+        {
+          "fecha": "2003-07",
+          "valor": 100.45054
+        },
+        {
+          "fecha": "2003-08",
+          "valor": 55.673644
+        },
+        {
+          "fecha": "2003-09",
+          "valor": 41.01981
+        },
+        {
+          "fecha": "2003-10",
+          "valor": 21.343252
+        },
+        {
+          "fecha": "2003-11",
+          "valor": 11.19501
+        },
+        {
+          "fecha": "2003-12",
+          "valor": 13.264249
+        },
+        {
+          "fecha": "2004-01",
+          "valor": 15.931365
+        },
+        {
+          "fecha": "2004-02",
+          "valor": 14.190135
+        },
+        {
+          "fecha": "2004-03",
+          "valor": 24.376664
+        },
+        {
+          "fecha": "2004-04",
+          "valor": 27.79221
+        },
+        {
+          "fecha": "2004-05",
+          "valor": 68.019301
+        },
+        {
+          "fecha": "2004-06",
+          "valor": 149.07084
+        },
+        {
+          "fecha": "2004-07",
+          "valor": 75.840446
+        },
+        {
+          "fecha": "2004-08",
+          "valor": 56.263667
+        },
+        {
+          "fecha": "2004-09",
+          "valor": 73.09854
+        },
+        {
+          "fecha": "2004-10",
+          "valor": 24.789336000000002
+        },
+        {
+          "fecha": "2004-11",
+          "valor": 15.07194
+        },
+        {
+          "fecha": "2004-12",
+          "valor": 19.010223
+        },
+        {
+          "fecha": "2005-01",
+          "valor": 8.615458
+        },
+        {
+          "fecha": "2005-02",
+          "valor": 14.934835999999999
+        },
+        {
+          "fecha": "2005-03",
+          "valor": 12.384159
+        },
+        {
+          "fecha": "2005-04",
+          "valor": 9.219240000000001
+        },
+        {
+          "fecha": "2005-05",
+          "valor": 27.148839000000002
+        },
+        {
+          "fecha": "2005-06",
+          "valor": 47.909310000000005
+        },
+        {
+          "fecha": "2005-07",
+          "valor": 74.64440400000001
+        },
+        {
+          "fecha": "2005-08",
+          "valor": 74.96754800000001
+        },
+        {
+          "fecha": "2005-09",
+          "valor": 45.93306
+        },
+        {
+          "fecha": "2005-10",
+          "valor": 13.569072
+        },
+        {
+          "fecha": "2005-11",
+          "valor": 13.2324
+        },
+        {
+          "fecha": "2005-12",
+          "valor": 12.857746
+        },
+        {
+          "fecha": "2006-01",
+          "valor": 12.269304
+        },
+        {
+          "fecha": "2006-02",
+          "valor": 20.221152
+        },
+        {
+          "fecha": "2006-03",
+          "valor": 9.447745999999999
+        },
+        {
+          "fecha": "2006-04",
+          "valor": 12.567150000000002
+        },
+        {
+          "fecha": "2006-05",
+          "valor": 52.992516
+        },
+        {
+          "fecha": "2006-06",
+          "valor": 65.74125
+        },
+        {
+          "fecha": "2006-07",
+          "valor": 68.75325699999999
+        },
+        {
+          "fecha": "2006-08",
+          "valor": 40.119673000000006
+        },
+        {
+          "fecha": "2006-09",
+          "valor": 28.99359
+        },
+        {
+          "fecha": "2006-10",
+          "valor": 11.183963
+        },
+        {
+          "fecha": "2006-11",
+          "valor": 9.434790000000001
+        },
+        {
+          "fecha": "2006-12",
+          "valor": 15.931706
+        },
+        {
+          "fecha": "2007-01",
+          "valor": 15.717774999999998
+        },
+        {
+          "fecha": "2007-02",
+          "valor": 23.701748
+        },
+        {
+          "fecha": "2007-03",
+          "valor": 31.072415999999997
+        },
+        {
+          "fecha": "2007-04",
+          "valor": 16.05528
+        },
+        {
+          "fecha": "2007-05",
+          "valor": 45.469280999999995
+        },
+        {
+          "fecha": "2007-06",
+          "valor": 43.50183
+        },
+        {
+          "fecha": "2007-07",
+          "valor": 106.122951
+        },
+        {
+          "fecha": "2007-08",
+          "valor": 83.50417300000001
+        },
+        {
+          "fecha": "2007-09",
+          "valor": 42.29907
+        },
+        {
+          "fecha": "2007-10",
+          "valor": 12.3442
+        },
+        {
+          "fecha": "2007-11",
+          "valor": 15.451410000000001
+        },
+        {
+          "fecha": "2007-12",
+          "valor": 14.543588
+        },
+        {
+          "fecha": "2008-01",
+          "valor": 19.362476
+        },
+        {
+          "fecha": "2008-02",
+          "valor": 28.816226999999998
+        },
+        {
+          "fecha": "2008-03",
+          "valor": 20.920102
+        },
+        {
+          "fecha": "2008-04",
+          "valor": 13.3731
+        },
+        {
+          "fecha": "2008-05",
+          "valor": 75.96841400000001
+        },
+        {
+          "fecha": "2008-06",
+          "valor": 46.77237
+        },
+        {
+          "fecha": "2008-07",
+          "valor": 51.140390000000004
+        },
+        {
+          "fecha": "2008-08",
+          "valor": 73.774141
+        },
+        {
+          "fecha": "2008-09",
+          "valor": 44.699070000000006
+        },
+        {
+          "fecha": "2008-10",
+          "valor": 22.572681
+        },
+        {
+          "fecha": "2008-11",
+          "valor": 19.684559999999998
+        },
+        {
+          "fecha": "2008-12",
+          "valor": 16.795211
+        },
+        {
+          "fecha": "2009-01",
+          "valor": 23.342937999999997
+        },
+        {
+          "fecha": "2009-02",
+          "valor": 16.196264
+        },
+        {
+          "fecha": "2009-03",
+          "valor": 17.022968
+        },
+        {
+          "fecha": "2009-04",
+          "valor": 18.3684
+        },
+        {
+          "fecha": "2009-05",
+          "valor": 64.290466
+        },
+        {
+          "fecha": "2009-06",
+          "valor": 98.93571
+        },
+        {
+          "fecha": "2009-07",
+          "valor": 124.529635
+        },
+        {
+          "fecha": "2009-08",
+          "valor": 77.059366
+        },
+        {
+          "fecha": "2009-09",
+          "valor": 41.6157
+        },
+        {
+          "fecha": "2009-10",
+          "valor": 17.442677
+        },
+        {
+          "fecha": "2009-11",
+          "valor": 21.11817
+        },
+        {
+          "fecha": "2009-12",
+          "valor": 28.619293
+        },
+        {
+          "fecha": "2010-01",
+          "valor": 16.110793
+        },
+        {
+          "fecha": "2010-02",
+          "valor": 11.468828
+        },
+        {
+          "fecha": "2010-03",
+          "valor": 14.548455
+        },
+        {
+          "fecha": "2010-04",
+          "valor": 16.255020000000002
+        },
+        {
+          "fecha": "2010-05",
+          "valor": 37.227993000000005
+        },
+        {
+          "fecha": "2010-06",
+          "valor": 56.09016
+        },
+        {
+          "fecha": "2010-07",
+          "valor": 95.87664500000001
+        },
+        {
+          "fecha": "2010-08",
+          "valor": 39.77083
+        },
+        {
+          "fecha": "2010-09",
+          "valor": 39.93735
+        },
+        {
+          "fecha": "2010-10",
+          "valor": 5.107002
+        },
+        {
+          "fecha": "2010-11",
+          "valor": 14.85441
+        },
+        {
+          "fecha": "2010-12",
+          "valor": 19.819602
+        },
+        {
+          "fecha": "2011-01",
+          "valor": 22.252513
+        },
+        {
+          "fecha": "2011-02",
+          "valor": 14.613928
+        },
+        {
+          "fecha": "2011-03",
+          "valor": 11.870551
+        },
+        {
+          "fecha": "2011-04",
+          "valor": 15.383550000000001
+        },
+        {
+          "fecha": "2011-05",
+          "valor": 88.334283
+        },
+        {
+          "fecha": "2011-06",
+          "valor": 67.32912
+        },
+        {
+          "fecha": "2011-07",
+          "valor": 153.695148
+        },
+        {
+          "fecha": "2011-08",
+          "valor": 100.056933
+        },
+        {
+          "fecha": "2011-09",
+          "valor": 26.94369
+        },
+        {
+          "fecha": "2011-10",
+          "valor": 11.774203
+        },
+        {
+          "fecha": "2011-11",
+          "valor": 20.94048
+        },
+        {
+          "fecha": "2011-12",
+          "valor": 24.456706
+        },
+        {
+          "fecha": "2012-01",
+          "valor": 26.705322
+        },
+        {
+          "fecha": "2012-02",
+          "valor": 12.059447
+        },
+        {
+          "fecha": "2012-03",
+          "valor": 17.244152999999997
+        },
+        {
+          "fecha": "2012-04",
+          "valor": 21.037679999999998
+        },
+        {
+          "fecha": "2012-05",
+          "valor": 57.252629
+        },
+        {
+          "fecha": "2012-06",
+          "valor": 61.37274000000001
+        },
+        {
+          "fecha": "2012-07",
+          "valor": 115.58412
+        },
+        {
+          "fecha": "2012-08",
+          "valor": 124.704413
+        },
+        {
+          "fecha": "2012-09",
+          "valor": 39.76191
+        },
+        {
+          "fecha": "2012-10",
+          "valor": 14.019936
+        },
+        {
+          "fecha": "2012-11",
+          "valor": 20.73696
+        },
+        {
+          "fecha": "2012-12",
+          "valor": 19.081647
+        },
+        {
+          "fecha": "2013-01",
+          "valor": 35.045716999999996
+        },
+        {
+          "fecha": "2013-02",
+          "valor": 35.044044
+        },
+        {
+          "fecha": "2013-03",
+          "valor": 14.169976
+        },
+        {
+          "fecha": "2013-04",
+          "valor": 10.17975
+        },
+        {
+          "fecha": "2013-05",
+          "valor": 29.570187
+        },
+        {
+          "fecha": "2013-06",
+          "valor": null
+        },
+        {
+          "fecha": "2013-07",
+          "valor": 135.990366
+        },
+        {
+          "fecha": "2013-08",
+          "valor": 174.828871
+        },
+        {
+          "fecha": "2013-09",
+          "valor": 38.26299
+        },
+        {
+          "fecha": "2013-10",
+          "valor": 25.853969000000003
+        },
+        {
+          "fecha": "2013-11",
+          "valor": 31.738679999999995
+        },
+        {
+          "fecha": "2013-12",
+          "valor": 44.590927
+        },
+        {
+          "fecha": "2014-01",
+          "valor": 11.237283
+        },
+        {
+          "fecha": "2014-02",
+          "valor": 9.14998
+        },
+        {
+          "fecha": "2014-03",
+          "valor": 10.571837
+        },
+        {
+          "fecha": "2014-04",
+          "valor": 16.688129999999997
+        },
+        {
+          "fecha": "2014-05",
+          "valor": 25.435624
+        },
+        {
+          "fecha": "2014-06",
+          "valor": 54.74559
+        },
+        {
+          "fecha": "2014-07",
+          "valor": 47.754725
+        },
+        {
+          "fecha": "2014-08",
+          "valor": 39.294731999999996
+        },
+        {
+          "fecha": "2014-09",
+          "valor": 22.01871
+        },
+        {
+          "fecha": "2014-10",
+          "valor": 10.18164
+        },
+        {
+          "fecha": "2014-11",
+          "valor": 12.27
+        },
+        {
+          "fecha": "2014-12",
+          "valor": 13.266636
+        },
+        {
+          "fecha": "2015-01",
+          "valor": 23.835435
+        },
+        {
+          "fecha": "2015-02",
+          "valor": 22.896692
+        },
+        {
+          "fecha": "2015-03",
+          "valor": 19.119436
+        },
+        {
+          "fecha": "2015-04",
+          "valor": 27.45678
+        },
+        {
+          "fecha": "2015-05",
+          "valor": 58.422693
+        },
+        {
+          "fecha": "2015-06",
+          "valor": 88.03086
+        },
+        {
+          "fecha": "2015-07",
+          "valor": 131.995892
+        },
+        {
+          "fecha": "2015-08",
+          "valor": 88.87576
+        },
+        {
+          "fecha": "2015-09",
+          "valor": 24.90816
+        },
+        {
+          "fecha": "2015-10",
+          "valor": 7.210538
+        },
+        {
+          "fecha": "2015-11",
+          "valor": 30.033990000000003
+        },
+        {
+          "fecha": "2015-12",
+          "valor": 18.751218
+        },
+        {
+          "fecha": "2016-01",
+          "valor": 11.27346
+        },
+        {
+          "fecha": "2016-02",
+          "valor": 23.767037
+        },
+        {
+          "fecha": "2016-03",
+          "valor": 25.718529999999998
+        },
+        {
+          "fecha": "2016-04",
+          "valor": 26.51922
+        },
+        {
+          "fecha": "2016-05",
+          "valor": 56.488138
+        },
+        {
+          "fecha": "2016-06",
+          "valor": 54.0045
+        },
+        {
+          "fecha": "2016-07",
+          "valor": 59.924736
+        },
+        {
+          "fecha": "2016-08",
+          "valor": 88.993684
+        },
+        {
+          "fecha": "2016-09",
+          "valor": 43.75068
+        },
+        {
+          "fecha": "2016-10",
+          "valor": 28.687896000000002
+        },
+        {
+          "fecha": "2016-11",
+          "valor": 28.117919999999998
+        },
+        {
+          "fecha": "2016-12",
+          "valor": 15.680141
+        },
+        {
+          "fecha": "2017-01",
+          "valor": 8.376726999999999
+        },
+        {
+          "fecha": "2017-02",
+          "valor": 11.06098
+        },
+        {
+          "fecha": "2017-03",
+          "valor": 12.243822
+        },
+        {
+          "fecha": "2017-04",
+          "valor": 8.520570000000001
+        },
+        {
+          "fecha": "2017-05",
+          "valor": 44.498206
+        },
+        {
+          "fecha": "2017-06",
+          "valor": 73.16688
+        },
+        {
+          "fecha": "2017-07",
+          "valor": 41.787349
+        },
+        {
+          "fecha": "2017-08",
+          "valor": 51.221765
+        },
+        {
+          "fecha": "2017-09",
+          "valor": 26.42739
+        },
+        {
+          "fecha": "2017-10",
+          "valor": 8.170205
+        },
+        {
+          "fecha": "2017-11",
+          "valor": 17.73588
+        },
+        {
+          "fecha": "2017-12",
+          "valor": 8.835496
+        },
+        {
+          "fecha": "2018-01",
+          "valor": 17.672728000000003
+        },
+        {
+          "fecha": "2018-02",
+          "valor": 21.417004000000002
+        },
+        {
+          "fecha": "2018-03",
+          "valor": 24.655354
+        },
+        {
+          "fecha": "2018-04",
+          "valor": 15.562859999999999
+        },
+        {
+          "fecha": "2018-05",
+          "valor": 73.631603
+        },
+        {
+          "fecha": "2018-06",
+          "valor": 150.69396
+        },
+        {
+          "fecha": "2018-07",
+          "valor": 238.54484499999998
+        },
+        {
+          "fecha": "2018-08",
+          "valor": 59.868347
+        },
+        {
+          "fecha": "2018-09",
+          "valor": 40.95975
+        },
+        {
+          "fecha": "2018-10",
+          "valor": 12.518265
+        },
+        {
+          "fecha": "2018-11",
+          "valor": 7.649039999999999
+        },
+        {
+          "fecha": "2018-12",
+          "valor": 12.947181
+        },
+        {
+          "fecha": "2019-01",
+          "valor": 28.200855
+        },
+        {
+          "fecha": "2019-02",
+          "valor": 22.557080000000003
+        },
+        {
+          "fecha": "2019-03",
+          "valor": 19.71259
+        },
+        {
+          "fecha": "2019-04",
+          "valor": 15.311160000000001
+        },
+        {
+          "fecha": "2019-05",
+          "valor": 75.76235700000001
+        },
+        {
+          "fecha": "2019-06",
+          "valor": 71.01132
+        },
+        {
+          "fecha": "2019-07",
+          "valor": 111.367283
+        },
+        {
+          "fecha": "2019-08",
+          "valor": 103.174944
+        },
+        {
+          "fecha": "2019-09",
+          "valor": 30.587069999999997
+        },
+        {
+          "fecha": "2019-10",
+          "valor": 11.648157
+        },
+        {
+          "fecha": "2019-11",
+          "valor": 7.615919999999999
+        },
+        {
+          "fecha": "2019-12",
+          "valor": 8.630958
+        },
+        {
+          "fecha": "2020-01",
+          "valor": 17.88235
+        },
+        {
+          "fecha": "2020-02",
+          "valor": 22.503362
+        },
+        {
+          "fecha": "2020-03",
+          "valor": 19.483965
+        },
+        {
+          "fecha": "2020-04",
+          "valor": 17.122619999999998
+        },
+        {
+          "fecha": "2020-05",
+          "valor": 31.616342
+        },
+        {
+          "fecha": "2020-06",
+          "valor": 136.33035
+        },
+        {
+          "fecha": "2020-07",
+          "valor": 135.105657
+        },
+        {
+          "fecha": "2020-08",
+          "valor": 81.471813
+        },
+        {
+          "fecha": "2020-09",
+          "valor": 57.01704
+        },
+        {
+          "fecha": "2020-10",
+          "valor": 18.053935000000003
+        },
+        {
+          "fecha": "2020-11",
+          "valor": 28.42407
+        },
+        {
+          "fecha": "2020-12",
+          "valor": 33.396454999999996
+        },
+        {
+          "fecha": "2021-01",
+          "valor": 16.228996
+        },
+        {
+          "fecha": "2021-02",
+          "valor": 9.464196
+        },
+        {
+          "fecha": "2021-03",
+          "valor": 12.03172
+        },
+        {
+          "fecha": "2021-04",
+          "valor": 23.03688
+        },
+        {
+          "fecha": "2021-05",
+          "valor": 65.592683
+        },
+        {
+          "fecha": "2021-06",
+          "valor": 95.95776000000001
+        },
+        {
+          "fecha": "2021-07",
+          "valor": 69.297369
+        },
+        {
+          "fecha": "2021-08",
+          "valor": 55.98538
+        },
+        {
+          "fecha": "2021-09",
+          "valor": 65.20278
+        },
+        {
+          "fecha": "2021-10",
+          "valor": 14.378637
+        },
+        {
+          "fecha": "2021-11",
+          "valor": 9.804359999999999
+        },
+        {
+          "fecha": "2021-12",
+          "valor": 12.796645000000002
+        },
+        {
+          "fecha": "2022-01",
+          "valor": 13.888434
+        },
+        {
+          "fecha": "2022-02",
+          "valor": 15.958936
+        },
+        {
+          "fecha": "2022-03",
+          "valor": 17.128988
+        },
+        {
+          "fecha": "2022-04",
+          "valor": 9.768329999999999
+        },
+        {
+          "fecha": "2022-05",
+          "valor": 45.854921
+        },
+        {
+          "fecha": "2022-06",
+          "valor": 66.16773
+        },
+        {
+          "fecha": "2022-07",
+          "valor": 100.975277
+        },
+        {
+          "fecha": "2022-08",
+          "valor": 77.551491
+        },
+        {
+          "fecha": "2022-09",
+          "valor": 35.37594
+        },
+        {
+          "fecha": "2022-10",
+          "valor": 16.153263
+        },
+        {
+          "fecha": "2022-11",
+          "valor": 29.03397
+        },
+        {
+          "fecha": "2022-12",
+          "valor": 23.256293
+        },
+        {
+          "fecha": "2023-01",
+          "valor": 27.903192999999998
+        },
+        {
+          "fecha": "2023-02",
+          "valor": 10.666404
+        },
+        {
+          "fecha": "2023-03",
+          "valor": 13.871601
+        },
+        {
+          "fecha": "2023-04",
+          "valor": 6.0718499999999995
+        },
+        {
+          "fecha": "2023-05",
+          "valor": 45.815768
+        },
+        {
+          "fecha": "2023-06",
+          "valor": 47.40663
+        },
+        {
+          "fecha": "2023-07",
+          "valor": 50.217737
+        },
+        {
+          "fecha": "2023-08",
+          "valor": 83.635489
+        },
+        {
+          "fecha": "2023-09",
+          "valor": 53.205000000000005
+        },
+        {
+          "fecha": "2023-10",
+          "valor": 15.915616999999997
+        },
+        {
+          "fecha": "2023-11",
+          "valor": 25.58511
+        },
+        {
+          "fecha": "2023-12",
+          "valor": 38.450757
+        },
+        {
+          "fecha": "2024-01",
+          "valor": 9.76624
+        },
+        {
+          "fecha": "2024-02",
+          "valor": 9.767664
+        },
+        {
+          "fecha": "2024-03",
+          "valor": 7.133844
+        },
+        {
+          "fecha": "2024-04",
+          "valor": 8.97684
+        },
+        {
+          "fecha": "2024-05",
+          "valor": 28.813353000000003
+        },
+        {
+          "fecha": "2024-06",
+          "valor": 47.28876
+        },
+        {
+          "fecha": "2024-07",
+          "valor": 69.950539
+        },
+        {
+          "fecha": "2024-08",
+          "valor": 59.765086
+        },
+        {
+          "fecha": "2024-09",
+          "valor": 36.62073
+        },
+        {
+          "fecha": "2024-10",
+          "valor": 15.312729
+        },
+        {
+          "fecha": "2024-11",
+          "valor": 16.07628
+        },
+        {
+          "fecha": "2024-12",
+          "valor": 9.933392
+        }
+      ],
+      "annual": [
+        {
+          "anio": 2001,
+          "valor": 543.719496,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        },
+        {
+          "anio": 2002,
+          "valor": 737.295645,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2003,
+          "valor": 470.061612,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2004,
+          "valor": 563.454667,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2005,
+          "valor": 355.41607200000004,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2006,
+          "valor": 347.656097,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2007,
+          "valor": 449.783722,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2008,
+          "valor": 433.878742,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2009,
+          "valor": 548.5415869999999,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2010,
+          "valor": 367.067088,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2011,
+          "valor": 557.651105,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2012,
+          "valor": 529.560957,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2013,
+          "valor": null,
+          "completo": false,
+          "meses_faltantes": [
+            6
+          ],
+          "en_tramo": false
+        },
+        {
+          "anio": 2014,
+          "valor": 272.614887,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        },
+        {
+          "anio": 2015,
+          "valor": 541.537454,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        },
+        {
+          "anio": 2016,
+          "valor": 462.925942,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        },
+        {
+          "anio": 2017,
+          "valor": 312.04527,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        },
+        {
+          "anio": 2018,
+          "valor": 676.120937,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        },
+        {
+          "anio": 2019,
+          "valor": 505.579694,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        },
+        {
+          "anio": 2020,
+          "valor": 598.407959,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        },
+        {
+          "anio": 2021,
+          "valor": 449.777406,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        },
+        {
+          "anio": 2022,
+          "valor": 451.11357300000003,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        },
+        {
+          "anio": 2023,
+          "valor": 418.745156,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        },
+        {
+          "anio": 2024,
+          "valor": 319.405457,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        }
+      ],
+      "slope_decade": -73.18222999999989,
+      "ci95": [
+        -313.45334603781873,
+        167.08888603781898
+      ],
+      "p_raw": 0.550527724285921,
+      "p_holm": 1.0,
+      "label": "evidencia insuficiente",
+      "texto": "P cambió aproximadamente -73.2 mm por década (total anual); IC95 % [-313.5, +167.1]; p ajustado 1.000; evidencia insuficiente. Período 2002–2012, 11 años válidos.",
+      "motivo_null": null,
+      "quality": {
+        "n_meses_esperados": 288,
+        "n_meses_validos": 287,
+        "meses_faltantes": [
+          "2013-06"
+        ],
+        "n_valores_relleno": 0,
+        "anios_completos": 23,
+        "anios_incompletos": [
+          2013
+        ],
+        "n_anios_tramo": 11,
+        "fraccion_area": null,
+        "residuos": {
+          "durbin_watson": 1.6680611292450471,
+          "autocorrelacion_lag1": -0.06311193068588052,
+          "residuo_estandarizado_max": 1.7838331904704698,
+          "diferencia_medias_mitades_en_sd": 0.22196885854245157
+        },
+        "advertencias": []
+      },
+      "sensibilidad": {
+        "rezago_principal": 1,
+        "rezagos": [
+          {
+            "maxlags": 2,
+            "slope_decade": -73.18222999999989,
+            "ci95": [
+              -315.19125258797266,
+              168.82679258797285
+            ],
+            "p_raw": 0.5533935928031514,
+            "p_holm": 1.0,
+            "decision_rechaza_H0": false
+          },
+          {
+            "maxlags": 3,
+            "slope_decade": -73.18222999999989,
+            "ci95": [
+              -306.47641880408923,
+              160.11195880408948
+            ],
+            "p_raw": 0.5386718955170737,
+            "p_holm": 1.0,
+            "decision_rechaza_H0": false
+          }
+        ],
+        "resultado_sensible_al_rezago": false
+      }
+    },
+    {
+      "id": "T",
+      "nombre": "Temperatura del aire a 2 m",
+      "producto": "MERRA-2 mensual",
+      "campo": "T2M",
+      "conversion": "K − 273.15 → °C",
+      "units": {
+        "monthly": "°C",
+        "annual": "°C",
+        "slope_decade": "°C por década"
+      },
+      "annual_aggregation": "media ponderada por días Σ(X·días)/Σ(días)",
+      "monthly": [
+        {
+          "fecha": "2001-01",
+          "valor": 15.479000000000042
+        },
+        {
+          "fecha": "2001-02",
+          "valor": 15.054400000000044
+        },
+        {
+          "fecha": "2001-03",
+          "valor": null
+        },
+        {
+          "fecha": "2001-04",
+          "valor": 19.879800000000046
+        },
+        {
+          "fecha": "2001-05",
+          "valor": 22.507300000000043
+        },
+        {
+          "fecha": "2001-06",
+          "valor": 24.263900000000035
+        },
+        {
+          "fecha": "2001-07",
+          "valor": 25.79600000000005
+        },
+        {
+          "fecha": "2001-08",
+          "valor": 25.245000000000005
+        },
+        {
+          "fecha": "2001-09",
+          "valor": 24.061900000000037
+        },
+        {
+          "fecha": "2001-10",
+          "valor": 22.039600000000007
+        },
+        {
+          "fecha": "2001-11",
+          "valor": 19.35880000000003
+        },
+        {
+          "fecha": "2001-12",
+          "valor": 17.5505
+        },
+        {
+          "fecha": "2002-01",
+          "valor": 15.673600000000022
+        },
+        {
+          "fecha": "2002-02",
+          "valor": 15.730500000000006
+        },
+        {
+          "fecha": "2002-03",
+          "valor": 17.28280000000001
+        },
+        {
+          "fecha": "2002-04",
+          "valor": 20.010700000000043
+        },
+        {
+          "fecha": "2002-05",
+          "valor": 22.626900000000035
+        },
+        {
+          "fecha": "2002-06",
+          "valor": 24.31850000000003
+        },
+        {
+          "fecha": "2002-07",
+          "valor": 26.465700000000027
+        },
+        {
+          "fecha": "2002-08",
+          "valor": 26.467700000000036
+        },
+        {
+          "fecha": "2002-09",
+          "valor": 24.94440000000003
+        },
+        {
+          "fecha": "2002-10",
+          "valor": 22.679100000000005
+        },
+        {
+          "fecha": "2002-11",
+          "valor": 18.795100000000048
+        },
+        {
+          "fecha": "2002-12",
+          "valor": 17.076700000000017
+        },
+        {
+          "fecha": "2003-01",
+          "valor": 15.23580000000004
+        },
+        {
+          "fecha": "2003-02",
+          "valor": 15.27600000000001
+        },
+        {
+          "fecha": "2003-03",
+          "valor": 16.576900000000023
+        },
+        {
+          "fecha": "2003-04",
+          "valor": 18.503000000000043
+        },
+        {
+          "fecha": "2003-05",
+          "valor": 22.602800000000002
+        },
+        {
+          "fecha": "2003-06",
+          "valor": 25.7491
+        },
+        {
+          "fecha": "2003-07",
+          "valor": 25.924800000000005
+        },
+        {
+          "fecha": "2003-08",
+          "valor": 25.858600000000024
+        },
+        {
+          "fecha": "2003-09",
+          "valor": 25.438000000000045
+        },
+        {
+          "fecha": "2003-10",
+          "valor": 22.731300000000033
+        },
+        {
+          "fecha": "2003-11",
+          "valor": 19.978800000000035
+        },
+        {
+          "fecha": "2003-12",
+          "valor": 17.734200000000044
+        },
+        {
+          "fecha": "2004-01",
+          "valor": 15.895700000000033
+        },
+        {
+          "fecha": "2004-02",
+          "valor": 15.857600000000048
+        },
+        {
+          "fecha": "2004-03",
+          "valor": 17.177700000000016
+        },
+        {
+          "fecha": "2004-04",
+          "valor": 19.887900000000002
+        },
+        {
+          "fecha": "2004-05",
+          "valor": 22.32910000000004
+        },
+        {
+          "fecha": "2004-06",
+          "valor": 25.295600000000036
+        },
+        {
+          "fecha": "2004-07",
+          "valor": 27.018700000000024
+        },
+        {
+          "fecha": "2004-08",
+          "valor": 26.9658
+        },
+        {
+          "fecha": "2004-09",
+          "valor": 25.289800000000014
+        },
+        {
+          "fecha": "2004-10",
+          "valor": 22.575000000000045
+        },
+        {
+          "fecha": "2004-11",
+          "valor": 19.480999999999995
+        },
+        {
+          "fecha": "2004-12",
+          "valor": 17.585300000000018
+        },
+        {
+          "fecha": "2005-01",
+          "valor": 15.6875
+        },
+        {
+          "fecha": "2005-02",
+          "valor": 15.196300000000008
+        },
+        {
+          "fecha": "2005-03",
+          "valor": 16.654600000000016
+        },
+        {
+          "fecha": "2005-04",
+          "valor": 19.409400000000005
+        },
+        {
+          "fecha": "2005-05",
+          "valor": 21.925100000000043
+        },
+        {
+          "fecha": "2005-06",
+          "valor": 23.71040000000005
+        },
+        {
+          "fecha": "2005-07",
+          "valor": 26.39590000000004
+        },
+        {
+          "fecha": "2005-08",
+          "valor": 26.02290000000005
+        },
+        {
+          "fecha": "2005-09",
+          "valor": 24.497600000000034
+        },
+        {
+          "fecha": "2005-10",
+          "valor": 22.207700000000045
+        },
+        {
+          "fecha": "2005-11",
+          "valor": 18.80970000000002
+        },
+        {
+          "fecha": "2005-12",
+          "valor": 17.03060000000005
+        },
+        {
+          "fecha": "2006-01",
+          "valor": 15.376599999999996
+        },
+        {
+          "fecha": "2006-02",
+          "valor": 15.085500000000025
+        },
+        {
+          "fecha": "2006-03",
+          "valor": 16.314999999999998
+        },
+        {
+          "fecha": "2006-04",
+          "valor": 19.05510000000004
+        },
+        {
+          "fecha": "2006-05",
+          "valor": 21.478800000000035
+        },
+        {
+          "fecha": "2006-06",
+          "valor": 24.49720000000002
+        },
+        {
+          "fecha": "2006-07",
+          "valor": 26.228400000000022
+        },
+        {
+          "fecha": "2006-08",
+          "valor": 26.927099999999996
+        },
+        {
+          "fecha": "2006-09",
+          "valor": 24.376599999999996
+        },
+        {
+          "fecha": "2006-10",
+          "valor": 22.417200000000037
+        },
+        {
+          "fecha": "2006-11",
+          "valor": 19.70780000000002
+        },
+        {
+          "fecha": "2006-12",
+          "valor": 16.8913
+        },
+        {
+          "fecha": "2007-01",
+          "valor": 15.672600000000045
+        },
+        {
+          "fecha": "2007-02",
+          "valor": 15.75410000000005
+        },
+        {
+          "fecha": "2007-03",
+          "valor": 17.46180000000004
+        },
+        {
+          "fecha": "2007-04",
+          "valor": 19.455200000000048
+        },
+        {
+          "fecha": "2007-05",
+          "valor": 22.318200000000047
+        },
+        {
+          "fecha": "2007-06",
+          "valor": 24.906000000000006
+        },
+        {
+          "fecha": "2007-07",
+          "valor": 25.903400000000033
+        },
+        {
+          "fecha": "2007-08",
+          "valor": 26.137699999999995
+        },
+        {
+          "fecha": "2007-09",
+          "valor": 24.59970000000004
+        },
+        {
+          "fecha": "2007-10",
+          "valor": 21.701099999999997
+        },
+        {
+          "fecha": "2007-11",
+          "valor": 19.38130000000001
+        },
+        {
+          "fecha": "2007-12",
+          "valor": 17.40130000000005
+        },
+        {
+          "fecha": "2008-01",
+          "valor": 16.867800000000045
+        },
+        {
+          "fecha": "2008-02",
+          "valor": 16.600099999999998
+        },
+        {
+          "fecha": "2008-03",
+          "valor": 16.84710000000001
+        },
+        {
+          "fecha": "2008-04",
+          "valor": 19.66500000000002
+        },
+        {
+          "fecha": "2008-05",
+          "valor": 22.76520000000005
+        },
+        {
+          "fecha": "2008-06",
+          "valor": 25.182200000000023
+        },
+        {
+          "fecha": "2008-07",
+          "valor": 26.35850000000005
+        },
+        {
+          "fecha": "2008-08",
+          "valor": 26.14620000000002
+        },
+        {
+          "fecha": "2008-09",
+          "valor": 24.608600000000024
+        },
+        {
+          "fecha": "2008-10",
+          "valor": 22.273500000000013
+        },
+        {
+          "fecha": "2008-11",
+          "valor": 20.298100000000034
+        },
+        {
+          "fecha": "2008-12",
+          "valor": 17.094300000000032
+        },
+        {
+          "fecha": "2009-01",
+          "valor": 16.033000000000015
+        },
+        {
+          "fecha": "2009-02",
+          "valor": 16.399200000000008
+        },
+        {
+          "fecha": "2009-03",
+          "valor": 17.958500000000015
+        },
+        {
+          "fecha": "2009-04",
+          "valor": 21.022500000000036
+        },
+        {
+          "fecha": "2009-05",
+          "valor": 23.70240000000001
+        },
+        {
+          "fecha": "2009-06",
+          "valor": 25.443300000000022
+        },
+        {
+          "fecha": "2009-07",
+          "valor": 26.26600000000002
+        },
+        {
+          "fecha": "2009-08",
+          "valor": 25.933100000000024
+        },
+        {
+          "fecha": "2009-09",
+          "valor": 24.714
+        },
+        {
+          "fecha": "2009-10",
+          "valor": 22.354300000000023
+        },
+        {
+          "fecha": "2009-11",
+          "valor": 20.214
+        },
+        {
+          "fecha": "2009-12",
+          "valor": 17.385700000000043
+        },
+        {
+          "fecha": "2010-01",
+          "valor": 15.841499999999996
+        },
+        {
+          "fecha": "2010-02",
+          "valor": 15.628100000000018
+        },
+        {
+          "fecha": "2010-03",
+          "valor": 17.932200000000023
+        },
+        {
+          "fecha": "2010-04",
+          "valor": 20.27660000000003
+        },
+        {
+          "fecha": "2010-05",
+          "valor": 22.16560000000004
+        },
+        {
+          "fecha": "2010-06",
+          "valor": 23.83280000000002
+        },
+        {
+          "fecha": "2010-07",
+          "valor": 25.42240000000004
+        },
+        {
+          "fecha": "2010-08",
+          "valor": 25.661699999999996
+        },
+        {
+          "fecha": "2010-09",
+          "valor": 23.801800000000014
+        },
+        {
+          "fecha": "2010-10",
+          "valor": 21.83630000000005
+        },
+        {
+          "fecha": "2010-11",
+          "valor": 18.82420000000002
+        },
+        {
+          "fecha": "2010-12",
+          "valor": 17.185400000000016
+        },
+        {
+          "fecha": "2011-01",
+          "valor": 15.903200000000027
+        },
+        {
+          "fecha": "2011-02",
+          "valor": 16.3057
+        },
+        {
+          "fecha": "2011-03",
+          "valor": 17.538400000000024
+        },
+        {
+          "fecha": "2011-04",
+          "valor": 19.573200000000043
+        },
+        {
+          "fecha": "2011-05",
+          "valor": 22.481300000000033
+        },
+        {
+          "fecha": "2011-06",
+          "valor": 24.176199999999994
+        },
+        {
+          "fecha": "2011-07",
+          "valor": 25.749500000000012
+        },
+        {
+          "fecha": "2011-08",
+          "valor": 26.144600000000025
+        },
+        {
+          "fecha": "2011-09",
+          "valor": 24.337500000000034
+        },
+        {
+          "fecha": "2011-10",
+          "valor": 23.06660000000005
+        },
+        {
+          "fecha": "2011-11",
+          "valor": 20.6087
+        },
+        {
+          "fecha": "2011-12",
+          "valor": 17.10250000000002
+        },
+        {
+          "fecha": "2012-01",
+          "valor": 14.293300000000045
+        },
+        {
+          "fecha": "2012-02",
+          "valor": 15.62620000000004
+        },
+        {
+          "fecha": "2012-03",
+          "valor": 17.72290000000004
+        },
+        {
+          "fecha": "2012-04",
+          "valor": 19.695500000000038
+        },
+        {
+          "fecha": "2012-05",
+          "valor": 22.772800000000018
+        },
+        {
+          "fecha": "2012-06",
+          "valor": 25.482100000000003
+        },
+        {
+          "fecha": "2012-07",
+          "valor": 26.079600000000028
+        },
+        {
+          "fecha": "2012-08",
+          "valor": 26.401400000000024
+        },
+        {
+          "fecha": "2012-09",
+          "valor": 25.343700000000013
+        },
+        {
+          "fecha": "2012-10",
+          "valor": 21.925200000000018
+        },
+        {
+          "fecha": "2012-11",
+          "valor": 19.6293
+        },
+        {
+          "fecha": "2012-12",
+          "valor": 17.670600000000036
+        },
+        {
+          "fecha": "2013-01",
+          "valor": 16.07340000000005
+        },
+        {
+          "fecha": "2013-02",
+          "valor": 16.013300000000015
+        },
+        {
+          "fecha": "2013-03",
+          "valor": 17.498500000000035
+        },
+        {
+          "fecha": "2013-04",
+          "valor": 20.122500000000002
+        },
+        {
+          "fecha": "2013-05",
+          "valor": 23.117500000000007
+        },
+        {
+          "fecha": "2013-06",
+          "valor": null
+        },
+        {
+          "fecha": "2013-07",
+          "valor": 27.425700000000006
+        },
+        {
+          "fecha": "2013-08",
+          "valor": 27.841000000000008
+        },
+        {
+          "fecha": "2013-09",
+          "valor": 26.342100000000016
+        },
+        {
+          "fecha": "2013-10",
+          "valor": 23.33250000000004
+        },
+        {
+          "fecha": "2013-11",
+          "valor": 20.11930000000001
+        },
+        {
+          "fecha": "2013-12",
+          "valor": 18.247600000000034
+        },
+        {
+          "fecha": "2014-01",
+          "valor": 16.226300000000037
+        },
+        {
+          "fecha": "2014-02",
+          "valor": 15.386000000000024
+        },
+        {
+          "fecha": "2014-03",
+          "valor": 16.32080000000002
+        },
+        {
+          "fecha": "2014-04",
+          "valor": 20.211100000000044
+        },
+        {
+          "fecha": "2014-05",
+          "valor": 21.78770000000003
+        },
+        {
+          "fecha": "2014-06",
+          "valor": 25.082600000000014
+        },
+        {
+          "fecha": "2014-07",
+          "valor": 26.424599999999998
+        },
+        {
+          "fecha": "2014-08",
+          "valor": 26.135400000000004
+        },
+        {
+          "fecha": "2014-09",
+          "valor": 25.005200000000002
+        },
+        {
+          "fecha": "2014-10",
+          "valor": 22.397100000000023
+        },
+        {
+          "fecha": "2014-11",
+          "valor": 19.21700000000004
+        },
+        {
+          "fecha": "2014-12",
+          "valor": 16.9187
+        },
+        {
+          "fecha": "2015-01",
+          "valor": 15.496400000000051
+        },
+        {
+          "fecha": "2015-02",
+          "valor": 15.464800000000025
+        },
+        {
+          "fecha": "2015-03",
+          "valor": 17.280700000000024
+        },
+        {
+          "fecha": "2015-04",
+          "valor": 20.71010000000001
+        },
+        {
+          "fecha": "2015-05",
+          "valor": 22.85220000000004
+        },
+        {
+          "fecha": "2015-06",
+          "valor": 25.693100000000015
+        },
+        {
+          "fecha": "2015-07",
+          "valor": 27.376100000000008
+        },
+        {
+          "fecha": "2015-08",
+          "valor": 27.090599999999995
+        },
+        {
+          "fecha": "2015-09",
+          "valor": 25.45640000000003
+        },
+        {
+          "fecha": "2015-10",
+          "valor": 23.021500000000003
+        },
+        {
+          "fecha": "2015-11",
+          "valor": 20.364900000000034
+        },
+        {
+          "fecha": "2015-12",
+          "valor": 16.682500000000005
+        },
+        {
+          "fecha": "2016-01",
+          "valor": 16.014499999999998
+        },
+        {
+          "fecha": "2016-02",
+          "valor": 16.55590000000001
+        },
+        {
+          "fecha": "2016-03",
+          "valor": 18.04140000000001
+        },
+        {
+          "fecha": "2016-04",
+          "valor": 20.1712
+        },
+        {
+          "fecha": "2016-05",
+          "valor": 22.88160000000005
+        },
+        {
+          "fecha": "2016-06",
+          "valor": 25.0274
+        },
+        {
+          "fecha": "2016-07",
+          "valor": 26.150300000000016
+        },
+        {
+          "fecha": "2016-08",
+          "valor": 26.934000000000026
+        },
+        {
+          "fecha": "2016-09",
+          "valor": 25.0822
+        },
+        {
+          "fecha": "2016-10",
+          "valor": 22.84390000000002
+        },
+        {
+          "fecha": "2016-11",
+          "valor": 19.794500000000028
+        },
+        {
+          "fecha": "2016-12",
+          "valor": 17.582100000000025
+        },
+        {
+          "fecha": "2017-01",
+          "valor": 15.207300000000032
+        },
+        {
+          "fecha": "2017-02",
+          "valor": 16.0086
+        },
+        {
+          "fecha": "2017-03",
+          "valor": 17.600300000000004
+        },
+        {
+          "fecha": "2017-04",
+          "valor": 19.086700000000008
+        },
+        {
+          "fecha": "2017-05",
+          "valor": 22.418000000000006
+        },
+        {
+          "fecha": "2017-06",
+          "valor": 24.885500000000036
+        },
+        {
+          "fecha": "2017-07",
+          "valor": 26.4221
+        },
+        {
+          "fecha": "2017-08",
+          "valor": 26.39580000000001
+        },
+        {
+          "fecha": "2017-09",
+          "valor": 23.993300000000033
+        },
+        {
+          "fecha": "2017-10",
+          "valor": 22.037500000000023
+        },
+        {
+          "fecha": "2017-11",
+          "valor": 18.72520000000003
+        },
+        {
+          "fecha": "2017-12",
+          "valor": 16.085200000000043
+        },
+        {
+          "fecha": "2018-01",
+          "valor": 15.789100000000019
+        },
+        {
+          "fecha": "2018-02",
+          "valor": 16.073800000000006
+        },
+        {
+          "fecha": "2018-03",
+          "valor": 18.487700000000018
+        },
+        {
+          "fecha": "2018-04",
+          "valor": 20.302400000000034
+        },
+        {
+          "fecha": "2018-05",
+          "valor": 23.10300000000001
+        },
+        {
+          "fecha": "2018-06",
+          "valor": 25.5539
+        },
+        {
+          "fecha": "2018-07",
+          "valor": 27.43090000000001
+        },
+        {
+          "fecha": "2018-08",
+          "valor": 26.185600000000022
+        },
+        {
+          "fecha": "2018-09",
+          "valor": 25.39100000000002
+        },
+        {
+          "fecha": "2018-10",
+          "valor": 22.740700000000004
+        },
+        {
+          "fecha": "2018-11",
+          "valor": 20.659700000000043
+        },
+        {
+          "fecha": "2018-12",
+          "valor": 18.9144
+        },
+        {
+          "fecha": "2019-01",
+          "valor": 16.745300000000043
+        },
+        {
+          "fecha": "2019-02",
+          "valor": 16.23950000000002
+        },
+        {
+          "fecha": "2019-03",
+          "valor": 17.379700000000014
+        },
+        {
+          "fecha": "2019-04",
+          "valor": 18.876300000000015
+        },
+        {
+          "fecha": "2019-05",
+          "valor": 22.110100000000045
+        },
+        {
+          "fecha": "2019-06",
+          "valor": 25.052800000000047
+        },
+        {
+          "fecha": "2019-07",
+          "valor": 26.239800000000002
+        },
+        {
+          "fecha": "2019-08",
+          "valor": 26.623000000000047
+        },
+        {
+          "fecha": "2019-09",
+          "valor": 25.477900000000034
+        },
+        {
+          "fecha": "2019-10",
+          "valor": 22.418100000000038
+        },
+        {
+          "fecha": "2019-11",
+          "valor": 20.16130000000004
+        },
+        {
+          "fecha": "2019-12",
+          "valor": 18.19160000000005
+        },
+        {
+          "fecha": "2020-01",
+          "valor": 17.310400000000016
+        },
+        {
+          "fecha": "2020-02",
+          "valor": 17.208799999999997
+        },
+        {
+          "fecha": "2020-03",
+          "valor": 18.509900000000016
+        },
+        {
+          "fecha": "2020-04",
+          "valor": 21.289000000000044
+        },
+        {
+          "fecha": "2020-05",
+          "valor": 23.79740000000004
+        },
+        {
+          "fecha": "2020-06",
+          "valor": 25.61940000000004
+        },
+        {
+          "fecha": "2020-07",
+          "valor": 26.998800000000017
+        },
+        {
+          "fecha": "2020-08",
+          "valor": 27.37390000000005
+        },
+        {
+          "fecha": "2020-09",
+          "valor": 26.551000000000045
+        },
+        {
+          "fecha": "2020-10",
+          "valor": 24.528800000000047
+        },
+        {
+          "fecha": "2020-11",
+          "valor": 21.158100000000047
+        },
+        {
+          "fecha": "2020-12",
+          "valor": 18.662900000000036
+        },
+        {
+          "fecha": "2021-01",
+          "valor": 16.599000000000046
+        },
+        {
+          "fecha": "2021-02",
+          "valor": 16.076300000000003
+        },
+        {
+          "fecha": "2021-03",
+          "valor": 17.776900000000012
+        },
+        {
+          "fecha": "2021-04",
+          "valor": 19.67180000000002
+        },
+        {
+          "fecha": "2021-05",
+          "valor": 22.681200000000047
+        },
+        {
+          "fecha": "2021-06",
+          "valor": 26.155100000000004
+        },
+        {
+          "fecha": "2021-07",
+          "valor": 27.420000000000016
+        },
+        {
+          "fecha": "2021-08",
+          "valor": 27.411900000000003
+        },
+        {
+          "fecha": "2021-09",
+          "valor": 24.767300000000034
+        },
+        {
+          "fecha": "2021-10",
+          "valor": 22.959100000000035
+        },
+        {
+          "fecha": "2021-11",
+          "valor": 20.329000000000008
+        },
+        {
+          "fecha": "2021-12",
+          "valor": 17.073000000000036
+        },
+        {
+          "fecha": "2022-01",
+          "valor": 15.459300000000042
+        },
+        {
+          "fecha": "2022-02",
+          "valor": 16.22750000000002
+        },
+        {
+          "fecha": "2022-03",
+          "valor": 17.9384
+        },
+        {
+          "fecha": "2022-04",
+          "valor": 19.70930000000004
+        },
+        {
+          "fecha": "2022-05",
+          "valor": 22.8904
+        },
+        {
+          "fecha": "2022-06",
+          "valor": 25.261400000000037
+        },
+        {
+          "fecha": "2022-07",
+          "valor": 26.599400000000003
+        },
+        {
+          "fecha": "2022-08",
+          "valor": 26.806500000000028
+        },
+        {
+          "fecha": "2022-09",
+          "valor": 24.17100000000005
+        },
+        {
+          "fecha": "2022-10",
+          "valor": 21.902500000000032
+        },
+        {
+          "fecha": "2022-11",
+          "valor": 19.28280000000001
+        },
+        {
+          "fecha": "2022-12",
+          "valor": 17.583000000000027
+        },
+        {
+          "fecha": "2023-01",
+          "valor": 16.253900000000044
+        },
+        {
+          "fecha": "2023-02",
+          "valor": 16.41900000000004
+        },
+        {
+          "fecha": "2023-03",
+          "valor": 17.74980000000005
+        },
+        {
+          "fecha": "2023-04",
+          "valor": 20.344700000000046
+        },
+        {
+          "fecha": "2023-05",
+          "valor": 23.947000000000003
+        },
+        {
+          "fecha": "2023-06",
+          "valor": 26.131500000000017
+        },
+        {
+          "fecha": "2023-07",
+          "valor": 27.090900000000033
+        },
+        {
+          "fecha": "2023-08",
+          "valor": 27.064700000000016
+        },
+        {
+          "fecha": "2023-09",
+          "valor": 26.01060000000001
+        },
+        {
+          "fecha": "2023-10",
+          "valor": 22.953300000000013
+        },
+        {
+          "fecha": "2023-11",
+          "valor": 20.010400000000004
+        },
+        {
+          "fecha": "2023-12",
+          "valor": 18.364599999999996
+        },
+        {
+          "fecha": "2024-01",
+          "valor": 16.029100000000028
+        },
+        {
+          "fecha": "2024-02",
+          "valor": 16.182000000000016
+        },
+        {
+          "fecha": "2024-03",
+          "valor": 16.853499999999997
+        },
+        {
+          "fecha": "2024-04",
+          "valor": 20.20700000000005
+        },
+        {
+          "fecha": "2024-05",
+          "valor": 22.8938
+        },
+        {
+          "fecha": "2024-06",
+          "valor": 25.84140000000002
+        },
+        {
+          "fecha": "2024-07",
+          "valor": 26.639200000000017
+        },
+        {
+          "fecha": "2024-08",
+          "valor": 26.9991
+        },
+        {
+          "fecha": "2024-09",
+          "valor": 25.56370000000004
+        },
+        {
+          "fecha": "2024-10",
+          "valor": 22.539000000000044
+        },
+        {
+          "fecha": "2024-11",
+          "valor": 19.848700000000008
+        },
+        {
+          "fecha": "2024-12",
+          "valor": 17.212300000000027
+        }
+      ],
+      "annual": [
+        {
+          "anio": 2001,
+          "valor": null,
+          "completo": false,
+          "meses_faltantes": [
+            3
+          ],
+          "en_tramo": false
+        },
+        {
+          "anio": 2002,
+          "valor": 21.03825342465756,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2003,
+          "valor": 20.99833260273975,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2004,
+          "valor": 21.29635437158472,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2005,
+          "valor": 20.662911506849344,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2006,
+          "valor": 20.72920931506851,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2007,
+          "valor": 20.920164109589074,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2008,
+          "valor": 21.237569672131176,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2009,
+          "valor": 21.47839616438358,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2010,
+          "valor": 20.731635342465776,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2011,
+          "valor": 21.109580000000022,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2012,
+          "valor": 21.0669879781421,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2013,
+          "valor": null,
+          "completo": false,
+          "meses_faltantes": [
+            6
+          ],
+          "en_tramo": false
+        },
+        {
+          "anio": 2014,
+          "valor": 20.955653698630154,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        },
+        {
+          "anio": 2015,
+          "valor": 21.489176438356186,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        },
+        {
+          "anio": 2016,
+          "valor": 21.437874043715862,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        },
+        {
+          "anio": 2017,
+          "valor": 20.767435616438377,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        },
+        {
+          "anio": 2018,
+          "valor": 21.751972054794535,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        },
+        {
+          "anio": 2019,
+          "valor": 21.322440000000032,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        },
+        {
+          "anio": 2020,
+          "valor": 22.432309562841564,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        },
+        {
+          "anio": 2021,
+          "valor": 21.609278082191803,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        },
+        {
+          "anio": 2022,
+          "valor": 21.182656164383587,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        },
+        {
+          "anio": 2023,
+          "valor": 21.8925978082192,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        },
+        {
+          "anio": 2024,
+          "valor": 21.413245901639364,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        }
+      ],
+      "slope_decade": 0.09398499465801624,
+      "ci95": [
+        -0.18495575928374502,
+        0.3729257485997775
+      ],
+      "p_raw": 0.5090092915154281,
+      "p_holm": 1.0,
+      "label": "evidencia insuficiente",
+      "texto": "T cambió aproximadamente +0.09 °C por década; IC95 % [-0.18, +0.37]; p ajustado 1.000; evidencia insuficiente. Período 2002–2012, 11 años válidos.",
+      "motivo_null": null,
+      "quality": {
+        "n_meses_esperados": 288,
+        "n_meses_validos": 286,
+        "meses_faltantes": [
+          "2001-03",
+          "2013-06"
+        ],
+        "n_valores_relleno": 1,
+        "anios_completos": 22,
+        "anios_incompletos": [
+          2001,
+          2013
+        ],
+        "n_anios_tramo": 11,
+        "fraccion_area": null,
+        "residuos": {
+          "durbin_watson": 2.1775662623140195,
+          "autocorrelacion_lag1": -0.09193308657132611,
+          "residuo_estandarizado_max": 1.6314985846174201,
+          "diferencia_medias_mitades_en_sd": 0.35253391253938504
+        },
+        "advertencias": []
+      },
+      "sensibilidad": {
+        "rezago_principal": 1,
+        "rezagos": [
+          {
+            "maxlags": 2,
+            "slope_decade": 0.09398499465801624,
+            "ci95": [
+              -0.1569664555578926,
+              0.34493644487392505
+            ],
+            "p_raw": 0.462927268905999,
+            "p_holm": 1.0,
+            "decision_rechaza_H0": false
+          },
+          {
+            "maxlags": 3,
+            "slope_decade": 0.09398499465801624,
+            "ci95": [
+              -0.14927173840645513,
+              0.3372417277224876
+            ],
+            "p_raw": 0.44889753048828807,
+            "p_holm": 1.0,
+            "decision_rechaza_H0": false
+          }
+        ],
+        "resultado_sensible_al_rezago": false
+      }
+    },
+    {
+      "id": "SM",
+      "nombre": "Humedad del suelo 0–10 cm",
+      "producto": "GLDAS Noah mensual 2.1",
+      "campo": "SoilMoi0_10cm_inst",
+      "conversion": "kg/m² ÷ 100 → m³/m³ (capa 0–10 cm)",
+      "units": {
+        "monthly": "m³/m³",
+        "annual": "m³/m³",
+        "slope_decade": "m³/m³ por década"
+      },
+      "annual_aggregation": "media ponderada por días Σ(X·días)/Σ(días)",
+      "monthly": [
+        {
+          "fecha": "2001-01",
+          "valor": 0.17880400000000002
+        },
+        {
+          "fecha": "2001-02",
+          "valor": 0.18962900000000002
+        },
+        {
+          "fecha": "2001-03",
+          "valor": 0.182318
+        },
+        {
+          "fecha": "2001-04",
+          "valor": 0.185075
+        },
+        {
+          "fecha": "2001-05",
+          "valor": 0.205437
+        },
+        {
+          "fecha": "2001-06",
+          "valor": 0.240015
+        },
+        {
+          "fecha": "2001-07",
+          "valor": 0.255664
+        },
+        {
+          "fecha": "2001-08",
+          "valor": 0.254902
+        },
+        {
+          "fecha": "2001-09",
+          "valor": 0.249954
+        },
+        {
+          "fecha": "2001-10",
+          "valor": 0.228641
+        },
+        {
+          "fecha": "2001-11",
+          "valor": 0.20627199999999998
+        },
+        {
+          "fecha": "2001-12",
+          "valor": 0.180003
+        },
+        {
+          "fecha": "2002-01",
+          "valor": 0.182834
+        },
+        {
+          "fecha": "2002-02",
+          "valor": 0.18134499999999998
+        },
+        {
+          "fecha": "2002-03",
+          "valor": 0.18280000000000002
+        },
+        {
+          "fecha": "2002-04",
+          "valor": 0.157301
+        },
+        {
+          "fecha": "2002-05",
+          "valor": 0.208422
+        },
+        {
+          "fecha": "2002-06",
+          "valor": 0.230224
+        },
+        {
+          "fecha": "2002-07",
+          "valor": 0.246495
+        },
+        {
+          "fecha": "2002-08",
+          "valor": 0.24810300000000002
+        },
+        {
+          "fecha": "2002-09",
+          "valor": 0.26813400000000004
+        },
+        {
+          "fecha": "2002-10",
+          "valor": 0.238277
+        },
+        {
+          "fecha": "2002-11",
+          "valor": 0.203704
+        },
+        {
+          "fecha": "2002-12",
+          "valor": 0.176535
+        },
+        {
+          "fecha": "2003-01",
+          "valor": 0.18180700000000002
+        },
+        {
+          "fecha": "2003-02",
+          "valor": 0.16846499999999998
+        },
+        {
+          "fecha": "2003-03",
+          "valor": 0.182827
+        },
+        {
+          "fecha": "2003-04",
+          "valor": 0.19348700000000002
+        },
+        {
+          "fecha": "2003-05",
+          "valor": 0.227486
+        },
+        {
+          "fecha": "2003-06",
+          "valor": 0.22191299999999997
+        },
+        {
+          "fecha": "2003-07",
+          "valor": 0.245847
+        },
+        {
+          "fecha": "2003-08",
+          "valor": 0.235784
+        },
+        {
+          "fecha": "2003-09",
+          "valor": 0.227942
+        },
+        {
+          "fecha": "2003-10",
+          "valor": 0.227696
+        },
+        {
+          "fecha": "2003-11",
+          "valor": 0.191219
+        },
+        {
+          "fecha": "2003-12",
+          "valor": 0.17314800000000002
+        },
+        {
+          "fecha": "2004-01",
+          "valor": 0.171578
+        },
+        {
+          "fecha": "2004-02",
+          "valor": 0.17113499999999998
+        },
+        {
+          "fecha": "2004-03",
+          "valor": 0.188172
+        },
+        {
+          "fecha": "2004-04",
+          "valor": 0.17965399999999998
+        },
+        {
+          "fecha": "2004-05",
+          "valor": 0.206089
+        },
+        {
+          "fecha": "2004-06",
+          "valor": 0.23166899999999999
+        },
+        {
+          "fecha": "2004-07",
+          "valor": 0.225016
+        },
+        {
+          "fecha": "2004-08",
+          "valor": 0.231968
+        },
+        {
+          "fecha": "2004-09",
+          "valor": 0.24524
+        },
+        {
+          "fecha": "2004-10",
+          "valor": 0.22856300000000002
+        },
+        {
+          "fecha": "2004-11",
+          "valor": 0.19725
+        },
+        {
+          "fecha": "2004-12",
+          "valor": 0.181949
+        },
+        {
+          "fecha": "2005-01",
+          "valor": 0.16417
+        },
+        {
+          "fecha": "2005-02",
+          "valor": 0.181023
+        },
+        {
+          "fecha": "2005-03",
+          "valor": 0.177849
+        },
+        {
+          "fecha": "2005-04",
+          "valor": 0.17421399999999998
+        },
+        {
+          "fecha": "2005-05",
+          "valor": 0.20084599999999997
+        },
+        {
+          "fecha": "2005-06",
+          "valor": 0.226759
+        },
+        {
+          "fecha": "2005-07",
+          "valor": 0.234926
+        },
+        {
+          "fecha": "2005-08",
+          "valor": 0.241709
+        },
+        {
+          "fecha": "2005-09",
+          "valor": 0.23971499999999998
+        },
+        {
+          "fecha": "2005-10",
+          "valor": 0.21990600000000002
+        },
+        {
+          "fecha": "2005-11",
+          "valor": 0.19494599999999998
+        },
+        {
+          "fecha": "2005-12",
+          "valor": 0.17293399999999998
+        },
+        {
+          "fecha": "2006-01",
+          "valor": 0.168281
+        },
+        {
+          "fecha": "2006-02",
+          "valor": 0.18114999999999998
+        },
+        {
+          "fecha": "2006-03",
+          "valor": 0.164623
+        },
+        {
+          "fecha": "2006-04",
+          "valor": 0.176804
+        },
+        {
+          "fecha": "2006-05",
+          "valor": 0.207703
+        },
+        {
+          "fecha": "2006-06",
+          "valor": 0.21760200000000002
+        },
+        {
+          "fecha": "2006-07",
+          "valor": 0.234407
+        },
+        {
+          "fecha": "2006-08",
+          "valor": 0.23362
+        },
+        {
+          "fecha": "2006-09",
+          "valor": 0.24064
+        },
+        {
+          "fecha": "2006-10",
+          "valor": 0.22410699999999997
+        },
+        {
+          "fecha": "2006-11",
+          "valor": 0.19299499999999997
+        },
+        {
+          "fecha": "2006-12",
+          "valor": 0.187346
+        },
+        {
+          "fecha": "2007-01",
+          "valor": 0.180818
+        },
+        {
+          "fecha": "2007-02",
+          "valor": 0.182119
+        },
+        {
+          "fecha": "2007-03",
+          "valor": 0.181447
+        },
+        {
+          "fecha": "2007-04",
+          "valor": 0.175334
+        },
+        {
+          "fecha": "2007-05",
+          "valor": 0.201453
+        },
+        {
+          "fecha": "2007-06",
+          "valor": 0.21196500000000001
+        },
+        {
+          "fecha": "2007-07",
+          "valor": 0.243461
+        },
+        {
+          "fecha": "2007-08",
+          "valor": 0.242103
+        },
+        {
+          "fecha": "2007-09",
+          "valor": 0.23341599999999998
+        },
+        {
+          "fecha": "2007-10",
+          "valor": 0.21308
+        },
+        {
+          "fecha": "2007-11",
+          "valor": 0.201519
+        },
+        {
+          "fecha": "2007-12",
+          "valor": 0.174158
+        },
+        {
+          "fecha": "2008-01",
+          "valor": 0.167713
+        },
+        {
+          "fecha": "2008-02",
+          "valor": 0.183866
+        },
+        {
+          "fecha": "2008-03",
+          "valor": 0.178795
+        },
+        {
+          "fecha": "2008-04",
+          "valor": 0.169818
+        },
+        {
+          "fecha": "2008-05",
+          "valor": 0.20804999999999998
+        },
+        {
+          "fecha": "2008-06",
+          "valor": 0.207741
+        },
+        {
+          "fecha": "2008-07",
+          "valor": 0.22275099999999998
+        },
+        {
+          "fecha": "2008-08",
+          "valor": 0.23436099999999999
+        },
+        {
+          "fecha": "2008-09",
+          "valor": 0.233473
+        },
+        {
+          "fecha": "2008-10",
+          "valor": 0.22994900000000001
+        },
+        {
+          "fecha": "2008-11",
+          "valor": 0.204009
+        },
+        {
+          "fecha": "2008-12",
+          "valor": 0.17946600000000001
+        },
+        {
+          "fecha": "2009-01",
+          "valor": 0.18363800000000002
+        },
+        {
+          "fecha": "2009-02",
+          "valor": 0.164969
+        },
+        {
+          "fecha": "2009-03",
+          "valor": 0.16703900000000002
+        },
+        {
+          "fecha": "2009-04",
+          "valor": 0.16523
+        },
+        {
+          "fecha": "2009-05",
+          "valor": 0.19869499999999998
+        },
+        {
+          "fecha": "2009-06",
+          "valor": 0.22231
+        },
+        {
+          "fecha": "2009-07",
+          "valor": 0.243395
+        },
+        {
+          "fecha": "2009-08",
+          "valor": 0.238786
+        },
+        {
+          "fecha": "2009-09",
+          "valor": 0.22941
+        },
+        {
+          "fecha": "2009-10",
+          "valor": 0.21316
+        },
+        {
+          "fecha": "2009-11",
+          "valor": 0.18978799999999998
+        },
+        {
+          "fecha": "2009-12",
+          "valor": 0.18363
+        },
+        {
+          "fecha": "2010-01",
+          "valor": 0.171904
+        },
+        {
+          "fecha": "2010-02",
+          "valor": 0.166903
+        },
+        {
+          "fecha": "2010-03",
+          "valor": 0.16531600000000002
+        },
+        {
+          "fecha": "2010-04",
+          "valor": 0.17288900000000001
+        },
+        {
+          "fecha": "2010-05",
+          "valor": 0.188195
+        },
+        {
+          "fecha": "2010-06",
+          "valor": 0.209303
+        },
+        {
+          "fecha": "2010-07",
+          "valor": 0.241508
+        },
+        {
+          "fecha": "2010-08",
+          "valor": 0.230912
+        },
+        {
+          "fecha": "2010-09",
+          "valor": 0.23518999999999998
+        },
+        {
+          "fecha": "2010-10",
+          "valor": 0.19825199999999998
+        },
+        {
+          "fecha": "2010-11",
+          "valor": 0.19914300000000001
+        },
+        {
+          "fecha": "2010-12",
+          "valor": 0.179913
+        },
+        {
+          "fecha": "2011-01",
+          "valor": 0.175378
+        },
+        {
+          "fecha": "2011-02",
+          "valor": 0.171202
+        },
+        {
+          "fecha": "2011-03",
+          "valor": 0.17136700000000002
+        },
+        {
+          "fecha": "2011-04",
+          "valor": 0.183455
+        },
+        {
+          "fecha": "2011-05",
+          "valor": 0.216134
+        },
+        {
+          "fecha": "2011-06",
+          "valor": 0.225403
+        },
+        {
+          "fecha": "2011-07",
+          "valor": 0.25160699999999997
+        },
+        {
+          "fecha": "2011-08",
+          "valor": 0.24610700000000002
+        },
+        {
+          "fecha": "2011-09",
+          "valor": 0.226766
+        },
+        {
+          "fecha": "2011-10",
+          "valor": 0.20575
+        },
+        {
+          "fecha": "2011-11",
+          "valor": 0.19517700000000002
+        },
+        {
+          "fecha": "2011-12",
+          "valor": 0.180088
+        },
+        {
+          "fecha": "2012-01",
+          "valor": 0.184841
+        },
+        {
+          "fecha": "2012-02",
+          "valor": 0.16073
+        },
+        {
+          "fecha": "2012-03",
+          "valor": 0.165198
+        },
+        {
+          "fecha": "2012-04",
+          "valor": 0.17071000000000003
+        },
+        {
+          "fecha": "2012-05",
+          "valor": 0.193795
+        },
+        {
+          "fecha": "2012-06",
+          "valor": 0.20881
+        },
+        {
+          "fecha": "2012-07",
+          "valor": 0.23877700000000002
+        },
+        {
+          "fecha": "2012-08",
+          "valor": 0.252809
+        },
+        {
+          "fecha": "2012-09",
+          "valor": 0.233254
+        },
+        {
+          "fecha": "2012-10",
+          "valor": 0.214298
+        },
+        {
+          "fecha": "2012-11",
+          "valor": 0.197076
+        },
+        {
+          "fecha": "2012-12",
+          "valor": 0.170261
+        },
+        {
+          "fecha": "2013-01",
+          "valor": 0.176265
+        },
+        {
+          "fecha": "2013-02",
+          "valor": 0.185145
+        },
+        {
+          "fecha": "2013-03",
+          "valor": 0.164023
+        },
+        {
+          "fecha": "2013-04",
+          "valor": 0.162645
+        },
+        {
+          "fecha": "2013-05",
+          "valor": 0.180147
+        },
+        {
+          "fecha": "2013-06",
+          "valor": null
+        },
+        {
+          "fecha": "2013-07",
+          "valor": 0.239758
+        },
+        {
+          "fecha": "2013-08",
+          "valor": 0.242344
+        },
+        {
+          "fecha": "2013-09",
+          "valor": 0.217504
+        },
+        {
+          "fecha": "2013-10",
+          "valor": 0.223363
+        },
+        {
+          "fecha": "2013-11",
+          "valor": 0.208342
+        },
+        {
+          "fecha": "2013-12",
+          "valor": 0.195462
+        },
+        {
+          "fecha": "2014-01",
+          "valor": 0.172242
+        },
+        {
+          "fecha": "2014-02",
+          "valor": 0.170015
+        },
+        {
+          "fecha": "2014-03",
+          "valor": 0.170675
+        },
+        {
+          "fecha": "2014-04",
+          "valor": 0.179826
+        },
+        {
+          "fecha": "2014-05",
+          "valor": 0.19660699999999998
+        },
+        {
+          "fecha": "2014-06",
+          "valor": 0.213856
+        },
+        {
+          "fecha": "2014-07",
+          "valor": 0.22204999999999997
+        },
+        {
+          "fecha": "2014-08",
+          "valor": 0.228776
+        },
+        {
+          "fecha": "2014-09",
+          "valor": 0.219269
+        },
+        {
+          "fecha": "2014-10",
+          "valor": 0.214267
+        },
+        {
+          "fecha": "2014-11",
+          "valor": 0.199798
+        },
+        {
+          "fecha": "2014-12",
+          "valor": 0.17687899999999998
+        },
+        {
+          "fecha": "2015-01",
+          "valor": 0.172758
+        },
+        {
+          "fecha": "2015-02",
+          "valor": 0.172802
+        },
+        {
+          "fecha": "2015-03",
+          "valor": 0.17573699999999998
+        },
+        {
+          "fecha": "2015-04",
+          "valor": 0.1784
+        },
+        {
+          "fecha": "2015-05",
+          "valor": 0.196938
+        },
+        {
+          "fecha": "2015-06",
+          "valor": 0.212544
+        },
+        {
+          "fecha": "2015-07",
+          "valor": 0.234092
+        },
+        {
+          "fecha": "2015-08",
+          "valor": 0.239926
+        },
+        {
+          "fecha": "2015-09",
+          "valor": 0.21759599999999998
+        },
+        {
+          "fecha": "2015-10",
+          "valor": 0.199074
+        },
+        {
+          "fecha": "2015-11",
+          "valor": 0.210287
+        },
+        {
+          "fecha": "2015-12",
+          "valor": 0.176333
+        },
+        {
+          "fecha": "2016-01",
+          "valor": 0.15520799999999998
+        },
+        {
+          "fecha": "2016-02",
+          "valor": 0.164693
+        },
+        {
+          "fecha": "2016-03",
+          "valor": 0.169736
+        },
+        {
+          "fecha": "2016-04",
+          "valor": 0.18370799999999998
+        },
+        {
+          "fecha": "2016-05",
+          "valor": 0.194938
+        },
+        {
+          "fecha": "2016-06",
+          "valor": 0.206286
+        },
+        {
+          "fecha": "2016-07",
+          "valor": 0.217789
+        },
+        {
+          "fecha": "2016-08",
+          "valor": 0.229359
+        },
+        {
+          "fecha": "2016-09",
+          "valor": 0.233247
+        },
+        {
+          "fecha": "2016-10",
+          "valor": 0.226038
+        },
+        {
+          "fecha": "2016-11",
+          "valor": 0.21377
+        },
+        {
+          "fecha": "2016-12",
+          "valor": 0.170383
+        },
+        {
+          "fecha": "2017-01",
+          "valor": 0.16493400000000003
+        },
+        {
+          "fecha": "2017-02",
+          "valor": 0.17145
+        },
+        {
+          "fecha": "2017-03",
+          "valor": 0.16772099999999998
+        },
+        {
+          "fecha": "2017-04",
+          "valor": 0.159121
+        },
+        {
+          "fecha": "2017-05",
+          "valor": 0.200268
+        },
+        {
+          "fecha": "2017-06",
+          "valor": 0.21765299999999999
+        },
+        {
+          "fecha": "2017-07",
+          "valor": 0.21976199999999999
+        },
+        {
+          "fecha": "2017-08",
+          "valor": 0.23287500000000003
+        },
+        {
+          "fecha": "2017-09",
+          "valor": 0.23606100000000002
+        },
+        {
+          "fecha": "2017-10",
+          "valor": 0.21368600000000001
+        },
+        {
+          "fecha": "2017-11",
+          "valor": 0.208273
+        },
+        {
+          "fecha": "2017-12",
+          "valor": 0.162854
+        },
+        {
+          "fecha": "2018-01",
+          "valor": 0.16006599999999999
+        },
+        {
+          "fecha": "2018-02",
+          "valor": 0.168008
+        },
+        {
+          "fecha": "2018-03",
+          "valor": 0.171817
+        },
+        {
+          "fecha": "2018-04",
+          "valor": 0.16470500000000002
+        },
+        {
+          "fecha": "2018-05",
+          "valor": 0.195228
+        },
+        {
+          "fecha": "2018-06",
+          "valor": 0.22230899999999998
+        },
+        {
+          "fecha": "2018-07",
+          "valor": 0.249914
+        },
+        {
+          "fecha": "2018-08",
+          "valor": 0.23092500000000002
+        },
+        {
+          "fecha": "2018-09",
+          "valor": 0.226069
+        },
+        {
+          "fecha": "2018-10",
+          "valor": 0.21124500000000002
+        },
+        {
+          "fecha": "2018-11",
+          "valor": 0.166796
+        },
+        {
+          "fecha": "2018-12",
+          "valor": 0.157194
+        },
+        {
+          "fecha": "2019-01",
+          "valor": 0.17464
+        },
+        {
+          "fecha": "2019-02",
+          "valor": 0.17524
+        },
+        {
+          "fecha": "2019-03",
+          "valor": 0.173175
+        },
+        {
+          "fecha": "2019-04",
+          "valor": 0.17486100000000002
+        },
+        {
+          "fecha": "2019-05",
+          "valor": 0.20378799999999997
+        },
+        {
+          "fecha": "2019-06",
+          "valor": 0.209229
+        },
+        {
+          "fecha": "2019-07",
+          "valor": 0.236588
+        },
+        {
+          "fecha": "2019-08",
+          "valor": 0.239042
+        },
+        {
+          "fecha": "2019-09",
+          "valor": 0.220141
+        },
+        {
+          "fecha": "2019-10",
+          "valor": 0.204188
+        },
+        {
+          "fecha": "2019-11",
+          "valor": 0.173929
+        },
+        {
+          "fecha": "2019-12",
+          "valor": 0.154083
+        },
+        {
+          "fecha": "2020-01",
+          "valor": 0.155183
+        },
+        {
+          "fecha": "2020-02",
+          "valor": 0.162211
+        },
+        {
+          "fecha": "2020-03",
+          "valor": 0.161067
+        },
+        {
+          "fecha": "2020-04",
+          "valor": 0.159329
+        },
+        {
+          "fecha": "2020-05",
+          "valor": 0.171147
+        },
+        {
+          "fecha": "2020-06",
+          "valor": 0.211339
+        },
+        {
+          "fecha": "2020-07",
+          "valor": 0.22624300000000003
+        },
+        {
+          "fecha": "2020-08",
+          "valor": 0.221299
+        },
+        {
+          "fecha": "2020-09",
+          "valor": 0.219468
+        },
+        {
+          "fecha": "2020-10",
+          "valor": 0.20677600000000002
+        },
+        {
+          "fecha": "2020-11",
+          "valor": 0.201848
+        },
+        {
+          "fecha": "2020-12",
+          "valor": 0.17897300000000002
+        },
+        {
+          "fecha": "2021-01",
+          "valor": 0.17351299999999997
+        },
+        {
+          "fecha": "2021-02",
+          "valor": 0.152421
+        },
+        {
+          "fecha": "2021-03",
+          "valor": 0.156316
+        },
+        {
+          "fecha": "2021-04",
+          "valor": 0.17723299999999997
+        },
+        {
+          "fecha": "2021-05",
+          "valor": 0.202554
+        },
+        {
+          "fecha": "2021-06",
+          "valor": 0.21017600000000003
+        },
+        {
+          "fecha": "2021-07",
+          "valor": 0.21419899999999997
+        },
+        {
+          "fecha": "2021-08",
+          "valor": 0.22484300000000002
+        },
+        {
+          "fecha": "2021-09",
+          "valor": 0.244562
+        },
+        {
+          "fecha": "2021-10",
+          "valor": 0.217581
+        },
+        {
+          "fecha": "2021-11",
+          "valor": 0.18942799999999999
+        },
+        {
+          "fecha": "2021-12",
+          "valor": 0.164024
+        },
+        {
+          "fecha": "2022-01",
+          "valor": 0.164072
+        },
+        {
+          "fecha": "2022-02",
+          "valor": 0.16243200000000002
+        },
+        {
+          "fecha": "2022-03",
+          "valor": 0.160707
+        },
+        {
+          "fecha": "2022-04",
+          "valor": 0.155848
+        },
+        {
+          "fecha": "2022-05",
+          "valor": 0.19209199999999998
+        },
+        {
+          "fecha": "2022-06",
+          "valor": 0.19856400000000002
+        },
+        {
+          "fecha": "2022-07",
+          "valor": 0.225457
+        },
+        {
+          "fecha": "2022-08",
+          "valor": 0.22928300000000001
+        },
+        {
+          "fecha": "2022-09",
+          "valor": 0.221502
+        },
+        {
+          "fecha": "2022-10",
+          "valor": 0.209862
+        },
+        {
+          "fecha": "2022-11",
+          "valor": 0.206971
+        },
+        {
+          "fecha": "2022-12",
+          "valor": 0.17543399999999998
+        },
+        {
+          "fecha": "2023-01",
+          "valor": 0.17055199999999998
+        },
+        {
+          "fecha": "2023-02",
+          "valor": 0.148553
+        },
+        {
+          "fecha": "2023-03",
+          "valor": 0.157837
+        },
+        {
+          "fecha": "2023-04",
+          "valor": 0.132056
+        },
+        {
+          "fecha": "2023-05",
+          "valor": 0.17885500000000001
+        },
+        {
+          "fecha": "2023-06",
+          "valor": 0.19112600000000002
+        },
+        {
+          "fecha": "2023-07",
+          "valor": 0.206384
+        },
+        {
+          "fecha": "2023-08",
+          "valor": 0.22220099999999998
+        },
+        {
+          "fecha": "2023-09",
+          "valor": 0.22296700000000003
+        },
+        {
+          "fecha": "2023-10",
+          "valor": 0.206192
+        },
+        {
+          "fecha": "2023-11",
+          "valor": 0.195669
+        },
+        {
+          "fecha": "2023-12",
+          "valor": 0.18345199999999998
+        },
+        {
+          "fecha": "2024-01",
+          "valor": 0.162222
+        },
+        {
+          "fecha": "2024-02",
+          "valor": 0.161301
+        },
+        {
+          "fecha": "2024-03",
+          "valor": 0.15582700000000002
+        },
+        {
+          "fecha": "2024-04",
+          "valor": 0.15979100000000002
+        },
+        {
+          "fecha": "2024-05",
+          "valor": 0.18449300000000002
+        },
+        {
+          "fecha": "2024-06",
+          "valor": 0.201176
+        },
+        {
+          "fecha": "2024-07",
+          "valor": 0.22415
+        },
+        {
+          "fecha": "2024-08",
+          "valor": 0.230657
+        },
+        {
+          "fecha": "2024-09",
+          "valor": 0.22750299999999998
+        },
+        {
+          "fecha": "2024-10",
+          "valor": 0.21446300000000001
+        },
+        {
+          "fecha": "2024-11",
+          "valor": null
+        },
+        {
+          "fecha": "2024-12",
+          "valor": 0.16927299999999998
+        }
+      ],
+      "annual": [
+        {
+          "anio": 2001,
+          "valor": 0.21317241369863013,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        },
+        {
+          "anio": 2002,
+          "valor": 0.21053697534246577,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2003,
+          "valor": 0.20675697260273973,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2004,
+          "valor": 0.20494724043715845,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2005,
+          "valor": 0.20252110684931507,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2006,
+          "valor": 0.2025647315068493,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2007,
+          "valor": 0.2035574575342466,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2008,
+          "valor": 0.20174037978142076,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2009,
+          "valor": 0.2002737123287671,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2010,
+          "valor": 0.19678091506849316,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2011,
+          "valor": 0.20426588219178082,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2012,
+          "valor": 0.19938803005464484,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2013,
+          "valor": null,
+          "completo": false,
+          "meses_faltantes": [
+            6
+          ],
+          "en_tramo": false
+        },
+        {
+          "anio": 2014,
+          "valor": 0.19717607123287673,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        },
+        {
+          "anio": 2015,
+          "valor": 0.19902428493150684,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        },
+        {
+          "anio": 2016,
+          "valor": 0.19714045901639343,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        },
+        {
+          "anio": 2017,
+          "valor": 0.19632586301369864,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        },
+        {
+          "anio": 2018,
+          "valor": 0.1938867205479452,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        },
+        {
+          "anio": 2019,
+          "valor": 0.19507436712328768,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        },
+        {
+          "anio": 2020,
+          "valor": 0.1896310573770492,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        },
+        {
+          "anio": 2021,
+          "valor": 0.19411969315068495,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        },
+        {
+          "anio": 2022,
+          "valor": 0.19205140547945207,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        },
+        {
+          "anio": 2023,
+          "valor": 0.18494160821917807,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        },
+        {
+          "anio": 2024,
+          "valor": null,
+          "completo": false,
+          "meses_faltantes": [
+            11
+          ],
+          "en_tramo": false
+        }
+      ],
+      "slope_decade": -0.008684291359587308,
+      "ci95": [
+        -0.013824271827954291,
+        -0.0035443108912203256
+      ],
+      "p_raw": 0.0009280672735764841,
+      "p_holm": 0.0037122690943059366,
+      "label": "disminución con evidencia estadística según este método",
+      "texto": "SM cambió aproximadamente -0.0087 m³/m³ por década; IC95 % [-0.0138, -0.0035]; p ajustado 0.004; disminución con evidencia estadística según este método. Período 2002–2012, 11 años válidos.",
+      "motivo_null": null,
+      "quality": {
+        "n_meses_esperados": 288,
+        "n_meses_validos": 286,
+        "meses_faltantes": [
+          "2013-06",
+          "2024-11"
+        ],
+        "n_valores_relleno": 0,
+        "anios_completos": 22,
+        "anios_incompletos": [
+          2013,
+          2024
+        ],
+        "n_anios_tramo": 11,
+        "fraccion_area": null,
+        "residuos": {
+          "durbin_watson": 2.0081777631273066,
+          "autocorrelacion_lag1": -0.11684853286899599,
+          "residuo_estandarizado_max": 1.908152058804557,
+          "diferencia_medias_mitades_en_sd": 0.126426139580391
+        },
+        "advertencias": []
+      },
+      "sensibilidad": {
+        "rezago_principal": 1,
+        "rezagos": [
+          {
+            "maxlags": 2,
+            "slope_decade": -0.008684291359587308,
+            "ci95": [
+              -0.013429299934065015,
+              -0.003939282785109601
+            ],
+            "p_raw": 0.000334355031981592,
+            "p_holm": 0.001337420127926368,
+            "decision_rechaza_H0": true
+          },
+          {
+            "maxlags": 3,
+            "slope_decade": -0.008684291359587308,
+            "ci95": [
+              -0.013017391714841384,
+              -0.0043511910043332325
+            ],
+            "p_raw": 8.561576763575905e-05,
+            "p_holm": 0.0003424630705430362,
+            "decision_rechaza_H0": true
+          }
+        ],
+        "resultado_sensible_al_rezago": false
+      }
+    },
+    {
+      "id": "ET",
+      "nombre": "Evapotranspiración real",
+      "producto": "GLDAS Noah mensual 2.1",
+      "campo": "Evap_tavg",
+      "conversion": "kg/m²/s × 86 400 × días del mes → mm/mes",
+      "units": {
+        "monthly": "mm/mes",
+        "annual": "mm/año",
+        "slope_decade": "mm por década (total anual)"
+      },
+      "annual_aggregation": "suma de 12 meses",
+      "monthly": [
+        {
+          "fecha": "2001-01",
+          "valor": 27.392291424
+        },
+        {
+          "fecha": "2001-02",
+          "valor": 32.810714496
+        },
+        {
+          "fecha": "2001-03",
+          "valor": 30.035818655999996
+        },
+        {
+          "fecha": "2001-04",
+          "valor": 27.236010240000002
+        },
+        {
+          "fecha": "2001-05",
+          "valor": 39.873555072
+        },
+        {
+          "fecha": "2001-06",
+          "valor": 70.30164959999999
+        },
+        {
+          "fecha": "2001-07",
+          "valor": 80.240391072
+        },
+        {
+          "fecha": "2001-08",
+          "valor": 67.603110624
+        },
+        {
+          "fecha": "2001-09",
+          "valor": 50.717741759999996
+        },
+        {
+          "fecha": "2001-10",
+          "valor": 29.147714784
+        },
+        {
+          "fecha": "2001-11",
+          "valor": 26.014737599999997
+        },
+        {
+          "fecha": "2001-12",
+          "valor": 20.246448787200002
+        },
+        {
+          "fecha": "2002-01",
+          "valor": 32.095722527999996
+        },
+        {
+          "fecha": "2002-02",
+          "valor": 32.401748736
+        },
+        {
+          "fecha": "2002-03",
+          "valor": 31.455129600000003
+        },
+        {
+          "fecha": "2002-04",
+          "valor": 27.14723424
+        },
+        {
+          "fecha": "2002-05",
+          "valor": 46.135225727999995
+        },
+        {
+          "fecha": "2002-06",
+          "valor": 66.88793376000001
+        },
+        {
+          "fecha": "2002-07",
+          "valor": 82.357612704
+        },
+        {
+          "fecha": "2002-08",
+          "valor": 72.83426688
+        },
+        {
+          "fecha": "2002-09",
+          "valor": 115.67873088
+        },
+        {
+          "fecha": "2002-10",
+          "valor": 43.196083488
+        },
+        {
+          "fecha": "2002-11",
+          "valor": 31.349384639999997
+        },
+        {
+          "fecha": "2002-12",
+          "valor": 26.994227616
+        },
+        {
+          "fecha": "2003-01",
+          "valor": 32.972148575999995
+        },
+        {
+          "fecha": "2003-02",
+          "valor": 27.472846463999996
+        },
+        {
+          "fecha": "2003-03",
+          "valor": 30.3569856
+        },
+        {
+          "fecha": "2003-04",
+          "valor": 35.61625728
+        },
+        {
+          "fecha": "2003-05",
+          "valor": 62.63197343999999
+        },
+        {
+          "fecha": "2003-06",
+          "valor": 43.43118912
+        },
+        {
+          "fecha": "2003-07",
+          "valor": 67.37054515199999
+        },
+        {
+          "fecha": "2003-08",
+          "valor": 46.940058144
+        },
+        {
+          "fecha": "2003-09",
+          "valor": 37.543175999999995
+        },
+        {
+          "fecha": "2003-10",
+          "valor": 33.449814432
+        },
+        {
+          "fecha": "2003-11",
+          "valor": 29.125630079999997
+        },
+        {
+          "fecha": "2003-12",
+          "valor": 22.9985690688
+        },
+        {
+          "fecha": "2004-01",
+          "valor": 23.026405679999996
+        },
+        {
+          "fecha": "2004-02",
+          "valor": 25.184086272000002
+        },
+        {
+          "fecha": "2004-03",
+          "valor": 29.249788608
+        },
+        {
+          "fecha": "2004-04",
+          "valor": 33.711577919999996
+        },
+        {
+          "fecha": "2004-05",
+          "valor": 48.31016688
+        },
+        {
+          "fecha": "2004-06",
+          "valor": 85.70782367999999
+        },
+        {
+          "fecha": "2004-07",
+          "valor": 58.122271008000006
+        },
+        {
+          "fecha": "2004-08",
+          "valor": 44.564933376
+        },
+        {
+          "fecha": "2004-09",
+          "valor": 59.59995552
+        },
+        {
+          "fecha": "2004-10",
+          "valor": 37.798062912000006
+        },
+        {
+          "fecha": "2004-11",
+          "valor": 29.31634944
+        },
+        {
+          "fecha": "2004-12",
+          "valor": 27.207508607999998
+        },
+        {
+          "fecha": "2005-01",
+          "valor": 23.3055645984
+        },
+        {
+          "fecha": "2005-02",
+          "valor": 24.43186368
+        },
+        {
+          "fecha": "2005-03",
+          "valor": 22.941912873600003
+        },
+        {
+          "fecha": "2005-04",
+          "valor": 24.362021376
+        },
+        {
+          "fecha": "2005-05",
+          "valor": 35.226664992
+        },
+        {
+          "fecha": "2005-06",
+          "valor": 43.02489312
+        },
+        {
+          "fecha": "2005-07",
+          "valor": 55.244839104
+        },
+        {
+          "fecha": "2005-08",
+          "valor": 59.421000384
+        },
+        {
+          "fecha": "2005-09",
+          "valor": 41.055491520000004
+        },
+        {
+          "fecha": "2005-10",
+          "valor": 29.255761439999997
+        },
+        {
+          "fecha": "2005-11",
+          "valor": 28.31122368
+        },
+        {
+          "fecha": "2005-12",
+          "valor": 28.149341183999997
+        },
+        {
+          "fecha": "2006-01",
+          "valor": 24.346396195200004
+        },
+        {
+          "fecha": "2006-02",
+          "valor": 31.002604415999997
+        },
+        {
+          "fecha": "2006-03",
+          "valor": 27.172716192
+        },
+        {
+          "fecha": "2006-04",
+          "valor": 27.614027519999997
+        },
+        {
+          "fecha": "2006-05",
+          "valor": 44.518436352
+        },
+        {
+          "fecha": "2006-06",
+          "valor": 49.01399424
+        },
+        {
+          "fecha": "2006-07",
+          "valor": 56.206545408000004
+        },
+        {
+          "fecha": "2006-08",
+          "valor": 35.676529056
+        },
+        {
+          "fecha": "2006-09",
+          "valor": 31.94061984
+        },
+        {
+          "fecha": "2006-10",
+          "valor": 27.080739936000004
+        },
+        {
+          "fecha": "2006-11",
+          "valor": 25.174297152
+        },
+        {
+          "fecha": "2006-12",
+          "valor": 28.407913920000002
+        },
+        {
+          "fecha": "2007-01",
+          "valor": 25.0551570816
+        },
+        {
+          "fecha": "2007-02",
+          "valor": 29.34804096
+        },
+        {
+          "fecha": "2007-03",
+          "valor": 33.198553728
+        },
+        {
+          "fecha": "2007-04",
+          "valor": 30.77898912
+        },
+        {
+          "fecha": "2007-05",
+          "valor": 37.069939872
+        },
+        {
+          "fecha": "2007-06",
+          "valor": 40.81694976
+        },
+        {
+          "fecha": "2007-07",
+          "valor": 69.82797715199999
+        },
+        {
+          "fecha": "2007-08",
+          "valor": 56.038904351999996
+        },
+        {
+          "fecha": "2007-09",
+          "valor": 43.21470528
+        },
+        {
+          "fecha": "2007-10",
+          "valor": 26.2147435776
+        },
+        {
+          "fecha": "2007-11",
+          "valor": 31.77639072
+        },
+        {
+          "fecha": "2007-12",
+          "valor": 36.710311104
+        },
+        {
+          "fecha": "2008-01",
+          "valor": 32.066126208
+        },
+        {
+          "fecha": "2008-02",
+          "valor": 29.041783200000005
+        },
+        {
+          "fecha": "2008-03",
+          "valor": 28.659683519999998
+        },
+        {
+          "fecha": "2008-04",
+          "valor": 27.40749696
+        },
+        {
+          "fecha": "2008-05",
+          "valor": 54.912101471999996
+        },
+        {
+          "fecha": "2008-06",
+          "valor": 38.90340576
+        },
+        {
+          "fecha": "2008-07",
+          "valor": 46.008590976
+        },
+        {
+          "fecha": "2008-08",
+          "valor": 55.695962016
+        },
+        {
+          "fecha": "2008-09",
+          "valor": 46.24615296
+        },
+        {
+          "fecha": "2008-10",
+          "valor": 36.827625024
+        },
+        {
+          "fecha": "2008-11",
+          "valor": 36.49647456
+        },
+        {
+          "fecha": "2008-12",
+          "valor": 27.705182112
+        },
+        {
+          "fecha": "2009-01",
+          "valor": 31.550266367999996
+        },
+        {
+          "fecha": "2009-02",
+          "valor": 27.831517056
+        },
+        {
+          "fecha": "2009-03",
+          "valor": 26.5428074016
+        },
+        {
+          "fecha": "2009-04",
+          "valor": 27.773124480000003
+        },
+        {
+          "fecha": "2009-05",
+          "valor": 42.884103456
+        },
+        {
+          "fecha": "2009-06",
+          "valor": 59.58935424
+        },
+        {
+          "fecha": "2009-07",
+          "valor": 82.923049728
+        },
+        {
+          "fecha": "2009-08",
+          "valor": 57.806996544
+        },
+        {
+          "fecha": "2009-09",
+          "valor": 41.16526272
+        },
+        {
+          "fecha": "2009-10",
+          "valor": 28.615677408000003
+        },
+        {
+          "fecha": "2009-11",
+          "valor": 26.66885472
+        },
+        {
+          "fecha": "2009-12",
+          "valor": 31.271311007999998
+        },
+        {
+          "fecha": "2010-01",
+          "valor": 26.913580992
+        },
+        {
+          "fecha": "2010-02",
+          "valor": 27.0944352
+        },
+        {
+          "fecha": "2010-03",
+          "valor": 25.1853380352
+        },
+        {
+          "fecha": "2010-04",
+          "valor": 28.640537279999997
+        },
+        {
+          "fecha": "2010-05",
+          "valor": 38.564728128
+        },
+        {
+          "fecha": "2010-06",
+          "valor": 43.8581952
+        },
+        {
+          "fecha": "2010-07",
+          "valor": 66.370269888
+        },
+        {
+          "fecha": "2010-08",
+          "valor": 39.000878784
+        },
+        {
+          "fecha": "2010-09",
+          "valor": 40.402152
+        },
+        {
+          "fecha": "2010-10",
+          "valor": 20.936779603199998
+        },
+        {
+          "fecha": "2010-11",
+          "valor": 27.762341759999998
+        },
+        {
+          "fecha": "2010-12",
+          "valor": 26.511416553600004
+        },
+        {
+          "fecha": "2011-01",
+          "valor": 24.7334517792
+        },
+        {
+          "fecha": "2011-02",
+          "valor": 25.227562752
+        },
+        {
+          "fecha": "2011-03",
+          "valor": 25.5944582784
+        },
+        {
+          "fecha": "2011-04",
+          "valor": 23.835521376000003
+        },
+        {
+          "fecha": "2011-05",
+          "valor": 57.352498848
+        },
+        {
+          "fecha": "2011-06",
+          "valor": 50.01033312
+        },
+        {
+          "fecha": "2011-07",
+          "valor": 95.51268144
+        },
+        {
+          "fecha": "2011-08",
+          "valor": 65.502789696
+        },
+        {
+          "fecha": "2011-09",
+          "valor": 33.837575040000004
+        },
+        {
+          "fecha": "2011-10",
+          "valor": 22.066804598399997
+        },
+        {
+          "fecha": "2011-11",
+          "valor": 23.796089280000004
+        },
+        {
+          "fecha": "2011-12",
+          "valor": 25.6502225664
+        },
+        {
+          "fecha": "2012-01",
+          "valor": 26.635579142399997
+        },
+        {
+          "fecha": "2012-02",
+          "valor": 23.8255073568
+        },
+        {
+          "fecha": "2012-03",
+          "valor": 27.280575360000004
+        },
+        {
+          "fecha": "2012-04",
+          "valor": 34.068911039999996
+        },
+        {
+          "fecha": "2012-05",
+          "valor": 48.542491295999994
+        },
+        {
+          "fecha": "2012-06",
+          "valor": 44.83900800000001
+        },
+        {
+          "fecha": "2012-07",
+          "valor": 79.86876307200001
+        },
+        {
+          "fecha": "2012-08",
+          "valor": 83.356521984
+        },
+        {
+          "fecha": "2012-09",
+          "valor": 41.00826528
+        },
+        {
+          "fecha": "2012-10",
+          "valor": 30.497815872000004
+        },
+        {
+          "fecha": "2012-11",
+          "valor": 30.729196800000004
+        },
+        {
+          "fecha": "2012-12",
+          "valor": 30.57581088
+        },
+        {
+          "fecha": "2013-01",
+          "valor": 30.657475296
+        },
+        {
+          "fecha": "2013-02",
+          "valor": 31.885491456
+        },
+        {
+          "fecha": "2013-03",
+          "valor": 25.869803155199996
+        },
+        {
+          "fecha": "2013-04",
+          "valor": 23.575927392
+        },
+        {
+          "fecha": "2013-05",
+          "valor": 38.139398208
+        },
+        {
+          "fecha": "2013-06",
+          "valor": null
+        },
+        {
+          "fecha": "2013-07",
+          "valor": 78.48646761600001
+        },
+        {
+          "fecha": "2013-08",
+          "valor": 97.75158278400001
+        },
+        {
+          "fecha": "2013-09",
+          "valor": 35.87994144
+        },
+        {
+          "fecha": "2013-10",
+          "valor": 30.866095872000002
+        },
+        {
+          "fecha": "2013-11",
+          "valor": 33.864998400000005
+        },
+        {
+          "fecha": "2013-12",
+          "valor": 39.513578112
+        },
+        {
+          "fecha": "2014-01",
+          "valor": 29.587561632
+        },
+        {
+          "fecha": "2014-02",
+          "valor": 28.174874112
+        },
+        {
+          "fecha": "2014-03",
+          "valor": 28.706368031999997
+        },
+        {
+          "fecha": "2014-04",
+          "valor": 32.1905664
+        },
+        {
+          "fecha": "2014-05",
+          "valor": 32.916491424
+        },
+        {
+          "fecha": "2014-06",
+          "valor": 44.71067808
+        },
+        {
+          "fecha": "2014-07",
+          "valor": 44.533703232
+        },
+        {
+          "fecha": "2014-08",
+          "valor": 40.820503392
+        },
+        {
+          "fecha": "2014-09",
+          "valor": 30.92973984
+        },
+        {
+          "fecha": "2014-10",
+          "valor": 26.5195428192
+        },
+        {
+          "fecha": "2014-11",
+          "valor": 24.776606592000004
+        },
+        {
+          "fecha": "2014-12",
+          "valor": 29.099851776
+        },
+        {
+          "fecha": "2015-01",
+          "valor": 30.072780576000003
+        },
+        {
+          "fecha": "2015-02",
+          "valor": 32.862993408
+        },
+        {
+          "fecha": "2015-03",
+          "valor": 29.03974848
+        },
+        {
+          "fecha": "2015-04",
+          "valor": 30.2796144
+        },
+        {
+          "fecha": "2015-05",
+          "valor": 45.103800672
+        },
+        {
+          "fecha": "2015-06",
+          "valor": 58.91144256
+        },
+        {
+          "fecha": "2015-07",
+          "valor": 84.960213984
+        },
+        {
+          "fecha": "2015-08",
+          "valor": 64.157697216
+        },
+        {
+          "fecha": "2015-09",
+          "valor": 28.79483904
+        },
+        {
+          "fecha": "2015-10",
+          "valor": 21.4134758784
+        },
+        {
+          "fecha": "2015-11",
+          "valor": 33.85286784
+        },
+        {
+          "fecha": "2015-12",
+          "valor": 26.402810112
+        },
+        {
+          "fecha": "2016-01",
+          "valor": 24.9333380928
+        },
+        {
+          "fecha": "2016-02",
+          "valor": 29.621579040000004
+        },
+        {
+          "fecha": "2016-03",
+          "valor": 31.162059072000005
+        },
+        {
+          "fecha": "2016-04",
+          "valor": 28.417936320000003
+        },
+        {
+          "fecha": "2016-05",
+          "valor": 38.97848736
+        },
+        {
+          "fecha": "2016-06",
+          "valor": 46.533709439999996
+        },
+        {
+          "fecha": "2016-07",
+          "valor": 44.291736576
+        },
+        {
+          "fecha": "2016-08",
+          "valor": 60.478620192
+        },
+        {
+          "fecha": "2016-09",
+          "valor": 46.72554336
+        },
+        {
+          "fecha": "2016-10",
+          "valor": 37.083626496
+        },
+        {
+          "fecha": "2016-11",
+          "valor": 37.78425792
+        },
+        {
+          "fecha": "2016-12",
+          "valor": 26.797445567999997
+        },
+        {
+          "fecha": "2017-01",
+          "valor": 25.6590693216
+        },
+        {
+          "fecha": "2017-02",
+          "valor": 28.568502144
+        },
+        {
+          "fecha": "2017-03",
+          "valor": 21.3097575168
+        },
+        {
+          "fecha": "2017-04",
+          "valor": 23.700817728
+        },
+        {
+          "fecha": "2017-05",
+          "valor": 38.732985216
+        },
+        {
+          "fecha": "2017-06",
+          "valor": 51.931782719999994
+        },
+        {
+          "fecha": "2017-07",
+          "valor": 44.514713376
+        },
+        {
+          "fecha": "2017-08",
+          "valor": 44.631036288000004
+        },
+        {
+          "fecha": "2017-09",
+          "valor": 32.43716927999999
+        },
+        {
+          "fecha": "2017-10",
+          "valor": 22.6870497216
+        },
+        {
+          "fecha": "2017-11",
+          "valor": 26.88388704
+        },
+        {
+          "fecha": "2017-12",
+          "valor": 22.683958848
+        },
+        {
+          "fecha": "2018-01",
+          "valor": 19.0290838464
+        },
+        {
+          "fecha": "2018-02",
+          "valor": 25.365723264000003
+        },
+        {
+          "fecha": "2018-03",
+          "valor": 30.87351504
+        },
+        {
+          "fecha": "2018-04",
+          "valor": 24.635765088
+        },
+        {
+          "fecha": "2018-05",
+          "valor": 47.774540447999996
+        },
+        {
+          "fecha": "2018-06",
+          "valor": 79.641144
+        },
+        {
+          "fecha": "2018-07",
+          "valor": 137.45096150400002
+        },
+        {
+          "fecha": "2018-08",
+          "valor": 51.632025696
+        },
+        {
+          "fecha": "2018-09",
+          "valor": 46.24065792
+        },
+        {
+          "fecha": "2018-10",
+          "valor": 31.341056544
+        },
+        {
+          "fecha": "2018-11",
+          "valor": 26.002166399999997
+        },
+        {
+          "fecha": "2018-12",
+          "valor": 23.3605816128
+        },
+        {
+          "fecha": "2019-01",
+          "valor": 34.893338111999995
+        },
+        {
+          "fecha": "2019-02",
+          "valor": 29.184696576
+        },
+        {
+          "fecha": "2019-03",
+          "valor": 24.541855113599997
+        },
+        {
+          "fecha": "2019-04",
+          "valor": 27.987145920000003
+        },
+        {
+          "fecha": "2019-05",
+          "valor": 50.317440192
+        },
+        {
+          "fecha": "2019-06",
+          "valor": 47.0015136
+        },
+        {
+          "fecha": "2019-07",
+          "valor": 70.471141344
+        },
+        {
+          "fecha": "2019-08",
+          "valor": 69.013957824
+        },
+        {
+          "fecha": "2019-09",
+          "valor": 34.311988799999995
+        },
+        {
+          "fecha": "2019-10",
+          "valor": 30.804251616
+        },
+        {
+          "fecha": "2019-11",
+          "valor": 26.96102496
+        },
+        {
+          "fecha": "2019-12",
+          "valor": 28.066203648
+        },
+        {
+          "fecha": "2020-01",
+          "valor": 32.506830144000006
+        },
+        {
+          "fecha": "2020-02",
+          "valor": 31.038320448
+        },
+        {
+          "fecha": "2020-03",
+          "valor": 28.772712
+        },
+        {
+          "fecha": "2020-04",
+          "valor": 25.604361791999995
+        },
+        {
+          "fecha": "2020-05",
+          "valor": 32.682640320000004
+        },
+        {
+          "fecha": "2020-06",
+          "valor": 75.49513632
+        },
+        {
+          "fecha": "2020-07",
+          "valor": 80.668747584
+        },
+        {
+          "fecha": "2020-08",
+          "valor": 58.169732256
+        },
+        {
+          "fecha": "2020-09",
+          "valor": 45.23887584
+        },
+        {
+          "fecha": "2020-10",
+          "valor": 25.0693874208
+        },
+        {
+          "fecha": "2020-11",
+          "valor": 31.9913712
+        },
+        {
+          "fecha": "2020-12",
+          "valor": 27.238604832000004
+        },
+        {
+          "fecha": "2021-01",
+          "valor": 20.360133475199998
+        },
+        {
+          "fecha": "2021-02",
+          "valor": 24.208861824000003
+        },
+        {
+          "fecha": "2021-03",
+          "valor": 28.160081568000003
+        },
+        {
+          "fecha": "2021-04",
+          "valor": 33.19164864
+        },
+        {
+          "fecha": "2021-05",
+          "valor": 45.340008768
+        },
+        {
+          "fecha": "2021-06",
+          "valor": 63.61006464
+        },
+        {
+          "fecha": "2021-07",
+          "valor": 46.973297088
+        },
+        {
+          "fecha": "2021-08",
+          "valor": 47.973518784
+        },
+        {
+          "fecha": "2021-09",
+          "valor": 55.1429856
+        },
+        {
+          "fecha": "2021-10",
+          "valor": 30.605246496
+        },
+        {
+          "fecha": "2021-11",
+          "valor": 28.27734624
+        },
+        {
+          "fecha": "2021-12",
+          "valor": 26.889770016
+        },
+        {
+          "fecha": "2022-01",
+          "valor": 29.096102016
+        },
+        {
+          "fecha": "2022-02",
+          "valor": 32.12141184
+        },
+        {
+          "fecha": "2022-03",
+          "valor": 31.996514592
+        },
+        {
+          "fecha": "2022-04",
+          "valor": 28.6362864
+        },
+        {
+          "fecha": "2022-05",
+          "valor": 38.638759104
+        },
+        {
+          "fecha": "2022-06",
+          "valor": 48.30692256
+        },
+        {
+          "fecha": "2022-07",
+          "valor": 61.827033888
+        },
+        {
+          "fecha": "2022-08",
+          "valor": 56.165217696
+        },
+        {
+          "fecha": "2022-09",
+          "valor": 33.24805056
+        },
+        {
+          "fecha": "2022-10",
+          "valor": 27.988717536
+        },
+        {
+          "fecha": "2022-11",
+          "valor": 33.73223616
+        },
+        {
+          "fecha": "2022-12",
+          "valor": 29.818279007999998
+        },
+        {
+          "fecha": "2023-01",
+          "valor": 29.867829408
+        },
+        {
+          "fecha": "2023-02",
+          "valor": 26.215757568
+        },
+        {
+          "fecha": "2023-03",
+          "valor": 22.4899543008
+        },
+        {
+          "fecha": "2023-04",
+          "valor": 23.696382815999996
+        },
+        {
+          "fecha": "2023-05",
+          "valor": 36.513448704
+        },
+        {
+          "fecha": "2023-06",
+          "valor": 37.15704576
+        },
+        {
+          "fecha": "2023-07",
+          "valor": 41.02197264
+        },
+        {
+          "fecha": "2023-08",
+          "valor": 60.538455647999996
+        },
+        {
+          "fecha": "2023-09",
+          "valor": 43.19912736
+        },
+        {
+          "fecha": "2023-10",
+          "valor": 28.218792096
+        },
+        {
+          "fecha": "2023-11",
+          "valor": 27.45288288
+        },
+        {
+          "fecha": "2023-12",
+          "valor": 34.021786752000004
+        },
+        {
+          "fecha": "2024-01",
+          "valor": 19.2553497216
+        },
+        {
+          "fecha": "2024-02",
+          "valor": 26.187103008
+        },
+        {
+          "fecha": "2024-03",
+          "valor": 23.483774620800002
+        },
+        {
+          "fecha": "2024-04",
+          "valor": 26.01543744
+        },
+        {
+          "fecha": "2024-05",
+          "valor": 32.83544304
+        },
+        {
+          "fecha": "2024-06",
+          "valor": 42.16059072
+        },
+        {
+          "fecha": "2024-07",
+          "valor": 54.440997696
+        },
+        {
+          "fecha": "2024-08",
+          "valor": 52.683645888
+        },
+        {
+          "fecha": "2024-09",
+          "valor": 37.916631360000004
+        },
+        {
+          "fecha": "2024-10",
+          "valor": 24.8053909248
+        },
+        {
+          "fecha": "2024-11",
+          "valor": 32.6755296
+        },
+        {
+          "fecha": "2024-12",
+          "valor": 31.429604448000003
+        }
+      ],
+      "annual": [
+        {
+          "anio": 2001,
+          "valor": 501.6201841152,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        },
+        {
+          "anio": 2002,
+          "valor": 608.5333008,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2003,
+          "valor": 469.90919335679996,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2004,
+          "valor": 501.798929904,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2005,
+          "valor": 414.73057795200003,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2006,
+          "valor": 408.1548202272,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2007,
+          "valor": 460.0506627072,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2008,
+          "valor": 459.970584768,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2009,
+          "valor": 484.6223251296,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2010,
+          "valor": 411.240653424,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2011,
+          "valor": 473.1199887744,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2012,
+          "valor": 501.2284460832,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": true
+        },
+        {
+          "anio": 2013,
+          "valor": null,
+          "completo": false,
+          "meses_faltantes": [
+            6
+          ],
+          "en_tramo": false
+        },
+        {
+          "anio": 2014,
+          "valor": 392.9664873312,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        },
+        {
+          "anio": 2015,
+          "valor": 485.8522841664,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        },
+        {
+          "anio": 2016,
+          "valor": 452.8083394368,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        },
+        {
+          "anio": 2017,
+          "valor": 383.7407292,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        },
+        {
+          "anio": 2018,
+          "valor": 543.3472213632,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        },
+        {
+          "anio": 2019,
+          "valor": 473.5545577056,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        },
+        {
+          "anio": 2020,
+          "valor": 494.4767201568,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        },
+        {
+          "anio": 2021,
+          "valor": 450.7329631392,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        },
+        {
+          "anio": 2022,
+          "valor": 451.57553136,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        },
+        {
+          "anio": 2023,
+          "valor": 410.3934359328,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        },
+        {
+          "anio": 2024,
+          "valor": 403.8894984672,
+          "completo": true,
+          "meses_faltantes": [],
+          "en_tramo": false
+        }
+      ],
+      "slope_decade": -54.8869693143272,
+      "ci95": [
+        -178.59306754434016,
+        68.81912891568574
+      ],
+      "p_raw": 0.3845117017501557,
+      "p_holm": 1.0,
+      "label": "evidencia insuficiente",
+      "texto": "ET cambió aproximadamente -54.9 mm por década (total anual); IC95 % [-178.6, +68.8]; p ajustado 1.000; evidencia insuficiente. Período 2002–2012, 11 años válidos.",
+      "motivo_null": null,
+      "quality": {
+        "n_meses_esperados": 288,
+        "n_meses_validos": 287,
+        "meses_faltantes": [
+          "2013-06"
+        ],
+        "n_valores_relleno": 0,
+        "anios_completos": 23,
+        "anios_incompletos": [
+          2013
+        ],
+        "n_anios_tramo": 11,
+        "fraccion_area": null,
+        "residuos": {
+          "durbin_watson": 1.41009173852724,
+          "autocorrelacion_lag1": 0.013946574145261686,
+          "residuo_estandarizado_max": 1.9340155043867329,
+          "diferencia_medias_mitades_en_sd": 0.25915401493917356
+        },
+        "advertencias": []
+      },
+      "sensibilidad": {
+        "rezago_principal": 1,
+        "rezagos": [
+          {
+            "maxlags": 2,
+            "slope_decade": -54.8869693143272,
+            "ci95": [
+              -176.10926560291446,
+              66.33532697426004
+            ],
+            "p_raw": 0.3748466356508455,
+            "p_holm": 1.0,
+            "decision_rechaza_H0": false
+          },
+          {
+            "maxlags": 3,
+            "slope_decade": -54.8869693143272,
+            "ci95": [
+              -170.50192109335111,
+              60.7279824646967
+            ],
+            "p_raw": 0.35212672058200967,
+            "p_holm": 1.0,
+            "decision_rechaza_H0": false
+          }
+        ],
+        "resultado_sensible_al_rezago": false
+      }
+    }
+  ],
+  "joint": {
+    "standardized_anomalies": [
+      {
+        "fecha": "2001-01",
+        "P": -0.39154972627727574,
+        "T": -0.6473739819594835,
+        "SM": 0.8671946809984074,
+        "ET": 0.01308323450753506
+      },
+      {
+        "fecha": "2001-02",
+        "P": 0.37506748423576297,
+        "T": -1.6387365087851895,
+        "SM": 1.8248526931426499,
+        "ET": 1.521792838241286
+      },
+      {
+        "fecha": "2001-03",
+        "P": 0.4638295733000236,
+        "T": null,
+        "SM": 1.2822394076313164,
+        "ET": 0.7337511553818707
+      },
+      {
+        "fecha": "2001-04",
+        "P": 0.10035540817267463,
+        "T": -0.0013296963654376185,
+        "SM": 1.1321935385593018,
+        "ET": -0.26121627515963236
+      },
+      {
+        "fecha": "2001-05",
+        "P": -0.15034050569756838,
+        "T": -0.2770117556366691,
+        "SM": 0.5815117210536654,
+        "ET": -0.4047845016520466
+      },
+      {
+        "fecha": "2001-06",
+        "P": 0.8436381053787373,
+        "T": -1.203551611084338,
+        "SM": 2.17992853796409,
+        "ET": 1.2099198187180442
+      },
+      {
+        "fecha": "2001-07",
+        "P": 0.49892733510161835,
+        "T": -1.205935830801438,
+        "SM": 1.7326376213515144,
+        "ET": 0.569051950714436
+      },
+      {
+        "fecha": "2001-08",
+        "P": 0.4203949924936473,
+        "T": -2.0743628850176647,
+        "SM": 2.1322153367118686,
+        "ET": 0.6907604042295545
+      },
+      {
+        "fecha": "2001-09",
+        "P": 0.26517185972836393,
+        "T": -1.2841893422053425,
+        "SM": 1.4943394727610757,
+        "ET": 0.4007848546812055
+      },
+      {
+        "fecha": "2001-10",
+        "P": 0.09593939260378885,
+        "T": -0.8654814668424522,
+        "SM": 1.1946639836321833,
+        "ET": -0.02218600847790149
+      },
+      {
+        "fecha": "2001-11",
+        "P": -0.5441246478330457,
+        "T": -0.6485473798670138,
+        "SM": 0.7767632051414911,
+        "ET": -0.9519358050466825
+      },
+      {
+        "fecha": "2001-12",
+        "P": -0.638140443722349,
+        "T": 0.12735420903294514,
+        "SM": 0.5208285415205514,
+        "ET": -1.8544265680692262
+      },
+      {
+        "fecha": "2002-01",
+        "P": 0.9343759091562628,
+        "T": -0.3346287871496698,
+        "SM": 1.3387340740899925,
+        "ET": 1.0654229974408382
+      },
+      {
+        "fecha": "2002-02",
+        "P": 0.7920938753922073,
+        "T": -0.3763315027011721,
+        "SM": 1.0262202960565425,
+        "ET": 1.381343461859938
+      },
+      {
+        "fecha": "2002-03",
+        "P": -0.14807826507374205,
+        "T": -0.23947672076418536,
+        "SM": 1.3346076761056629,
+        "ET": 1.1739452574479623
+      },
+      {
+        "fecha": "2002-04",
+        "P": -1.3578654968884718,
+        "T": 0.19950559698757508,
+        "SM": -1.0221887448121105,
+        "ET": -0.2859967599285078
+      },
+      {
+        "fecha": "2002-05",
+        "P": 0.17921519058429847,
+        "T": -0.07723924586843847,
+        "SM": 0.824952301766841,
+        "ET": 0.3849214301606623
+      },
+      {
+        "fecha": "2002-06",
+        "P": 0.7047045624142726,
+        "T": -1.1243852658558058,
+        "SM": 1.322262912140113,
+        "ET": 0.963232987859945
+      },
+      {
+        "fecha": "2002-07",
+        "P": 0.72361786453234,
+        "T": -0.04686669595446811,
+        "SM": 1.0208956923392958,
+        "ET": 0.6667144748174962
+      },
+      {
+        "fecha": "2002-08",
+        "P": 0.9334174547068658,
+        "T": -0.10397564933007854,
+        "SM": 1.3674646810779016,
+        "ET": 1.0613468244695894
+      },
+      {
+        "fecha": "2002-09",
+        "P": 4.30072073777579,
+        "T": -0.0666649229916022,
+        "SM": 3.0110902311364898,
+        "ET": 4.193486096328701
+      },
+      {
+        "fecha": "2002-10",
+        "P": 3.509008142585847,
+        "T": 0.19460468718949603,
+        "SM": 2.1187793514306663,
+        "ET": 2.517710492488769
+      },
+      {
+        "fecha": "2002-11",
+        "P": 0.17222841405105885,
+        "T": -1.513285742134277,
+        "SM": 0.5427441079429771,
+        "ET": 0.45832051251179395
+      },
+      {
+        "fecha": "2002-12",
+        "P": -0.1242506569873231,
+        "T": -0.6019453738626598,
+        "SM": 0.1480794493871495,
+        "ET": -0.2889315654260585
+      },
+      {
+        "fecha": "2003-01",
+        "P": 0.8189255719741372,
+        "T": -1.0382251195635692,
+        "SM": 1.218567583592462,
+        "ET": 1.2615134597411213
+      },
+      {
+        "fecha": "2003-02",
+        "P": -0.4657828757360554,
+        "T": -1.224967910429633,
+        "SM": -0.215496902696356,
+        "ET": -0.3113685401106125
+      },
+      {
+        "fecha": "2003-03",
+        "P": 0.1377837357927315,
+        "T": -1.3826575138343042,
+        "SM": 1.3375411683231024,
+        "ET": 0.8333599092811096
+      },
+      {
+        "fecha": "2003-04",
+        "P": 0.23503672529265757,
+        "T": -2.11370579940925,
+        "SM": 1.7846981748277684,
+        "ET": 2.0780036055978544
+      },
+      {
+        "fecha": "2003-05",
+        "P": 2.200711524674752,
+        "T": -0.11749440879002068,
+        "SM": 2.3797098329949815,
+        "ET": 2.4654491741902813
+      },
+      {
+        "fecha": "2003-06",
+        "P": -0.6622729247971552,
+        "T": 0.94988897377696,
+        "SM": 0.59424136007974,
+        "ET": -0.7318319410034193
+      },
+      {
+        "fecha": "2003-07",
+        "P": -0.0037369163486708147,
+        "T": -0.9830179503053305,
+        "SM": 0.9705948121997053,
+        "ET": -0.02460419674205485
+      },
+      {
+        "fecha": "2003-08",
+        "P": -0.7577893924899636,
+        "T": -1.085543380791027,
+        "SM": -0.018174872791028706,
+        "ET": -0.7730549121285212
+      },
+      {
+        "fecha": "2003-09",
+        "P": -0.20202241400018672,
+        "T": 0.6143209731261599,
+        "SM": -0.3421136456855451,
+        "ET": -0.368402816150223
+      },
+      {
+        "fecha": "2003-10",
+        "P": 0.5088096544773796,
+        "T": 0.28113556637713805,
+        "SM": 1.1040362311861922,
+        "ET": 0.7556187368982584
+      },
+      {
+        "fecha": "2003-11",
+        "P": -0.9656843357662053,
+        "T": 0.30255743582523964,
+        "SM": -0.5950006072141338,
+        "ET": -0.1295466684703371
+      },
+      {
+        "fecha": "2003-12",
+        "P": -0.6251184227075388,
+        "T": 0.4101155711645615,
+        "SM": -0.21596356533482927,
+        "ET": -1.2159304559665274
+      },
+      {
+        "fecha": "2004-01",
+        "P": -0.38249350549123806,
+        "T": 0.022312157183683064,
+        "SM": 0.02169997765353944,
+        "ET": -0.963734553878391
+      },
+      {
+        "fecha": "2004-02",
+        "P": -0.5467018078428064,
+        "T": -0.1390120584276333,
+        "SM": 0.04190875884636494,
+        "ET": -1.097387745368413
+      },
+      {
+        "fecha": "2004-03",
+        "P": 1.29502806259982,
+        "T": -0.40968255919974855,
+        "SM": 1.9182639795168326,
+        "ET": 0.48996680873180787
+      },
+      {
+        "fecha": "2004-04",
+        "P": 1.9602153276570413,
+        "T": 0.011097850434796571,
+        "SM": 0.7116957219626125,
+        "ET": 1.5463410180734114
+      },
+      {
+        "fecha": "2004-05",
+        "P": 0.7009454073209359,
+        "T": -0.5746661138365191,
+        "SM": 0.6346853420335608,
+        "ET": 0.6592194607401184
+      },
+      {
+        "fecha": "2004-06",
+        "P": 2.1826571814428073,
+        "T": 0.292344329800026,
+        "SM": 1.4488410787539039,
+        "ET": 2.3232228695787196
+      },
+      {
+        "fecha": "2004-07",
+        "P": -0.560970271636805,
+        "T": 0.9102263779150149,
+        "SM": -0.6464077096951055,
+        "ET": -0.451205636501056
+      },
+      {
+        "fecha": "2004-08",
+        "P": -0.7383844056395138,
+        "T": 0.6987150205774155,
+        "SM": -0.44739806765780427,
+        "ET": -0.9413138863059811
+      },
+      {
+        "fecha": "2004-09",
+        "P": 0.8234006467297587,
+        "T": 0.40985964856240276,
+        "SM": 1.1010521749072977,
+        "ET": 0.9193666006256934
+      },
+      {
+        "fecha": "2004-10",
+        "P": 0.8971558755472019,
+        "T": 0.02204023271774684,
+        "SM": 1.1871835977160068,
+        "ET": 1.5417670315782719
+      },
+      {
+        "fecha": "2004-11",
+        "P": -0.44029587733845615,
+        "T": -0.46108768877417805,
+        "SM": -0.045402018738959785,
+        "ET": -0.07912849079072941
+      },
+      {
+        "fecha": "2004-12",
+        "P": 0.0014868948363658222,
+        "T": 0.18092032445038156,
+        "SM": 0.7299893642689946,
+        "ET": -0.23945004927000044
+      },
+      {
+        "fecha": "2005-01",
+        "P": -1.4194857116254436,
+        "T": -0.3122898446632872,
+        "SM": -0.8450900531212697,
+        "ET": -0.9012758883820595
+      },
+      {
+        "fecha": "2005-02",
+        "P": -0.4359226831889573,
+        "T": -1.3737826996396685,
+        "SM": 0.9951773660877212,
+        "ET": -1.3557203596840008
+      },
+      {
+        "fecha": "2005-03",
+        "P": -0.8145279319291843,
+        "T": -1.2568250338491194,
+        "SM": 0.7966921217146143,
+        "ET": -1.466397796633119
+      },
+      {
+        "fecha": "2005-04",
+        "P": -1.0415871977295819,
+        "T": -0.7230479698052203,
+        "SM": 0.289724107447581,
+        "ET": -1.0634470275056194
+      },
+      {
+        "fecha": "2005-05",
+        "P": -1.396971045714283,
+        "T": -1.2494829528529934,
+        "SM": 0.20709439909245816,
+        "ET": -0.9908384259575853
+      },
+      {
+        "fecha": "2005-06",
+        "P": -0.9036422347964294,
+        "T": -2.006089561340685,
+        "SM": 1.0187381043084205,
+        "ET": -0.7611922853694936
+      },
+      {
+        "fecha": "2005-07",
+        "P": -0.5880516186940542,
+        "T": -0.16767157218607273,
+        "SM": 0.12285420725451603,
+        "ET": -0.5839348975439137
+      },
+      {
+        "fecha": "2005-08",
+        "P": -0.12324132671313281,
+        "T": -0.8207730995908041,
+        "SM": 0.6482683739557377,
+        "ET": 0.1111220230641866
+      },
+      {
+        "fecha": "2005-09",
+        "P": -0.044966325647206346,
+        "T": -0.6830840850365865,
+        "SM": 0.6401034433328096,
+        "ET": -0.16333876749243376
+      },
+      {
+        "fecha": "2005-10",
+        "P": -0.36727851543275286,
+        "T": -0.5868255129834821,
+        "SM": 0.3569566634038977,
+        "ET": -0.0026515465558279096
+      },
+      {
+        "fecha": "2005-11",
+        "P": -0.6895841246929819,
+        "T": -1.4908887577647911,
+        "SM": -0.2553630779077236,
+        "ET": -0.3448414690538167
+      },
+      {
+        "fecha": "2005-12",
+        "P": -0.669448059666834,
+        "T": -0.6729050842287735,
+        "SM": -0.2389648068909324,
+        "ET": -0.0209434519936417
+      },
+      {
+        "fecha": "2006-01",
+        "P": -0.9015718255666619,
+        "T": -0.8119428820033812,
+        "SM": -0.36407306925042465,
+        "ET": -0.6684015352532316
+      },
+      {
+        "fecha": "2006-02",
+        "P": 0.35045125631647883,
+        "T": -1.5806669988174467,
+        "SM": 1.007421006168591,
+        "ET": 0.900841262332268
+      },
+      {
+        "fecha": "2006-03",
+        "P": -1.331061187205117,
+        "T": -1.8067955641319378,
+        "SM": -0.6402844733926372,
+        "ET": -0.15422960992651494
+      },
+      {
+        "fecha": "2006-04",
+        "P": -0.5004909329551742,
+        "T": -1.2666380724405706,
+        "SM": 0.49062603421117207,
+        "ET": -0.15569843870145356
+      },
+      {
+        "fecha": "2006-05",
+        "P": -0.07039256991364555,
+        "T": -1.994955119320965,
+        "SM": 0.7663145203488265,
+        "ET": 0.18101607792123534
+      },
+      {
+        "fecha": "2006-06",
+        "P": -0.35961422323498843,
+        "T": -0.8652822275345654,
+        "SM": 0.21660919656966682,
+        "ET": -0.32839926912901435
+      },
+      {
+        "fecha": "2006-07",
+        "P": -0.7214417475292239,
+        "T": -0.45756866056429446,
+        "SM": 0.0825669282538251,
+        "ET": -0.5395736159119373
+      },
+      {
+        "fecha": "2006-08",
+        "P": -1.2693365740867475,
+        "T": 0.6363497747925796,
+        "SM": -0.26158131767879217,
+        "ET": -1.5709876672825702
+      },
+      {
+        "fecha": "2006-09",
+        "P": -0.5864504546804656,
+        "T": -0.8500194444982405,
+        "SM": 0.7172758554063667,
+        "ET": -0.6955040809597789
+      },
+      {
+        "fecha": "2006-10",
+        "P": -0.6360613039514373,
+        "T": -0.23954162045856472,
+        "SM": 0.7598425766585047,
+        "ET": -0.39588791612547786
+      },
+      {
+        "fecha": "2006-11",
+        "P": -1.2042234046412408,
+        "T": -0.1131674110338137,
+        "SM": -0.4331556241048829,
+        "ET": -1.1741129130046384
+      },
+      {
+        "fecha": "2006-12",
+        "P": -0.33422905555765065,
+        "T": -0.887323471517496,
+        "SM": 1.3100720777188144,
+        "ET": 0.03904581800141031
+      },
+      {
+        "fecha": "2007-01",
+        "P": -0.41276878992394156,
+        "T": -0.3362359053141223,
+        "SM": 1.1028473702506287,
+        "ET": -0.5098242654519877
+      },
+      {
+        "fecha": "2007-02",
+        "P": 0.8682125835520926,
+        "T": -0.33226589385094196,
+        "SM": 1.100839015919491,
+        "ET": 0.3326215522553978
+      },
+      {
+        "fecha": "2007-03",
+        "P": 2.4728523594818776,
+        "T": 0.050407628236509246,
+        "SM": 1.187607121653815,
+        "ET": 1.7146618789815409
+      },
+      {
+        "fecha": "2007-04",
+        "P": 0.06326798351735748,
+        "T": -0.6527786311071552,
+        "SM": 0.37660061631832353,
+        "ET": 0.7277529752265578
+      },
+      {
+        "fecha": "2007-05",
+        "P": -0.4565667826384841,
+        "T": -0.5928728057802678,
+        "SM": 0.25659806156914294,
+        "ET": -0.7583692996386303
+      },
+      {
+        "fecha": "2007-06",
+        "P": -1.038108399464818,
+        "T": -0.27254959146448166,
+        "SM": -0.27717704924483266,
+        "ET": -0.9207458556492585
+      },
+      {
+        "fecha": "2007-07",
+        "P": 0.12470048881131428,
+        "T": -1.0200555484622558,
+        "SM": 0.7853820035375665,
+        "ET": 0.08875144269797795
+      },
+      {
+        "fecha": "2007-08",
+        "P": 0.15751568762736237,
+        "T": -0.6357723188131629,
+        "SM": 0.6925854438659872,
+        "ET": -0.12847297277814518
+      },
+      {
+        "fecha": "2007-09",
+        "P": -0.16112981305652746,
+        "T": -0.5422237527966629,
+        "SM": 0.11458017452055896,
+        "ET": -0.037274604685327645
+      },
+      {
+        "fecha": "2007-10",
+        "P": -0.5053118345550479,
+        "T": -1.426606037819507,
+        "SM": -0.29767300664513546,
+        "ET": -0.5524570642518203
+      },
+      {
+        "fecha": "2007-11",
+        "P": -0.3888713846807144,
+        "T": -0.6140314792975685,
+        "SM": 0.3436273916739919,
+        "ET": 0.571202961423706
+      },
+      {
+        "fecha": "2007-12",
+        "P": -0.48560497897436117,
+        "T": -0.10230281453816552,
+        "SM": -0.10740630378502256,
+        "ET": 1.965214655373057
+      },
+      {
+        "fecha": "2008-01",
+        "P": 0.10384883939933282,
+        "T": 1.5845917248848906,
+        "SM": -0.4305332119988154,
+        "ET": 1.0588011540070081
+      },
+      {
+        "fecha": "2008-02",
+        "P": 1.6290246499794159,
+        "T": 1.2473741522177912,
+        "SM": 1.269261371992574,
+        "ET": 0.22744474869133524
+      },
+      {
+        "fecha": "2008-03",
+        "P": 0.6869973728013862,
+        "T": -0.9450778987506674,
+        "SM": 0.8994729971850106,
+        "ET": 0.30694787237053694
+      },
+      {
+        "fecha": "2008-04",
+        "P": -0.37023159665433775,
+        "T": -0.3308898263290221,
+        "SM": -0.051266189870079214,
+        "ET": -0.21334833728200553
+      },
+      {
+        "fecha": "2008-05",
+        "P": 1.1089803091465178,
+        "T": 0.15376859778500082,
+        "SM": 0.7946139781402733,
+        "ET": 1.491838612267388
+      },
+      {
+        "fecha": "2008-06",
+        "P": -0.9383287135230663,
+        "T": 0.12792192047919057,
+        "SM": -0.6471882435539416,
+        "ET": -1.059025117073529
+      },
+      {
+        "fecha": "2008-07",
+        "P": -1.120240588958015,
+        "T": -0.23240083251647098,
+        "SM": -0.8222279157385874,
+        "ET": -1.0099816050728494
+      },
+      {
+        "fecha": "2008-08",
+        "P": -0.16249072401160258,
+        "T": -0.6220745258112851,
+        "SM": -0.17823373188312175,
+        "ET": -0.15276774938727894
+      },
+      {
+        "fecha": "2008-09",
+        "P": -0.08441183370535381,
+        "T": -0.5299450362743043,
+        "SM": 0.11933566369698596,
+        "ET": 0.13971431644527232
+      },
+      {
+        "fecha": "2008-10",
+        "P": 0.6473565112062492,
+        "T": -0.4777501901761828,
+        "SM": 1.32010430130346,
+        "ET": 1.3663152159212058
+      },
+      {
+        "fecha": "2008-11",
+        "P": 0.18479080493669536,
+        "T": 0.792376415906744,
+        "SM": 0.5705384321818973,
+        "ET": 1.8189946156520014
+      },
+      {
+        "fecha": "2008-12",
+        "P": -0.24006280546223632,
+        "T": -0.5748544649159003,
+        "SM": 0.46311047275595213,
+        "ET": -0.1239890356199027
+      },
+      {
+        "fecha": "2009-01",
+        "P": 0.6680588643235654,
+        "T": 0.24296948116819606,
+        "SM": 1.4328079381211711,
+        "ET": 0.9433833218481092
+      },
+      {
+        "fecha": "2009-02",
+        "P": -0.24827705137987452,
+        "T": 0.8722563209468541,
+        "SM": -0.5525344280721399,
+        "ET": -0.18819181995504464
+      },
+      {
+        "fecha": "2009-03",
+        "P": 0.0014673362341470026,
+        "T": 0.8547962100723386,
+        "SM": -0.3777912438614745,
+        "ET": -0.3495935191148766
+      },
+      {
+        "fecha": "2009-04",
+        "P": 0.4371193092623681,
+        "T": 1.7518749614992772,
+        "SM": -0.40714960299415426,
+        "ET": -0.1112889159244145
+      },
+      {
+        "fecha": "2009-05",
+        "P": 0.5095410552694816,
+        "T": 1.7192100372063361,
+        "SM": 0.03167038263884354,
+        "ET": -0.02510181831323688
+      },
+      {
+        "fecha": "2009-06",
+        "P": 0.6531031854516607,
+        "T": 0.5064994431746501,
+        "SM": 0.6290175068933598,
+        "ET": 0.43581256508842353
+      },
+      {
+        "fecha": "2009-07",
+        "P": 0.5414733091446463,
+        "T": -0.39249325445671673,
+        "SM": 0.7802587657455703,
+        "ET": 0.6927967735010765
+      },
+      {
+        "fecha": "2009-08",
+        "P": -0.05444451576926414,
+        "T": -0.9654862538925872,
+        "SM": 0.31948970556066597,
+        "ET": -0.003217498840408238
+      },
+      {
+        "fecha": "2009-09",
+        "P": -0.18297429870203233,
+        "T": -0.3845319215036546,
+        "SM": -0.2196389419839444,
+        "ET": -0.15692985389402694
+      },
+      {
+        "fecha": "2009-10",
+        "P": 0.06924591742122507,
+        "T": -0.3438096721999624,
+        "SM": -0.29000081596187727,
+        "ET": -0.11837652697569136
+      },
+      {
+        "fecha": "2009-11",
+        "P": 0.37906878980787084,
+        "T": 0.6633636497781131,
+        "SM": -0.7254061088072331,
+        "ET": -0.7790147487919169
+      },
+      {
+        "fecha": "2009-12",
+        "P": 1.049367438439871,
+        "T": -0.1263152111045995,
+        "SM": 0.9106673411652588,
+        "ET": 0.703358319281801
+      },
+      {
+        "fecha": "2010-01",
+        "P": -0.35706050893151553,
+        "T": -0.0647936473317602,
+        "SM": 0.059844355357721646,
+        "ET": -0.09402283580274438
+      },
+      {
+        "fecha": "2010-02",
+        "P": -0.9515139503998763,
+        "T": -0.5675314326272131,
+        "SM": -0.366084035029586,
+        "ET": -0.44132471552362756
+      },
+      {
+        "fecha": "2010-03",
+        "P": -0.43381484481893123,
+        "T": 0.8122042638225361,
+        "SM": -0.5649915064782743,
+        "ET": -0.7706076819033456
+      },
+      {
+        "fecha": "2010-04",
+        "P": 0.09555038296239671,
+        "T": 0.6074666703455956,
+        "SM": 0.18694609472103652,
+        "ET": 0.13083631700708423
+      },
+      {
+        "fecha": "2010-05",
+        "P": -0.8795992819873217,
+        "T": -0.8477664929929397,
+        "SM": -0.8246532681110226,
+        "ET": -0.5698504174716065
+      },
+      {
+        "fecha": "2010-06",
+        "P": -0.6540557311191844,
+        "T": -1.8286177544547666,
+        "SM": -0.5103611873250543,
+        "ET": -0.7009750151286693
+      },
+      {
+        "fecha": "2010-07",
+        "P": -0.10730120413991681,
+        "T": -1.8525361425512583,
+        "SM": 0.6337807397835182,
+        "ET": -0.07074457505843033
+      },
+      {
+        "fecha": "2010-08",
+        "P": -1.2808095062061253,
+        "T": -1.4028487269159395,
+        "SM": -0.5661768134071012,
+        "ET": -1.3354835444775157
+      },
+      {
+        "fecha": "2010-09",
+        "P": -0.23662414063704965,
+        "T": -1.6430313834943215,
+        "SM": 0.2625843464324389,
+        "ET": -0.20148353163917446
+      },
+      {
+        "fecha": "2010-10",
+        "P": -1.3208864097639152,
+        "T": -1.2024877453641865,
+        "SM": -1.7197135497870972,
+        "ET": -1.5066947065903047
+      },
+      {
+        "fecha": "2010-11",
+        "P": -0.4697748081836838,
+        "T": -1.468645177397798,
+        "SM": 0.12710504940620787,
+        "ET": -0.4899427643165733
+      },
+      {
+        "fecha": "2010-12",
+        "P": 0.08975064007927291,
+        "T": -0.43462822599276885,
+        "SM": 0.5111551221745281,
+        "ET": -0.4009444699068725
+      },
+      {
+        "fecha": "2011-01",
+        "P": 0.513496726454141,
+        "T": 0.034365543417350645,
+        "SM": 0.4663276932237708,
+        "ET": -0.5818022054231063
+      },
+      {
+        "fecha": "2011-02",
+        "P": -0.48365983854985706,
+        "T": 0.6976743536803705,
+        "SM": 0.04836800203863656,
+        "ET": -1.0824568022418883
+      },
+      {
+        "fecha": "2011-03",
+        "P": -0.904874763991214,
+        "T": 0.17445869602111846,
+        "SM": 0.09243669380858259,
+        "ET": -0.6437205337038568
+      },
+      {
+        "fecha": "2011-04",
+        "P": -0.0452984337211322,
+        "T": -0.471735356732403,
+        "SM": 1.0065328739426946,
+        "ET": -1.2104115813356235
+      },
+      {
+        "fecha": "2011-05",
+        "P": 1.7437311478127933,
+        "T": -0.32044056210804417,
+        "SM": 1.4539016345842672,
+        "ET": 1.7996153047321566
+      },
+      {
+        "fecha": "2011-06",
+        "P": -0.3111704891983064,
+        "T": -1.3307107406914134,
+        "SM": 0.8999561015898718,
+        "ET": -0.2564003997773379
+      },
+      {
+        "fecha": "2011-07",
+        "P": 1.2018526099181293,
+        "T": -1.28641472399306,
+        "SM": 1.4177137467738516,
+        "ET": 1.273527289351882
+      },
+      {
+        "fecha": "2011-08",
+        "P": 0.7019115673450227,
+        "T": -0.6246529339057422,
+        "SM": 1.1429548548320718,
+        "ET": 0.5419691282721598
+      },
+      {
+        "fecha": "2011-09",
+        "P": -0.6519771987937867,
+        "T": -0.9039630193324746,
+        "SM": -0.44022689606230525,
+        "ET": -0.5847516980319358
+      },
+      {
+        "fecha": "2011-10",
+        "P": -0.56954595681415,
+        "T": 0.8369555623848507,
+        "SM": -1.0006374779986948,
+        "ET": -1.3023900935930575
+      },
+      {
+        "fecha": "2011-11",
+        "P": 0.3549888411943994,
+        "T": 1.2688492477680002,
+        "SM": -0.23431229463168562,
+        "ET": -1.53845311092649
+      },
+      {
+        "fecha": "2011-12",
+        "P": 0.5954323616471239,
+        "T": -0.5622325641566445,
+        "SM": 0.5299645486806839,
+        "ET": -0.6007427913209886
+      },
+      {
+        "fecha": "2012-01",
+        "P": 1.1446595102899995,
+        "T": -2.5529339895958323,
+        "SM": 1.5735677122872185,
+        "ET": -0.1562226201802146
+      },
+      {
+        "fecha": "2012-02",
+        "P": -0.8636555269199403,
+        "T": -0.5710790875769716,
+        "SM": -0.9612020682517616,
+        "ET": -1.5639587399785437
+      },
+      {
+        "fecha": "2012-03",
+        "P": 0.04037514929321134,
+        "T": 0.47325010602459966,
+        "SM": -0.5778119539470983,
+        "ET": -0.12077748316875953
+      },
+      {
+        "fecha": "2012-04",
+        "P": 0.868533964267141,
+        "T": -0.2840947426982307,
+        "SM": 0.01792474398054974,
+        "ET": 1.6460851824598948
+      },
+      {
+        "fecha": "2012-05",
+        "P": 0.14828274514614553,
+        "T": 0.1664631719842674,
+        "SM": -0.367947321044427,
+        "ET": 0.6885196235080724
+      },
+      {
+        "fecha": "2012-06",
+        "P": -0.4928914666973523,
+        "T": 0.5627568460110215,
+        "SM": -0.5535466794638773,
+        "ET": -0.6300981136414434
+      },
+      {
+        "fecha": "2012-07",
+        "P": 0.33892473951178215,
+        "T": -0.7151011187772679,
+        "SM": 0.4217873699359498,
+        "ET": 0.551909612869963
+      },
+      {
+        "fecha": "2012-08",
+        "P": 1.5125308572654617,
+        "T": -0.21081843474441414,
+        "SM": 1.8967949627977778,
+        "ET": 1.8067661277777778
+      },
+      {
+        "fecha": "2012-09",
+        "P": -0.2422322249276205,
+        "T": 0.48422176323166005,
+        "SM": 0.1010645737033527,
+        "ET": -0.16609603799451111
+      },
+      {
+        "fecha": "2012-10",
+        "P": -0.31646973345981666,
+        "T": -1.05512002199686,
+        "SM": -0.18086390349252526,
+        "ET": 0.22190760136493579
+      },
+      {
+        "fecha": "2012-11",
+        "P": 0.3274084982273569,
+        "T": -0.23358955302068457,
+        "SM": -0.061258452894934624,
+        "ET": 0.29436893092169586
+      },
+      {
+        "fecha": "2012-12",
+        "P": 0.009275767219056047,
+        "T": 0.31221887747066523,
+        "SM": -0.5262653614677999,
+        "ET": 0.5420012264745208
+      },
+      {
+        "fecha": "2013-01",
+        "P": 2.326867623526088,
+        "T": 0.3078970550136654,
+        "SM": 0.5701131626213484,
+        "ET": 0.7436313696491206
+      },
+      {
+        "fecha": "2013-02",
+        "P": 2.5554529960731656,
+        "T": 0.15170892877433587,
+        "SM": 1.392565432334574,
+        "ET": 1.2040474138281152
+      },
+      {
+        "fecha": "2013-03",
+        "P": -0.5003916478516041,
+        "T": 0.10984201710981971,
+        "SM": -0.7054731893358047,
+        "ET": -0.5583233264788615
+      },
+      {
+        "fecha": "2013-04",
+        "P": -0.8863475487311124,
+        "T": 0.37103642813241283,
+        "SM": -0.6076636882002842,
+        "ET": -1.282873336388831
+      },
+      {
+        "fecha": "2013-05",
+        "P": -1.2726811414865324,
+        "T": 0.7422289254718251,
+        "SM": -1.481004957752445,
+        "ET": -0.6234919421148057
+      },
+      {
+        "fecha": "2013-06",
+        "P": null,
+        "T": null,
+        "SM": null,
+        "ET": null
+      },
+      {
+        "fecha": "2013-07",
+        "P": 0.8009725857091621,
+        "T": 1.6146330344518405,
+        "SM": 0.49793731348060816,
+        "ET": 0.488147528991373
+      },
+      {
+        "fecha": "2013-08",
+        "P": 3.1610504037508167,
+        "T": 2.1091042482487525,
+        "SM": 0.7196930932273314,
+        "ET": 2.8265433605627837
+      },
+      {
+        "fecha": "2013-09",
+        "P": -0.29014643893139586,
+        "T": 1.861645423450371,
+        "SM": -1.2129521724139583,
+        "ET": -0.46550958540230725
+      },
+      {
+        "fecha": "2013-10",
+        "P": 1.0171315355648416,
+        "T": 1.2777325887446362,
+        "SM": 0.688491203304204,
+        "ET": 0.2884913523387885
+      },
+      {
+        "fecha": "2013-11",
+        "P": 1.8183244319310177,
+        "T": 0.5180900593812661,
+        "SM": 0.9654000942384265,
+        "ET": 1.1233429912205342
+      },
+      {
+        "fecha": "2013-12",
+        "P": 2.7910931744534735,
+        "T": 1.2003696991903317,
+        "SM": 2.18239953785569,
+        "ET": 2.6155768861812203
+      },
+      {
+        "fecha": "2014-01",
+        "P": -1.0478554966913536,
+        "T": 0.5536254223642398,
+        "SM": 0.09939282058475862,
+        "ET": 0.5042502313615119
+      },
+      {
+        "fecha": "2014-02",
+        "P": -1.296457695131425,
+        "T": -1.0195773607043457,
+        "SM": -0.06606664974084188,
+        "ET": -0.07027416251757185
+      },
+      {
+        "fecha": "2014-03",
+        "P": -1.1333266098631767,
+        "T": -1.7974026634380265,
+        "SM": 0.017252374754125152,
+        "ET": 0.32142690314748346
+      },
+      {
+        "fecha": "2014-04",
+        "P": 0.1655505332760077,
+        "T": 0.5069723104172549,
+        "SM": 0.7250374715391933,
+        "ET": 1.1217735358187173
+      },
+      {
+        "fecha": "2014-05",
+        "P": -1.4849118655681601,
+        "T": -1.4789874916670371,
+        "SM": -0.13861569191027354,
+        "ET": -1.2821916239125777
+      },
+      {
+        "fecha": "2014-06",
+        "P": -0.6950767161328826,
+        "T": -0.01649141257508557,
+        "SM": -0.11153046580768414,
+        "ET": -0.6393716744042148
+      },
+      {
+        "fecha": "2014-07",
+        "P": -1.1969004126804113,
+        "T": -0.11799965316253913,
+        "SM": -0.8766429110747822,
+        "ET": -1.0780147564778069
+      },
+      {
+        "fecha": "2014-08",
+        "P": -1.296467667717669,
+        "T": -0.6394787804489392,
+        "SM": -0.8064338218545424,
+        "ET": -1.2065774027643985
+      },
+      {
+        "fecha": "2014-09",
+        "P": -0.8094082462708461,
+        "T": 0.017216646060139302,
+        "SM": -1.065698867214146,
+        "ET": -0.7545235922556165
+      },
+      {
+        "fecha": "2014-10",
+        "P": -0.7490151232261176,
+        "T": -0.27286098198484554,
+        "SM": -0.18383687738228557,
+        "ET": -0.4973504149640128
+      },
+      {
+        "fecha": "2014-11",
+        "P": -0.8200053219781704,
+        "T": -0.866074255455966,
+        "SM": 0.18679449982093718,
+        "ET": -1.2792455713544895
+      },
+      {
+        "fecha": "2014-12",
+        "P": -0.6248581175107214,
+        "T": -0.8451478519072377,
+        "SM": 0.18505340777638943,
+        "ET": 0.19957645825955636
+      },
+      {
+        "fecha": "2015-01",
+        "P": 0.737867782143937,
+        "T": -0.6194101258973346,
+        "SM": 0.1597685840674519,
+        "ET": 0.6128125079653858
+      },
+      {
+        "fecha": "2015-02",
+        "P": 0.7484552595021331,
+        "T": -0.8724430396284287,
+        "SM": 0.20261858573465052,
+        "ET": 1.539746763255192
+      },
+      {
+        "fecha": "2015-03",
+        "P": 0.3702490575457692,
+        "T": -0.2428775986015979,
+        "SM": 0.567227841594657,
+        "ET": 0.42482363067511403
+      },
+      {
+        "fecha": "2015-04",
+        "P": 1.9060024246538898,
+        "T": 1.2725705639172475,
+        "SM": 0.6144250593519802,
+        "ET": 0.5883600352098752
+      },
+      {
+        "fecha": "2015-05",
+        "P": 0.2083431505485657,
+        "T": 0.299088065592987,
+        "SM": -0.1116211082532994,
+        "ET": 0.2548407329009032
+      },
+      {
+        "fecha": "2015-06",
+        "P": 0.3204111809992129,
+        "T": 0.8686927222605316,
+        "SM": -0.2264581852521782,
+        "ET": 0.3868243388332203
+      },
+      {
+        "fecha": "2015-07",
+        "P": 0.710527821474161,
+        "T": 1.5287888817141826,
+        "SM": 0.05811511151930056,
+        "ET": 0.7867664365001993
+      },
+      {
+        "fecha": "2015-08",
+        "P": 0.3341792670150261,
+        "T": 0.8998308519455281,
+        "SM": 0.4477167606309298,
+        "ET": 0.44667986856341924
+      },
+      {
+        "fecha": "2015-09",
+        "P": -0.7170445940057426,
+        "T": 0.6397061848128629,
+        "SM": -1.2052766460239412,
+        "ET": -0.879168260150018
+      },
+      {
+        "fecha": "2015-10",
+        "P": -1.0838346558065743,
+        "T": 0.7621942089104308,
+        "SM": -1.6408817905166146,
+        "ET": -1.4205096678206723
+      },
+      {
+        "fecha": "2015-11",
+        "P": 1.5873106010913596,
+        "T": 0.894850289597458,
+        "SM": 1.1426458668439998,
+        "ET": 1.1201361813327846
+      },
+      {
+        "fecha": "2015-12",
+        "P": -0.026757909311800873,
+        "T": -1.2087201640219394,
+        "SM": 0.126367997077187,
+        "ET": -0.42614133036916146
+      },
+      {
+        "fecha": "2016-01",
+        "P": -1.042727592927498,
+        "T": 0.21323779512509453,
+        "SM": -1.8937094181055927,
+        "ET": -0.5370798928780056
+      },
+      {
+        "fecha": "2016-02",
+        "P": 0.8779247475877595,
+        "T": 1.1648444949645695,
+        "SM": -0.5791426537597019,
+        "ET": 0.4265615748933611
+      },
+      {
+        "fecha": "2016-03",
+        "P": 1.5310706128555547,
+        "T": 0.9890499113692776,
+        "SM": -0.08476796569693344,
+        "ET": 1.0830505042859704
+      },
+      {
+        "fecha": "2016-04",
+        "P": 1.7544720029872702,
+        "T": 0.44575513543792294,
+        "SM": 1.0261576567501014,
+        "ET": 0.06870060804501424
+      },
+      {
+        "fecha": "2016-05",
+        "P": 0.10904075548874097,
+        "T": 0.348196023679846,
+        "SM": -0.2747303750627981,
+        "ET": -0.517668158486206
+      },
+      {
+        "fecha": "2016-06",
+        "P": -0.7176863547413609,
+        "T": -0.09652771764132283,
+        "SM": -0.7746423836391114,
+        "ET": -0.5076331672080998
+      },
+      {
+        "fecha": "2016-07",
+        "P": -0.92134128383582,
+        "T": -0.5927385865484047,
+        "SM": -1.2074022479186073,
+        "ET": -1.0891761172047962
+      },
+      {
+        "fecha": "2016-08",
+        "P": 0.3380576135699104,
+        "T": 0.6474691597000003,
+        "SM": -0.7408580559721181,
+        "ET": 0.18604609710080663
+      },
+      {
+        "fecha": "2016-09",
+        "P": -0.114727902220712,
+        "T": 0.12344823844479258,
+        "SM": 0.10048056626063563,
+        "ET": 0.1677031846867214
+      },
+      {
+        "fecha": "2016-10",
+        "P": 1.3364925381514696,
+        "T": 0.467790298111279,
+        "SM": 0.9450300792756581,
+        "ET": 1.4125993971436124
+      },
+      {
+        "fecha": "2016-11",
+        "P": 1.327651266633513,
+        "T": 0.019833859160581377,
+        "SM": 1.4600479367592745,
+        "ET": 2.159430375594365
+      },
+      {
+        "fecha": "2016-12",
+        "P": -0.3616625188326205,
+        "T": 0.17599470464189573,
+        "SM": -0.5131525041320792,
+        "ET": -0.33458530135454884
+      },
+      {
+        "fecha": "2017-01",
+        "P": -1.4533246035581358,
+        "T": -1.0840279872515608,
+        "SM": -0.7556964808329373,
+        "ET": -0.3747057000001315
+      },
+      {
+        "fecha": "2017-02",
+        "P": -1.0121839970787756,
+        "T": 0.14293315074059415,
+        "SM": 0.07227684251151828,
+        "ET": 0.06490784298972767
+      },
+      {
+        "fecha": "2017-03",
+        "P": -0.8392140804531347,
+        "T": 0.2747036189436557,
+        "SM": -0.303693403406077,
+        "ET": -1.9726048154376854
+      },
+      {
+        "fecha": "2017-04",
+        "P": -1.1545077145027136,
+        "T": -1.2181552972690723,
+        "SM": -0.8810144178971537,
+        "ET": -1.248012078064198
+      },
+      {
+        "fecha": "2017-05",
+        "P": -0.5064129091547726,
+        "T": -0.42617300247874,
+        "SM": 0.15995582098451572,
+        "ET": -0.5486302626977657
+      },
+      {
+        "fecha": "2017-06",
+        "P": -0.13306844507002194,
+        "T": -0.302273219251711,
+        "SM": 0.2210766612736802,
+        "ET": -0.11754985254562578
+      },
+      {
+        "fecha": "2017-07",
+        "P": -1.3320165544857163,
+        "T": -0.12232647537713505,
+        "SM": -1.054248487863957,
+        "ET": -1.0788907144981117
+      },
+      {
+        "fecha": "2017-08",
+        "P": -0.9042051312913225,
+        "T": -0.21984286307505982,
+        "SM": -0.34537882296593453,
+        "ET": -0.9366310130889124
+      },
+      {
+        "fecha": "2017-09",
+        "P": -0.6684811541017079,
+        "T": -1.3788320336025863,
+        "SM": 0.3352515582335963,
+        "ET": -0.6665133943471035
+      },
+      {
+        "fecha": "2017-10",
+        "P": -0.9756878280056812,
+        "T": -0.8689625941660654,
+        "SM": -0.23955616221945017,
+        "ET": -1.190251919307471
+      },
+      {
+        "fecha": "2017-11",
+        "P": -0.07928772657379982,
+        "T": -1.6205151399034792,
+        "SM": 0.9591121979351966,
+        "ET": -0.722169247021052
+      },
+      {
+        "fecha": "2017-12",
+        "P": -1.108079219238905,
+        "T": -2.128117886401704,
+        "SM": -1.3223877736454548,
+        "ET": -1.2889205080916428
+      },
+      {
+        "fecha": "2018-01",
+        "P": -0.13566425259744347,
+        "T": -0.14900663915102458,
+        "SM": -1.3252879859371227,
+        "ET": -1.858090316241173
+      },
+      {
+        "fecha": "2018-02",
+        "P": 0.5283420309704072,
+        "T": 0.2646737311232121,
+        "SM": -0.25955472566452803,
+        "ET": -1.0350089235956956
+      },
+      {
+        "fecha": "2018-03",
+        "P": 1.344051361745018,
+        "T": 1.7118174251066534,
+        "SM": 0.1413282307659568,
+        "ET": 0.9935596273152009
+      },
+      {
+        "fecha": "2018-04",
+        "P": -0.016317973900916712,
+        "T": 0.6470507083021168,
+        "SM": -0.4478729665273122,
+        "ET": -0.987035588763266
+      },
+      {
+        "fecha": "2018-05",
+        "P": 0.9890297628440632,
+        "T": 0.718009014170494,
+        "SM": -0.25107953137541983,
+        "ET": 0.5916676213311315
+      },
+      {
+        "fecha": "2018-06",
+        "P": 2.2321763445919434,
+        "T": 0.6668620399196107,
+        "SM": 0.6289299095462196,
+        "ET": 1.8848237601524254
+      },
+      {
+        "fecha": "2018-07",
+        "P": 3.123059467335721,
+        "T": 1.6236328246582117,
+        "SM": 1.286294934927667,
+        "ET": 3.2080428949393034
+      },
+      {
+        "fecha": "2018-08",
+        "P": -0.6198317932835891,
+        "T": -0.5585812264851299,
+        "SM": -0.5647145750598073,
+        "ET": -0.4406657855403517
+      },
+      {
+        "fecha": "2018-09",
+        "P": -0.20394228143344983,
+        "T": 0.5494783128393869,
+        "SM": -0.4983773514301637,
+        "ET": 0.13939349243515095
+      },
+      {
+        "fecha": "2018-10",
+        "P": -0.48569609536513897,
+        "T": 0.29671775534956896,
+        "SM": -0.4736538804423747,
+        "ET": 0.37436260004928523
+      },
+      {
+        "fecha": "2018-11",
+        "P": -1.4462222128831628,
+        "T": 1.3470852890588823,
+        "SM": -2.820642511762162,
+        "ET": -0.9552591016183881
+      },
+      {
+        "fecha": "2018-12",
+        "P": -0.659695066253613,
+        "T": 2.2267457267859045,
+        "SM": -1.9307383680730943,
+        "ET": -1.1319429924018793
+      },
+      {
+        "fecha": "2019-01",
+        "P": 1.3566436244970976,
+        "T": 1.387719749734804,
+        "SM": 0.37997631056828707,
+        "ET": 1.69135799156488
+      },
+      {
+        "fecha": "2019-02",
+        "P": 0.6979357623053483,
+        "T": 0.5740665864821124,
+        "SM": 0.4376579126414487,
+        "ET": 0.27652488326238694
+      },
+      {
+        "fecha": "2019-03",
+        "P": 0.4745885242692647,
+        "T": -0.08255050055097864,
+        "SM": 0.2888720245173285,
+        "ET": -0.9701815582734399
+      },
+      {
+        "fecha": "2019-04",
+        "P": -0.05699825797178995,
+        "T": -1.5409646610694805,
+        "SM": 0.33991080498273557,
+        "ET": -0.05154805089183125
+      },
+      {
+        "fecha": "2019-05",
+        "P": 1.0984032236571715,
+        "T": -0.9404702914221755,
+        "SM": 0.4470281305692306,
+        "ET": 0.9123716510005296
+      },
+      {
+        "fecha": "2019-06",
+        "P": -0.19883162174072547,
+        "T": -0.05969941784629161,
+        "SM": -0.5168433910132338,
+        "ET": -0.47382803195330436
+      },
+      {
+        "fecha": "2019-07",
+        "P": 0.243445127356983,
+        "T": -0.4378383512657528,
+        "SM": 0.2518666498347651,
+        "ET": 0.11841911539414769
+      },
+      {
+        "fecha": "2019-08",
+        "P": 0.8044583535797256,
+        "T": 0.1462910863387659,
+        "SM": 0.3482845530150417,
+        "ET": 0.7907078704812066
+      },
+      {
+        "fecha": "2019-09",
+        "P": -0.5355135522902541,
+        "T": 0.669368252816375,
+        "SM": -0.9929482257783168,
+        "ET": -0.5570533873845591
+      },
+      {
+        "fecha": "2019-10",
+        "P": -0.5837503371429427,
+        "T": -0.23804970874843134,
+        "SM": -1.150437001089315,
+        "ET": 0.27731012462979676
+      },
+      {
+        "fecha": "2019-11",
+        "P": -1.4507105234131767,
+        "T": 0.5825197404443353,
+        "SM": -2.1706198402991523,
+        "ET": -0.701777225170752
+      },
+      {
+        "fecha": "2019-12",
+        "P": -1.1303843320778761,
+        "T": 1.1141713525416548,
+        "SM": -2.2651162301339403,
+        "ET": -0.04023148742606715
+      },
+      {
+        "fecha": "2020-01",
+        "P": -0.10595141176523219,
+        "T": 2.295902224488326,
+        "SM": -1.8966346004448702,
+        "ET": 1.1574036986769216
+      },
+      {
+        "fecha": "2020-02",
+        "P": 0.6899448598919556,
+        "T": 2.3839307669247614,
+        "SM": -0.818423871718142,
+        "ET": 0.9131070677170923
+      },
+      {
+        "fecha": "2020-03",
+        "P": 0.4343719690750673,
+        "T": 1.7477695622452776,
+        "SM": -1.0266362632158177,
+        "ET": 0.3420032423525887
+      },
+      {
+        "fecha": "2020-04",
+        "P": 0.23577372209584826,
+        "T": 2.1607565938795728,
+        "SM": -0.8648802091068742,
+        "ET": -0.7166663913376772
+      },
+      {
+        "fecha": "2020-05",
+        "P": -1.1676502211127848,
+        "T": 1.8778922146978807,
+        "SM": -2.214996658395189,
+        "ET": -1.3116843286770468
+      },
+      {
+        "fecha": "2020-06",
+        "P": 1.793962320366647,
+        "T": 0.7618326555326664,
+        "SM": -0.3320129885529547,
+        "ET": 1.5852190059112097
+      },
+      {
+        "fecha": "2020-07",
+        "P": 0.7809405872729268,
+        "T": 0.8757848730867881,
+        "SM": -0.5511620616530055,
+        "ET": 0.5888110432655476
+      },
+      {
+        "fecha": "2020-08",
+        "P": 0.0906743626698936,
+        "T": 1.356370235171491,
+        "SM": -1.6474458312934568,
+        "ET": 0.022479483322783555
+      },
+      {
+        "fecha": "2020-09",
+        "P": 0.309342236339802,
+        "T": 2.1498503539589113,
+        "SM": -1.0490963699139968,
+        "ET": 0.08090515674097608
+      },
+      {
+        "fecha": "2020-10",
+        "P": 0.13812982576434685,
+        "T": 3.260814787444295,
+        "SM": -0.9022416324859022,
+        "ET": -0.7595334982714266
+      },
+      {
+        "fecha": "2020-11",
+        "P": 1.369139680545463,
+        "T": 2.1116508376734293,
+        "SM": 0.3736088102792531,
+        "ET": 0.628034758878811
+      },
+      {
+        "fecha": "2020-12",
+        "P": 1.570322651945653,
+        "T": 1.8396227949618746,
+        "SM": 0.41012163122718487,
+        "ET": -0.232235677769662
+      },
+      {
+        "fecha": "2021-01",
+        "P": -0.34030584136375136,
+        "T": 1.1525983622698535,
+        "SM": 0.24810909071364007,
+        "ET": -1.5602829454406049
+      },
+      {
+        "fecha": "2021-02",
+        "P": -1.2497160183615081,
+        "T": 0.2693416981624184,
+        "SM": -1.762244630708116,
+        "ET": -1.4323049412565083
+      },
+      {
+        "fecha": "2021-03",
+        "P": -0.8765241374888909,
+        "T": 0.5607012504158131,
+        "SM": -1.5428222456258065,
+        "ET": 0.15199815287404328
+      },
+      {
+        "fecha": "2021-04",
+        "P": 1.1916488785082635,
+        "T": -0.3204568240769198,
+        "SM": 0.5239028398411247,
+        "ET": 1.4012105818752054
+      },
+      {
+        "fecha": "2021-05",
+        "P": 0.5763849893978054,
+        "T": 0.013460146108301575,
+        "SM": 0.34638971294777343,
+        "ET": 0.2846306954845541
+      },
+      {
+        "fecha": "2021-06",
+        "P": 0.5622500187726908,
+        "T": 1.5385617972712513,
+        "SM": -0.43388870327394946,
+        "ET": 0.7263629075487396
+      },
+      {
+        "fecha": "2021-07",
+        "P": -0.7091217070038791,
+        "T": 1.6047678798025695,
+        "SM": -1.486075333877151,
+        "ET": -0.9654819492543085
+      },
+      {
+        "fecha": "2021-08",
+        "P": -0.7475368549095442,
+        "T": 1.4176074274149162,
+        "SM": -1.248817161846951,
+        "ET": -0.6998423257911698
+      },
+      {
+        "fecha": "2021-09",
+        "P": 0.5710061664623333,
+        "T": -0.31099758547630474,
+        "SM": 1.0444868825982467,
+        "ET": 0.6591495753223459
+      },
+      {
+        "fecha": "2021-10",
+        "P": -0.2760469875708696,
+        "T": 0.6587549970080694,
+        "SM": 0.13398362167169578,
+        "ET": 0.24133068683083492
+      },
+      {
+        "fecha": "2021-11",
+        "P": -1.1541405265441016,
+        "T": 0.8397782526887857,
+        "SM": -0.758212524302352,
+        "ET": -0.35379723940272245
+      },
+      {
+        "fecha": "2021-12",
+        "P": -0.6761111965879634,
+        "T": -0.6076406217662051,
+        "SM": -1.1966333221471612,
+        "ET": -0.31316588829540787
+      },
+      {
+        "fecha": "2022-01",
+        "P": -0.6720684720223815,
+        "T": -0.6790342097999462,
+        "SM": -0.8565567678912406,
+        "ET": 0.3942916746489668
+      },
+      {
+        "fecha": "2022-02",
+        "P": -0.2835811373094606,
+        "T": 0.5516603446939012,
+        "SM": -0.7971180098451277,
+        "ET": 1.285068550679396
+      },
+      {
+        "fecha": "2022-03",
+        "P": 0.020116911659795515,
+        "T": 0.8222449507711269,
+        "SM": -1.0657494927817188,
+        "ET": 1.3418538340942199
+      },
+      {
+        "fecha": "2022-04",
+        "P": -0.9528421155663881,
+        "T": -0.2629218851866011,
+        "SM": -1.1348955014096003,
+        "ET": 0.1296497478093929
+      },
+      {
+        "fecha": "2022-05",
+        "P": -0.43677154516481653,
+        "T": 0.3628950043316084,
+        "SM": -0.5068348617327159,
+        "ET": -0.5605138196054975
+      },
+      {
+        "fecha": "2022-06",
+        "P": -0.346602903862518,
+        "T": 0.24275661905248033,
+        "SM": -1.4510690982354484,
+        "ET": -0.37949469713297923
+      },
+      {
+        "fecha": "2022-07",
+        "P": 0.0081444262887783,
+        "T": 0.18453175608229086,
+        "SM": -0.6121751662667725,
+        "ET": -0.2803135160940223
+      },
+      {
+        "fecha": "2022-08",
+        "P": -0.03825924984949883,
+        "T": 0.44200226467247417,
+        "SM": -0.7494065263101348,
+        "ET": -0.11952466236822014
+      },
+      {
+        "fecha": "2022-09",
+        "P": -0.38243337321714815,
+        "T": -1.133671592475898,
+        "SM": -0.8794004929868461,
+        "ET": -0.6191706663630264
+      },
+      {
+        "fecha": "2022-10",
+        "P": -0.07606077106765789,
+        "T": -1.092749350685696,
+        "SM": -0.606286876879208,
+        "ET": -0.23172870463357936
+      },
+      {
+        "fecha": "2022-11",
+        "P": 1.4517912684758831,
+        "T": -0.765134421790613,
+        "SM": 0.8404623285611809,
+        "ET": 1.0882462385601703
+      },
+      {
+        "fecha": "2022-12",
+        "P": 0.4645258923437765,
+        "T": 0.17738003521303783,
+        "SM": 0.029741286054138425,
+        "ET": 0.3662526742402111
+      },
+      {
+        "fecha": "2023-01",
+        "P": 1.3144515662789815,
+        "T": 0.5979818837041877,
+        "SM": -0.09834950555042624,
+        "ET": 0.5669569912634176
+      },
+      {
+        "fecha": "2023-02",
+        "P": -1.0708797473052656,
+        "T": 0.909226619897461,
+        "SM": -2.1351454167932267,
+        "ET": -0.7430852478836936
+      },
+      {
+        "fecha": "2023-03",
+        "P": -0.5528776605626758,
+        "T": 0.5168137316565595,
+        "SM": -1.3775688507098742,
+        "ET": -1.6065710961950002
+      },
+      {
+        "fecha": "2023-04",
+        "P": -1.5502749978162997,
+        "T": 0.7119501193703747,
+        "SM": -2.9804007684209277,
+        "ET": -1.2492500170259375
+      },
+      {
+        "fecha": "2023-05",
+        "P": -0.4387813027957845,
+        "T": 2.1277748857791705,
+        "SM": -1.58637354411138,
+        "ET": -0.8285525463333259
+      },
+      {
+        "fecha": "2023-06",
+        "P": -0.9189783115694394,
+        "T": 1.5043433769893355,
+        "SM": -2.1026181662447168,
+        "ET": -1.1852230884715678
+      },
+      {
+        "fecha": "2023-07",
+        "P": -1.141131733337905,
+        "T": 1.0351850034726748,
+        "SM": -2.0927132633384287,
+        "ET": -1.2400027450761832
+      },
+      {
+        "fecha": "2023-08",
+        "P": 0.16183447732412612,
+        "T": 0.8580928709164407,
+        "SM": -1.545988985965934,
+        "ET": 0.190284970183031
+      },
+      {
+        "fecha": "2023-09",
+        "P": 0.18748723383736574,
+        "T": 1.4042977237683711,
+        "SM": -0.7571760781892657,
+        "ET": -0.03818411048760443
+      },
+      {
+        "fecha": "2023-10",
+        "P": -0.10284158257787052,
+        "T": 0.6491404548760777,
+        "SM": -0.9582486244736919,
+        "ET": -0.19013201947973196
+      },
+      {
+        "fecha": "2023-11",
+        "P": 0.9844134105488309,
+        "T": 0.35103310062499044,
+        "SM": -0.1894768601216904,
+        "ET": -0.5717506772435674
+      },
+      {
+        "fecha": "2023-12",
+        "P": 2.1215003129780206,
+        "T": 1.3804626734384553,
+        "SM": 0.8915354673475686,
+        "ET": 1.3414728961475335
+      },
+      {
+        "fecha": "2024-01",
+        "P": -1.2563682793016684,
+        "T": 0.2367017203267035,
+        "SM": -1.0730202609977997,
+        "ET": -1.8074658737431493
+      },
+      {
+        "fecha": "2024-02",
+        "P": -1.2045731766029306,
+        "T": 0.46670334458026247,
+        "SM": -0.9061538911952484,
+        "ET": -0.752925961889878
+      },
+      {
+        "fecha": "2024-03",
+        "P": -1.738090897416007,
+        "T": -0.9347133186746909,
+        "SM": -1.5959510491194877,
+        "ET": -1.2983413561039985
+      },
+      {
+        "fecha": "2024-04",
+        "P": -1.0807643962150004,
+        "T": 0.5006818237652597,
+        "SM": -0.8290436491976919,
+        "ET": -0.6019208088140292
+      },
+      {
+        "fecha": "2024-05",
+        "P": -1.3115300906571206,
+        "T": 0.36857415594709225,
+        "SM": -1.126568520975403,
+        "ET": -1.2924132393767036
+      },
+      {
+        "fecha": "2024-06",
+        "P": -0.9225743634697231,
+        "T": 1.083717795472861,
+        "SM": -1.22226482751211,
+        "ET": -0.823649745202779
+      },
+      {
+        "fecha": "2024-07",
+        "P": -0.6943323238071488,
+        "T": 0.25341476573874444,
+        "SM": -0.7136307995112888,
+        "ET": -0.6210142376079386
+      },
+      {
+        "fecha": "2024-08",
+        "P": -0.6232278953798877,
+        "T": 0.7523781390434244,
+        "SM": -0.5948591809886081,
+        "ET": -0.36616673727383814
+      },
+      {
+        "fecha": "2024-09",
+        "P": -0.34264263425192004,
+        "T": 0.7877405986164285,
+        "SM": -0.3787392553074835,
+        "ET": -0.3465988900284167
+      },
+      {
+        "fecha": "2024-10",
+        "P": -0.17078225858238527,
+        "T": -0.03763623568749427,
+        "SM": -0.1650400102083021,
+        "ET": -0.807263152196792
+      },
+      {
+        "fecha": "2024-11",
+        "P": -0.30419111291471723,
+        "T": 0.10297882853235717,
+        "SM": null,
+        "ET": 0.8088974661162697
+      },
+      {
+        "fecha": "2024-12",
+        "P": -0.9883523510508165,
+        "T": -0.3932222344775701,
+        "SM": -0.6324580093996935,
+        "ET": 0.7400826393222777
+      }
+    ],
+    "pairs": [
+      {
+        "par": "P–SM",
+        "x": "P",
+        "y": "SM",
+        "r": 0.722077406177071,
+        "n": 286,
+        "periodo_comun": [
+          "2001-01",
+          "2024-12"
+        ],
+        "motivo_null": null,
+        "texto": "P y SM mostraron asociación mensual r = 0.72, con 286 meses, tras quitar estación y tendencia."
+      },
+      {
+        "par": "T–SM",
+        "x": "T",
+        "y": "SM",
+        "r": -0.16133226522274816,
+        "n": 285,
+        "periodo_comun": [
+          "2001-01",
+          "2024-12"
+        ],
+        "motivo_null": null,
+        "texto": "T y SM mostraron asociación mensual r = -0.16, con 285 meses, tras quitar estación y tendencia."
+      },
+      {
+        "par": "P–ET",
+        "x": "P",
+        "y": "ET",
+        "r": 0.7816805885310693,
+        "n": 287,
+        "periodo_comun": [
+          "2001-01",
+          "2024-12"
+        ],
+        "motivo_null": null,
+        "texto": "P y ET mostraron asociación mensual r = 0.78, con 287 meses, tras quitar estación y tendencia."
+      }
+    ],
+    "preprocessing": {
+      "climatologia_base": "2001–2024",
+      "anomalia": "valor − μ_mes (mes calendario)",
+      "estandarizacion": "z = (valor − μ_mes)/s_mes, s con ddof=1; sin z si s_mes = 0 o < 10 valores en ese mes",
+      "quitar_tendencia": "recta OLS sobre cada serie z en tiempo real (año decimal), residuos",
+      "correlacion": "Pearson entre residuos en las mismas fechas; solo P–SM, T–SM y P–ET, mismo mes, sin retrasos",
+      "nota_grafico": "El gráfico de anomalías z conserva las tendencias; las correlaciones las eliminan.",
+      "exploratorio": "Correlaciones exploratorias: sin p-valor y sin calificarlas de 'significativas'.",
+      "climatologia": {
+        "P": {
+          "mu_mes": [
+            18.62982975,
+            17.865280333333335,
+            17.01462641666667,
+            15.66382375,
+            54.363865583333336,
+            77.52854608695652,
+            100.61558012500001,
+            78.71479183333334,
+            47.33975999999999,
+            16.828206625000004,
+            18.320957500000002,
+            18.996588166666665
+          ],
+          "s_mes": [
+            7.054929590332128,
+            6.7223946959949545,
+            5.6848479163870405,
+            6.187272428124784,
+            19.48145358261027,
+            32.77761369091948,
+            44.16478978950321,
+            30.40574077927397,
+            31.283409968530275,
+            8.87374155594118,
+            7.379168571007258,
+            9.170005167722495
+          ],
+          "n_mes": [
+            24,
+            24,
+            24,
+            24,
+            24,
+            23,
+            24,
+            24,
+            24,
+            24,
+            24,
+            24
+          ]
+        },
+        "T": {
+          "mu_mes": [
+            15.881816666666696,
+            15.932050000000018,
+            17.430673913043496,
+            19.880666666666695,
+            22.673141666666695,
+            25.093973913043495,
+            26.49277916666669,
+            26.53222083333335,
+            24.99272083333336,
+            22.561704166666697,
+            19.781570833333355,
+            17.467762500000024
+          ],
+          "s_mes": [
+            0.6222317823885987,
+            0.5355650498386616,
+            0.6174876312470445,
+            0.651777871381954,
+            0.598680970363476,
+            0.6896870108425232,
+            0.57779124632492,
+            0.6205379216097887,
+            0.7248314580580641,
+            0.6032528559756336,
+            0.65187347363891,
+            0.6496644329876227
+          ],
+          "n_mes": [
+            24,
+            24,
+            23,
+            24,
+            24,
+            23,
+            24,
+            24,
+            24,
+            24,
+            24,
+            24
+          ]
+        },
+        "SM": {
+          "mu_mes": [
+            0.1713925416666667,
+            0.17070029166666667,
+            0.17051620833333334,
+            0.17047891666666667,
+            0.19830666666666666,
+            0.21512921739130436,
+            0.23334333333333335,
+            0.23594558333333335,
+            0.23204262500000003,
+            0.21618391666666667,
+            0.19774821739130438,
+            0.17515729166666663
+          ],
+          "s_mes": [
+            0.00854647577496722,
+            0.010372732223517441,
+            0.009204046917001364,
+            0.012891862421248753,
+            0.01226171902505009,
+            0.0114158708303059,
+            0.01288247836224161,
+            0.008890479465315045,
+            0.011986148613812172,
+            0.010427269511766469,
+            0.010973463408508072,
+            0.009303845597989677
+          ],
+          "n_mes": [
+            24,
+            24,
+            24,
+            24,
+            24,
+            23,
+            24,
+            24,
+            24,
+            24,
+            23,
+            24
+          ]
+        },
+        "ET": {
+          "mu_mes": [
+            27.333815925599996,
+            28.3795010532,
+            27.669996306,
+            28.171816632000002,
+            43.083138708,
+            53.55846782608696,
+            67.903938468,
+            57.85241439600001,
+            43.8531408,
+            29.270427354000002,
+            29.615672736000004,
+            28.2396140892
+          ],
+          "s_mes": [
+            4.469498606504806,
+            2.911837492888384,
+            3.224284326705741,
+            3.5824965019048585,
+            7.929116907640306,
+            13.838257308366982,
+            21.67895670775183,
+            14.115887604871489,
+            17.12789512832334,
+            5.531079198956834,
+            3.782749967917657,
+            4.310316428610189
+          ],
+          "n_mes": [
+            24,
+            24,
+            24,
+            24,
+            24,
+            23,
+            24,
+            24,
+            24,
+            24,
+            24,
+            24
+          ]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,443 @@
+{
+  "metadata": {
+    "skill_name": "analisis-down-to-earth",
+    "skill_path": "<path/to/skill>",
+    "executor_model": "<model-name>",
+    "analyzer_model": "<model-name>",
+    "timestamp": "2026-11-15T03:21:50Z",
+    "evals_run": [
+      1,
+      2,
+      3
+    ],
+    "runs_per_configuration": 3
+  },
+  "runs": [
+    {
+      "eval_id": 1,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 11,
+        "failed": 0,
+        "total": 11,
+        "time_seconds": 86.7,
+        "tokens": 65112,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Existe un JSON con metadata, las cuatro variables P, T, SM, ET y una secciÃ³n del anÃ¡lisis conjunto",
+          "passed": true,
+          "evidence": "1 JSON; variables encontradas=True; secciÃ³n conjunta=True"
+        },
+        {
+          "text": "Las pendientes por dÃ©cada de P, T, SM y ET coinciden con OLS anual (tolerancia 1 %)",
+          "passed": true,
+          "evidence": "P: ref -32.52 âœ“; T: ref +0.3758 âœ“; SM: ref -0.008646 âœ“; ET: ref -23.51 âœ“"
+        },
+        {
+          "text": "Publica p ajustados por Holm sobre las cuatro variables que coinciden con HAC rezago 1 (tolerancia 0.005)",
+          "passed": true,
+          "evidence": "menciona Holm=True; P: ref p_holm 0.3435 âœ“; T: ref p_holm 0.0000 âœ“; SM: ref p_holm 0.0000 âœ“; ET: ref p_holm 0.2837 âœ“"
+        },
+        {
+          "text": "Las etiquetas siguen el p de Holm: T y SM con evidencia (aumento/disminuciÃ³n), P y ET 'evidencia insuficiente'; nunca 'sin cambio'/'no cambiÃ³'",
+          "passed": true,
+          "evidence": "T=True SM=True P=True ET=True; frases prohibidas=[]"
+        },
+        {
+          "text": "Reporta la sensibilidad con rezagos 2 y 3",
+          "passed": true,
+          "evidence": "rezago2=True rezago3=True"
+        },
+        {
+          "text": "Correlaciones solo de los pares Pâ€“SM, Tâ€“SM y Pâ€“ET con r (Â±0.02 de la referencia sin estaciÃ³n ni tendencia) y n = 288",
+          "passed": true,
+          "evidence": "Pâ€“SM: ref r=0.719, n=288 âœ“; Tâ€“SM: ref r=-0.159, n=288 âœ“; Pâ€“ET: ref r=0.782, n=288 âœ“; pares extra=[]; matriz completa=False"
+        },
+        {
+          "text": "Las correlaciones no llevan p-valor ni se califican de 'significativas'",
+          "passed": true,
+          "evidence": "claves p en secciÃ³n conjunta=[]; lÃ­neas con 'significativ'=[]"
+        },
+        {
+          "text": "El CSV anual tiene T y SM como media ponderada por dÃ­as (no suma) y P y ET como suma",
+          "passed": true,
+          "evidence": "coinciden en 2004, 2015, 2023"
+        },
+        {
+          "text": "El resumen y el JSON rotulan los datos como simulados",
+          "passed": true,
+          "evidence": "md=True json=True"
+        },
+        {
+          "text": "El resumen no afirma causas (causÃ³/provocÃ³/debido a) y menciona lÃ­mites",
+          "passed": true,
+          "evidence": "frases causales=[]; menciona lÃ­mites=True"
+        },
+        {
+          "text": "Se generaron grÃ¡ficos (serie anual y anomalÃ­as z)",
+          "passed": true,
+          "evidence": "5 archivos de grÃ¡fico"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 8,
+        "failed": 0,
+        "total": 8,
+        "time_seconds": 105.4,
+        "tokens": 70546,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Los valores mensuales convertidos coinciden con mm/dÃ­aÃ—dÃ­as, Kâˆ’273.15, kg/mÂ²Ã·100 y kg/mÂ²/sÃ—86400Ã—dÃ­as (tolerancia 0.5 %)",
+          "passed": true,
+          "evidence": "6 meses Ã— 4 variables coinciden (incl. febreros bisiestos)"
+        },
+        {
+          "text": "El âˆ’9999 de T2M (2001-03) se trata como faltante, no como valor ni como 0",
+          "passed": true,
+          "evidence": "T 2001-03 en salida = nan"
+        },
+        {
+          "text": "NingÃºn mes faltante aparece como 0 ni interpolado en la serie mensual de salida",
+          "passed": true,
+          "evidence": "2013-06 (todas), 2024-11 (SM) y 2001-03 (T) quedan vacÃ­os"
+        },
+        {
+          "text": "Identifica 2001, 2013 y 2024 como aÃ±os incompletos",
+          "passed": true,
+          "evidence": "menciona los tres aÃ±os y huecos"
+        },
+        {
+          "text": "Usa para las tendencias el tramo comÃºn 2002â€“2012 (11 aÃ±os) y lo dice",
+          "passed": true,
+          "evidence": "encontrado '2002â€“2012'"
+        },
+        {
+          "text": "Las pendientes por dÃ©cada en el tramo 2002â€“2012 coinciden con la referencia (tolerancia 2 %)",
+          "passed": true,
+          "evidence": "P: ref -73.18 âœ“; T: ref +0.09398 âœ“; SM: ref -0.008684 âœ“; ET: ref -54.89 âœ“"
+        },
+        {
+          "text": "Usa Holm sobre las cuatro variables (p ajustados coinciden con la referencia, tolerancia 0.01)",
+          "passed": true,
+          "evidence": "menciona Holm=True; P: ref 1.0000 âœ“; T: ref 1.0000 âœ“; SM: ref 0.0037 âœ“; ET: ref 1.0000 âœ“"
+        },
+        {
+          "text": "El aÃ±o 2010 (filas al final del archivo) queda en su lugar: valores anuales de 2010 correctos",
+          "passed": true,
+          "evidence": "T 2010 salida 20.73 vs ref 20.73"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 7,
+        "failed": 0,
+        "total": 7,
+        "time_seconds": 265.7,
+        "tokens": 87563,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "SeÃ±ala fillna(0) como error y lo corrige dejando NaN / aÃ±os incompletos",
+          "passed": true,
+          "evidence": "Error 1 (lÃ­nea 22, crÃ­tico); corregido a NaN + aÃ±o incompleto (sum(min_count=12))."
+        },
+        {
+          "text": "SeÃ±ala que T y SM no se suman y los corrige a media ponderada por dÃ­as (P y ET siguen como suma)",
+          "passed": true,
+          "evidence": "Error 2 (lÃ­nea 27); AGREGACION T/SM='media_dias' con calendar.monthrange (lÃ­neas 119â€“127)."
+        },
+        {
+          "text": "SeÃ±ala maxlags=3 y lo corrige a 1 como principal (2 y 3 solo sensibilidad)",
+          "passed": true,
+          "evidence": "Error 3 (lÃ­nea 37); REZAGO_PRINCIPAL=1 y sensibilidad con 2 y 3 con Holm completo."
+        },
+        {
+          "text": "SeÃ±ala que p no se multiplica por 10 y lo corrige",
+          "passed": true,
+          "evidence": "Error 4 (lÃ­nea 44); solo pendiente e IC Ã—10 (lÃ­nea 185)."
+        },
+        {
+          "text": "SeÃ±ala Bonferroni sobre las variables visibles y lo corrige a Holm sobre la familia fija [P, T, SM, ET]",
+          "passed": true,
+          "evidence": "Error 5 (lÃ­nea 55); multipletests holm sobre FAMILIA fija con p=1 interno para no evaluables."
+        },
+        {
+          "text": "SeÃ±ala la etiqueta 'sin cambio' y la cambia por 'evidencia insuficiente'",
+          "passed": true,
+          "evidence": "Error 6 (lÃ­nea 59); etiquetas 'evidencia insuficiente' / 'tras el ajuste' / 'aumento/disminuciÃ³n con evidencia estadÃ­stica segÃºn este mÃ©todo'."
+        },
+        {
+          "text": "Entrega un archivo .py corregido que no contiene fillna(0), maxlags 3 principal, p*10, Bonferroni ni 'sin cambio'",
+          "passed": true,
+          "evidence": "tendencias_demo_corregido.py: sin fillna(0), maxlags=1 principal, sin p*10, sin Bonferroni, sin 'sin cambio'; verificado contra el script en los dos CSV."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.5455,
+        "passed": 6,
+        "failed": 5,
+        "total": 11,
+        "time_seconds": 201.6,
+        "tokens": 63042,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Existe un JSON con metadata, las cuatro variables P, T, SM, ET y una secciÃ³n del anÃ¡lisis conjunto",
+          "passed": true,
+          "evidence": "1 JSON; variables encontradas=True; secciÃ³n conjunta=True"
+        },
+        {
+          "text": "Las pendientes por dÃ©cada de P, T, SM y ET coinciden con OLS anual (tolerancia 1 %)",
+          "passed": true,
+          "evidence": "P: ref -32.52 âœ“; T: ref +0.3758 âœ“; SM: ref -0.008646 âœ“; ET: ref -23.51 âœ“"
+        },
+        {
+          "text": "Publica p ajustados por Holm sobre las cuatro variables que coinciden con HAC rezago 1 (tolerancia 0.005)",
+          "passed": false,
+          "evidence": "menciona Holm=False; P: ref p_holm 0.3435 âœ“; T: ref p_holm 0.0000 âœ“; SM: ref p_holm 0.0000 âœ“; ET: ref p_holm 0.2837 âœ—"
+        },
+        {
+          "text": "Las etiquetas siguen el p de Holm: T y SM con evidencia (aumento/disminuciÃ³n), P y ET 'evidencia insuficiente'; nunca 'sin cambio'/'no cambiÃ³'",
+          "passed": false,
+          "evidence": "T=False SM=False P=False ET=False; frases prohibidas=[]"
+        },
+        {
+          "text": "Reporta la sensibilidad con rezagos 2 y 3",
+          "passed": false,
+          "evidence": "rezago2=False rezago3=False"
+        },
+        {
+          "text": "Correlaciones solo de los pares Pâ€“SM, Tâ€“SM y Pâ€“ET con r (Â±0.02 de la referencia sin estaciÃ³n ni tendencia) y n = 288",
+          "passed": false,
+          "evidence": "Pâ€“SM: ref r=0.719, n=288 âœ—; Tâ€“SM: ref r=-0.159, n=288 âœ“; Pâ€“ET: ref r=0.782, n=288 âœ—; pares extra=['P-T', 'T-ET', 'SM-ET', 'P-T', 'T-ET', 'SM-ET', 'P-T', 'T-ET', 'SM-ET', 'P-T', 'T-ET', 'SM-ET']; matriz completa=False"
+        },
+        {
+          "text": "Las correlaciones no llevan p-valor ni se califican de 'significativas'",
+          "passed": true,
+          "evidence": "claves p en secciÃ³n conjunta=[]; lÃ­neas con 'significativ'=[]"
+        },
+        {
+          "text": "El CSV anual tiene T y SM como media ponderada por dÃ­as (no suma) y P y ET como suma",
+          "passed": false,
+          "evidence": "T 2004: salida 21.2801 vs ref 21.297; T 2015: salida 21.4574 vs ref 21.489; T 2023: salida 21.8618 vs ref 21.893; SM 2004: salida 0.2049 vs ref 0.20495; SM 2015: salida 0.1989 vs ref 0.19902; SM 2023: salida 0.1847 vs ref 0.18494"
+        },
+        {
+          "text": "El resumen y el JSON rotulan los datos como simulados",
+          "passed": true,
+          "evidence": "md=True json=True"
+        },
+        {
+          "text": "El resumen no afirma causas (causÃ³/provocÃ³/debido a) y menciona lÃ­mites",
+          "passed": true,
+          "evidence": "frases causales=[]; menciona lÃ­mites=True"
+        },
+        {
+          "text": "Se generaron grÃ¡ficos (serie anual y anomalÃ­as z)",
+          "passed": true,
+          "evidence": "8 archivos de grÃ¡fico"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.5,
+        "passed": 4,
+        "failed": 4,
+        "total": 8,
+        "time_seconds": 152.8,
+        "tokens": 59639,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Los valores mensuales convertidos coinciden con mm/dÃ­aÃ—dÃ­as, Kâˆ’273.15, kg/mÂ²Ã·100 y kg/mÂ²/sÃ—86400Ã—dÃ­as (tolerancia 0.5 %)",
+          "passed": false,
+          "evidence": "P 2001-02: 0.72809 vs 20.387; SM 2001-02: 18.9629 vs 0.18963; ET 2001-02: 1.17181 vs 32.811; P 2004-02: 0.48931 vs 14.19; SM 2004-02: 17.1135 vs 0.17113; ET 2004-02: 0.86842 vs 25.184"
+        },
+        {
+          "text": "El âˆ’9999 de T2M (2001-03) se trata como faltante, no como valor ni como 0",
+          "passed": true,
+          "evidence": "T 2001-03 en salida = nan"
+        },
+        {
+          "text": "NingÃºn mes faltante aparece como 0 ni interpolado en la serie mensual de salida",
+          "passed": true,
+          "evidence": "2013-06 (todas), 2024-11 (SM) y 2001-03 (T) quedan vacÃ­os"
+        },
+        {
+          "text": "Identifica 2001, 2013 y 2024 como aÃ±os incompletos",
+          "passed": true,
+          "evidence": "menciona los tres aÃ±os y huecos"
+        },
+        {
+          "text": "Usa para las tendencias el tramo comÃºn 2002â€“2012 (11 aÃ±os) y lo dice",
+          "passed": false,
+          "evidence": "no aparece el tramo 2002â€“2012"
+        },
+        {
+          "text": "Las pendientes por dÃ©cada en el tramo 2002â€“2012 coinciden con la referencia (tolerancia 2 %)",
+          "passed": false,
+          "evidence": "P: ref -73.18 âœ—; T: ref +0.09398 âœ“; SM: ref -0.008684 âœ—; ET: ref -54.89 âœ—"
+        },
+        {
+          "text": "Usa Holm sobre las cuatro variables (p ajustados coinciden con la referencia, tolerancia 0.01)",
+          "passed": false,
+          "evidence": "menciona Holm=False; P: ref 1.0000 âœ“; T: ref 1.0000 âœ“; SM: ref 0.0037 âœ“; ET: ref 1.0000 âœ“"
+        },
+        {
+          "text": "El aÃ±o 2010 (filas al final del archivo) queda en su lugar: valores anuales de 2010 correctos",
+          "passed": true,
+          "evidence": "T 2010 salida 20.7 vs ref 20.73"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.5714,
+        "passed": 4,
+        "failed": 3,
+        "total": 7,
+        "time_seconds": 278.9,
+        "tokens": 60265,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "SeÃ±ala fillna(0) como error y lo corrige dejando NaN / aÃ±os incompletos",
+          "passed": true,
+          "evidence": "Problema 1: fillna(0) â†’ NaN."
+        },
+        {
+          "text": "SeÃ±ala que T y SM no se suman y los corrige a media ponderada por dÃ­as (P y ET siguen como suma)",
+          "passed": false,
+          "evidence": "Lo seÃ±ala, pero corrige T y SM a media SIMPLE ('mean'), no ponderada por dÃ­as."
+        },
+        {
+          "text": "SeÃ±ala maxlags=3 y lo corrige a 1 como principal (2 y 3 solo sensibilidad)",
+          "passed": false,
+          "evidence": "Critica maxlags=3, pero sustituye HAC por una prueba t con n efectivo (Santer) + Theil-Sen: no deja rezago 1 principal ni sensibilidad 2â€“3; cambia el mÃ©todo decidido."
+        },
+        {
+          "text": "SeÃ±ala que p no se multiplica por 10 y lo corrige",
+          "passed": true,
+          "evidence": "Problema 4: p ya no se multiplica por 10."
+        },
+        {
+          "text": "SeÃ±ala Bonferroni sobre las variables visibles y lo corrige a Holm sobre la familia fija [P, T, SM, ET]",
+          "passed": true,
+          "evidence": "Problema 6: Holm sobre las 4 variables; las visibles solo filtran la salida (excluye de la familia las variables con datos insuficientes)."
+        },
+        {
+          "text": "SeÃ±ala la etiqueta 'sin cambio' y la cambia por 'evidencia insuficiente'",
+          "passed": false,
+          "evidence": "SeÃ±ala 'sin cambio', pero lo cambia por 'no concluyente', no por 'evidencia insuficiente' (sentido correcto, redacciÃ³n distinta a la especificada)."
+        },
+        {
+          "text": "Entrega un archivo .py corregido que no contiene fillna(0), maxlags 3 principal, p*10, Bonferroni ni 'sin cambio'",
+          "passed": true,
+          "evidence": "tendencias_demo_corregido.py no contiene fillna(0), maxlags=3, p*10, Bonferroni ni 'sin cambio' (solo en comentarios)."
+        }
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 152.6,
+        "stddev": 98.3927,
+        "min": 86.7,
+        "max": 265.7
+      },
+      "tokens": {
+        "mean": 74407.0,
+        "stddev": 11712.9134,
+        "min": 65112,
+        "max": 87563
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.539,
+        "stddev": 0.0361,
+        "min": 0.5,
+        "max": 0.5714
+      },
+      "time_seconds": {
+        "mean": 211.1,
+        "stddev": 63.5845,
+        "min": 152.8,
+        "max": 278.9
+      },
+      "tokens": {
+        "mean": 60982.0,
+        "stddev": 1811.2617,
+        "min": 59639,
+        "max": 63042
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.46",
+      "time_seconds": "-58.5",
+      "tokens": "+13425"
+    }
+  },
+  "notes": [
+    "Un solo run por configuración: no hay estimación de varianza real; las ± del agregado mezclan evals distintos.",
+    "No discriminan (pasan en ambas): JSON con estructura, pendientes OLS del caso 1, rótulo de simulado, sin frases causales literales, gráficos, −9999 como faltante, sin ceros, años incompletos. El baseline también sabe limpiar huecos.",
+    "Holm del caso 2 coincide numéricamente con Bonferroni (el p más pequeño se multiplica por 4 en ambos y el resto topa en 1): la aserción solo discrimina por la mención explícita de Holm.",
+    "Lo que la skill aporta: Holm sobre la familia fija, etiquetas 'evidencia insuficiente', sensibilidad 2–3, solo 3 pares sin p, medias ponderadas por días, conversión a mm/mes y tramo común documentado.",
+    "Baseline caso 1: mensaje final causal ('el calentamiento seca el suelo') que el regex de causas no detectó; veredictos 'significativa/indicio' y matriz de 6 correlaciones con p.",
+    "Baseline caso 2: deja P y ET en mm/día y SM en kg/m² (no convierte a las unidades del proyecto), tramo distinto por variable, sin Holm.",
+    "Baseline caso 3: detecta los 6 errores, pero sustituye HAC por n efectivo (cambia el método decidido), usa media simple para T/SM y la etiqueta 'no concluyente'.",
+    "Costo: la skill usa ~22 % más tokens (lee SKILL.md + referencias) pero tarda ~58 s menos de media porque ejecuta el script en vez de escribir el análisis desde cero.",
+    "Fallo detectado en el script (caso 2 con skill): resumen.md dice 'con 24 años' fijo aunque el tramo sea de 11. Se corregirá en la iteración 2."
+  ]
+}

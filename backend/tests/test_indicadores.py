@@ -145,3 +145,32 @@ def test_validacion_unidades_y_frecuencia():
     with pytest.raises(ValueError, match="diaria"):
         indicadores_anuales(pr_mensual)
 
+
+
+def test_fechas_ausentes_cortan_la_racha_igual_que_nan():
+    """Un día que FALTA en el cubo (gránulo no recibido) debe comportarse como NaN: corta la racha seca.
+
+    2001 seco salvo 10 mm el 1-ene; faltan los días 1–20 de junio (20 días = 5.5 %, el año se acepta).
+    Rachas: 2-ene → 31-may = 150 días; 21-jun → 31-dic = 194 días → CDD = 194 (no 344 uniendo el hueco).
+    """
+    pr = _serie_diaria("2001-01-01", "2001-12-31", 0.0)
+    pr.loc[{"time": "2001-01-01"}] = 10.0
+    huecos = pd.date_range("2001-06-01", "2001-06-20", freq="D")
+
+    con_nan = pr.copy()
+    con_nan.loc[{"time": huecos}] = np.nan
+    ausentes = pr.drop_sel(time=huecos)
+
+    cdd_nan = float(indicadores_anuales(con_nan)["cdd"].sel(anio=2001))
+    cdd_ausentes = float(indicadores_anuales(ausentes)["cdd"].sel(anio=2001))
+    assert cdd_nan == pytest.approx(194.0)
+    assert cdd_ausentes == pytest.approx(194.0), "los días ausentes no deben unir dos rachas secas"
+
+
+def test_fechas_ausentes_cuentan_como_faltantes():
+    """40 días ausentes en 2001 (11 %) → todos los indicadores del año son NaN, igual que con NaN explícitos."""
+    pr = _serie_diaria("2001-01-01", "2001-12-31", 5.0)
+    ausentes = pr.drop_sel(time=pd.date_range("2001-03-01", periods=40, freq="D"))
+    ds = indicadores_anuales(ausentes)
+    for nombre in ("cdd", "r20mm", "dias_humedos", "prcptot", "sdii"):
+        assert np.isnan(float(ds[nombre].sel(anio=2001))), nombre

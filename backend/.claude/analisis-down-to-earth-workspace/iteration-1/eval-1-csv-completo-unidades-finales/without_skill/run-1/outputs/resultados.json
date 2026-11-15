@@ -1,0 +1,1095 @@
+{
+  "metadatos": {
+    "fuente": "dte_simulado_completo.csv",
+    "nota": "Datos SIMULADOS para probar el flujo; no interpretar como clima real.",
+    "variables": {
+      "P": {
+        "nombre": "Precipitación",
+        "unidad": "mm/mes",
+        "agregacion_anual": "suma"
+      },
+      "T": {
+        "nombre": "Temperatura",
+        "unidad": "°C",
+        "agregacion_anual": "media"
+      },
+      "SM": {
+        "nombre": "Humedad del suelo",
+        "unidad": "m³/m³",
+        "agregacion_anual": "media"
+      },
+      "ET": {
+        "nombre": "Evapotranspiración",
+        "unidad": "mm/mes",
+        "agregacion_anual": "suma"
+      }
+    },
+    "metodos": {
+      "anomalias": "valor mensual − climatología del mes (2001-2024)",
+      "tendencia_parametrica": "MCO sobre anomalías; ee corregido con n_ef = n(1−r1)/(1+r1) (AR(1) de residuos); t con n_ef−2 gl",
+      "tendencia_no_parametrica": "Mann-Kendall modificado Hamed-Rao (1998) + pendiente de Sen (IC Gilbert)",
+      "veredicto": "significativa si MCO y MK tienen p<0.05 con el mismo signo; indicio si solo una o p<0.10",
+      "correlaciones": "Pearson/Spearman; p con n efectivo de Bretherton et al. (1999)",
+      "anios_para_detectar": "Weatherhead et al. (1998): n*=[(3.3σ/|ω|)·√((1+φ)/(1−φ))]^(2/3)",
+      "alpha": 0.05
+    }
+  },
+  "calidad_datos": {
+    "n_meses": 288,
+    "periodo": [
+      "2001-01",
+      "2024-12"
+    ],
+    "meses_faltantes_en_calendario": 0,
+    "nulos_por_variable": {
+      "P": 0,
+      "T": 0,
+      "SM": 0,
+      "ET": 0
+    },
+    "duplicados": 0,
+    "rangos": {
+      "P": [
+        5.107,
+        238.545
+      ],
+      "T": [
+        14.293,
+        27.841
+      ],
+      "SM": [
+        0.13206,
+        0.26813
+      ],
+      "ET": [
+        19.029,
+        137.451
+      ]
+    },
+    "chequeo_plausibilidad": {
+      "P_no_negativa": true,
+      "ET_no_negativa": true,
+      "SM_entre_0_y_0.6": true,
+      "T_entre_-60_y_60": true
+    }
+  },
+  "climatologia_mensual": {
+    "P": {
+      "1": 18.629708333333333,
+      "2": 17.86525,
+      "3": 17.014666666666667,
+      "4": 15.663833333333335,
+      "5": 54.36383333333333,
+      "6": 78.744,
+      "7": 100.61558333333333,
+      "8": 78.71479166666667,
+      "9": 47.33983333333333,
+      "10": 16.82825,
+      "11": 18.320916666666665,
+      "12": 18.996583333333334
+    },
+    "T": {
+      "1": 15.881791666666667,
+      "2": 15.932125,
+      "3": 17.399,
+      "4": 19.880708333333335,
+      "5": 22.673083333333334,
+      "6": 25.153375,
+      "7": 26.49275,
+      "8": 26.532291666666666,
+      "9": 24.992791666666665,
+      "10": 22.561666666666667,
+      "11": 19.781541666666666,
+      "12": 17.46775
+    },
+    "SM": {
+      "1": 0.1713916666666667,
+      "2": 0.17069916666666665,
+      "3": 0.17051791666666669,
+      "4": 0.17047833333333332,
+      "5": 0.19830666666666666,
+      "6": 0.21535416666666665,
+      "7": 0.23334375,
+      "8": 0.23594541666666669,
+      "9": 0.2320425,
+      "10": 0.21618458333333335,
+      "11": 0.19780083333333334,
+      "12": 0.17515625
+    },
+    "ET": {
+      "1": 27.33375,
+      "2": 28.379625,
+      "3": 27.670125,
+      "4": 28.171833333333336,
+      "5": 43.08304166666667,
+      "6": 54.04170833333333,
+      "7": 67.904,
+      "8": 57.8525,
+      "9": 43.853208333333335,
+      "10": 29.2705,
+      "11": 29.615583333333333,
+      "12": 28.239625
+    }
+  },
+  "tendencias": {
+    "P": {
+      "nombre": "Precipitación",
+      "unidad_mensual": "mm/mes",
+      "unidad_anual": "mm/año",
+      "media_mensual": 40.25810416666667,
+      "media_anual": 483.09725,
+      "mensual_anomalias": {
+        "mco": {
+          "pendiente": -2.705413838419155,
+          "ee": 2.585720021193992,
+          "ic95": [
+            -7.817447739842132,
+            2.4066200630038224
+          ],
+          "t": -1.0462903238726877,
+          "p": 0.29722712643970034,
+          "r2": 0.007746089378555733,
+          "r1_residuos": 0.33881495382825105,
+          "n": 288,
+          "n_efectivo": 142.2312267673489,
+          "intercepto": 3.2352240484429062,
+          "sigma_residuos": 21.288011337438586
+        },
+        "mco_unidad_pendiente": "mm/mes por década",
+        "mann_kendall_hamed_rao": {
+          "S": -3134.0,
+          "tau": -0.07583236546651181,
+          "z": -1.3723477027022324,
+          "p": 0.16995522217093562,
+          "factor_hamed_rao": 1.9535046921101338,
+          "sen": -0.01587442881192882,
+          "sen_ic95": [
+            -0.03841980286738352,
+            0.007411738351254489
+          ],
+          "sen_por_decada": -1.9049314574314582,
+          "sen_ic95_por_decada": [
+            -4.610376344086022,
+            0.8894086021505387
+          ]
+        },
+        "veredicto": "no significativa",
+        "snr_pendiente_sobre_ee": -1.0462903238726877,
+        "anios_para_detectar_weatherhead": 51.49235179204337
+      },
+      "anual": {
+        "mco": {
+          "pendiente": -32.52103478260868,
+          "ee": 35.97666464118503,
+          "ic95": [
+            -107.13207065497735,
+            42.090001089759994
+          ],
+          "t": -0.9039480203892929,
+          "p": 0.37581538330906555,
+          "r2": 0.03581179180800237,
+          "r1_residuos": -0.16871862638179422,
+          "n": 24,
+          "n_efectivo": 24.0,
+          "intercepto": 520.49644,
+          "sigma_residuos": 122.00280564437595
+        },
+        "mco_unidad_pendiente": "mm/año por década",
+        "mann_kendall_hamed_rao": {
+          "S": -44.0,
+          "tau": -0.15942028985507245,
+          "z": -1.0665893292991906,
+          "p": 0.28615732110495806,
+          "factor_hamed_rao": 1.0,
+          "sen": -3.5200833333333312,
+          "sen_ic95": [
+            -11.5755,
+            4.533272727272726
+          ],
+          "sen_por_decada": -35.200833333333314,
+          "sen_ic95_por_decada": [
+            -115.755,
+            45.332727272727254
+          ]
+        },
+        "veredicto": "no significativa",
+        "cambio_total_periodo": -74.79837999999997,
+        "cambio_pct_respecto_media": -15.483089584964512
+      }
+    },
+    "T": {
+      "nombre": "Temperatura",
+      "unidad_mensual": "°C",
+      "unidad_anual": "°C",
+      "media_mensual": 21.229072916666667,
+      "media_anual": 21.229072916666667,
+      "mensual_anomalias": {
+        "mco": {
+          "pendiente": 0.3769399467103914,
+          "ee": 0.09029393432476145,
+          "ic95": [
+            0.1972956209238884,
+            0.5565842724968944
+          ],
+          "t": 4.174587689962055,
+          "p": 7.439548564945116e-05,
+          "r2": 0.17639902067401167,
+          "r1_residuos": 0.5510266898186533,
+          "n": 288,
+          "n_efectivo": 83.36691701117417,
+          "intercepto": -0.45075735294117625,
+          "sigma_residuos": 0.5662571973889958
+        },
+        "mco_unidad_pendiente": "°C por década",
+        "mann_kendall_hamed_rao": {
+          "S": 11842.0,
+          "tau": 0.28653697251258226,
+          "z": 4.814395713351287,
+          "p": 1.4764598225416358e-06,
+          "factor_hamed_rao": 2.2673323422108598,
+          "sen": 0.0030723301923831943,
+          "sen_ic95": [
+            0.0018994472789115773,
+            0.004275793650793653
+          ],
+          "sen_por_decada": 0.36867962308598334,
+          "sen_ic95_por_decada": [
+            0.22793367346938928,
+            0.5130952380952384
+          ]
+        },
+        "veredicto": "significativa",
+        "snr_pendiente_sobre_ee": 4.174587689962055,
+        "anios_para_detectar_weatherhead": 20.400301640849374
+      },
+      "anual": {
+        "mco": {
+          "pendiente": 0.37759094202898563,
+          "ee": 0.10915800460574762,
+          "ic95": [
+            0.15121109613098208,
+            0.6039707879269892
+          ],
+          "t": 3.4591227953712878,
+          "p": 0.0022324320466655372,
+          "r2": 0.35228451705520947,
+          "r1_residuos": -0.32812954052576415,
+          "n": 24,
+          "n_efectivo": 24.0,
+          "intercepto": 20.794843333333333,
+          "sigma_residuos": 0.37017280376784406
+        },
+        "mco_unidad_pendiente": "°C por década",
+        "mann_kendall_hamed_rao": {
+          "S": 120.0,
+          "tau": 0.43478260869565216,
+          "z": 3.5469478632283638,
+          "p": 0.00038972170819319196,
+          "factor_hamed_rao": 0.6925352294208627,
+          "sen": 0.034309523809524074,
+          "sen_ic95": [
+            0.017446078431372608,
+            0.058683333333333344
+          ],
+          "sen_por_decada": 0.34309523809524073,
+          "sen_ic95_por_decada": [
+            0.17446078431372608,
+            0.5868333333333334
+          ]
+        },
+        "veredicto": "significativa",
+        "cambio_total_periodo": 0.868459166666667,
+        "cambio_pct_respecto_media": 4.090895396495864
+      }
+    },
+    "SM": {
+      "nombre": "Humedad del suelo",
+      "unidad_mensual": "m³/m³",
+      "unidad_anual": "m³/m³",
+      "media_mensual": 0.19893510416666668,
+      "media_anual": 0.19893510416666668,
+      "mensual_anomalias": {
+        "mco": {
+          "pendiente": -0.008634945685591311,
+          "ee": 0.0010122353412296077,
+          "ic95": [
+            -0.010634432272315085,
+            -0.006635459098867537
+          ],
+          "t": -8.530571235639782,
+          "p": 1.2096034617892595e-14,
+          "r2": 0.3185209782080268,
+          "r1_residuos": 0.2923677569030305,
+          "n": 288,
+          "n_efectivo": 157.69357052074665,
+          "intercepto": 0.010325955882352938,
+          "sigma_residuos": 0.008781082620593381
+        },
+        "mco_unidad_pendiente": "m³/m³ por década",
+        "mann_kendall_hamed_rao": {
+          "S": -16154.0,
+          "tau": -0.39087301587301587,
+          "z": -7.558060857452396,
+          "p": 4.0912263298783525e-14,
+          "factor_hamed_rao": 1.7120164403984495,
+          "sen": -7.061613475177326e-05,
+          "sen_ic95": [
+            -8.655165912518864e-05,
+            -5.4185606060605954e-05
+          ],
+          "sen_por_decada": -0.008473936170212791,
+          "sen_ic95_por_decada": [
+            -0.010386199095022636,
+            -0.006502272727272714
+          ]
+        },
+        "veredicto": "significativa",
+        "snr_pendiente_sobre_ee": -8.530571235639782,
+        "anios_para_detectar_weatherhead": 12.717285731905784
+      },
+      "anual": {
+        "mco": {
+          "pendiente": -0.00864985869565218,
+          "ee": 0.0007497156471173421,
+          "ic95": [
+            -0.010204673784795074,
+            -0.007095043606509286
+          ],
+          "t": -11.53751923000527,
+          "p": 8.42444504803522e-11,
+          "r2": 0.8581691506785302,
+          "r1_residuos": -0.0759484112182374,
+          "n": 24,
+          "n_efectivo": 24.0,
+          "intercepto": 0.2088824416666667,
+          "sigma_residuos": 0.002542409456131056
+        },
+        "mco_unidad_pendiente": "m³/m³ por década",
+        "mann_kendall_hamed_rao": {
+          "S": -228.0,
+          "tau": -0.8260869565217391,
+          "z": -5.6305994825794485,
+          "p": 1.7958432001906072e-08,
+          "factor_hamed_rao": 1.0,
+          "sen": -0.000835708333333339,
+          "sen_ic95": [
+            -0.0010166025641025628,
+            -0.0006644230769230806
+          ],
+          "sen_por_decada": -0.00835708333333339,
+          "sen_ic95_por_decada": [
+            -0.010166025641025627,
+            -0.006644230769230806
+          ]
+        },
+        "veredicto": "significativa",
+        "cambio_total_periodo": -0.019894675000000014,
+        "cambio_pct_respecto_media": -10.000585408662904
+      }
+    },
+    "ET": {
+      "nombre": "Evapotranspiración",
+      "unidad_mensual": "mm/mes",
+      "unidad_anual": "mm/año",
+      "media_mensual": 38.784625,
+      "media_anual": 465.41550000000007,
+      "mensual_anomalias": {
+        "mco": {
+          "pendiente": -1.9561563965614936,
+          "ee": 1.182822441300914,
+          "ic95": [
+            -4.2926459317084,
+            0.3803331385854125
+          ],
+          "t": -1.6538039254734098,
+          "p": 0.10018647799399152,
+          "r2": 0.017300054584883075,
+          "r1_residuos": 0.29333335686909284,
+          "n": 288,
+          "n_efectivo": 157.36081663770227,
+          "intercepto": 2.339237024221453,
+          "sigma_residuos": 10.249944913124253
+        },
+        "mco_unidad_pendiente": "mm/mes por década",
+        "mann_kendall_hamed_rao": {
+          "S": -3894.0,
+          "tau": -0.09422183507549362,
+          "z": -2.4174112520908326,
+          "p": 0.015631345264946972,
+          "factor_hamed_rao": 0.9720524901717342,
+          "sen": -0.01154327324973876,
+          "sen_ic95": [
+            -0.021021739130434834,
+            -0.00218485696517412
+          ],
+          "sen_por_decada": -1.3851927899686514,
+          "sen_ic95_por_decada": [
+            -2.5226086956521803,
+            -0.2621828358208944
+          ]
+        },
+        "veredicto": "indicio (no concluyente)",
+        "snr_pendiente_sobre_ee": -1.6538039254734098,
+        "anios_para_detectar_weatherhead": 37.96527590981778
+      },
+      "anual": {
+        "mco": {
+          "pendiente": -23.51441739130434,
+          "ee": 15.195353533572796,
+          "ic95": [
+            -55.02765184186123,
+            7.998817059252545
+          ],
+          "t": -1.54747418935343,
+          "p": 0.1360146499164474,
+          "r2": 0.09816389160966432,
+          "r1_residuos": -0.04947952201626004,
+          "n": 24,
+          "n_efectivo": 24.0,
+          "intercepto": 492.4570800000001,
+          "sigma_residuos": 51.52995093746963
+        },
+        "mco_unidad_pendiente": "mm/año por década",
+        "mann_kendall_hamed_rao": {
+          "S": -64.0,
+          "tau": -0.2318840579710145,
+          "z": -1.5626773894383492,
+          "p": 0.11812849523841991,
+          "factor_hamed_rao": 1.0,
+          "sen": -2.17216477272727,
+          "sen_ic95": [
+            -5.309857142857156,
+            0.8959090909090874
+          ],
+          "sen_por_decada": -21.721647727272703,
+          "sen_ic95_por_decada": [
+            -53.09857142857156,
+            8.959090909090875
+          ]
+        },
+        "veredicto": "no significativa",
+        "cambio_total_periodo": -54.083159999999985,
+        "cambio_pct_respecto_media": -11.620403703787257
+      }
+    },
+    "P_menos_ET": {
+      "nombre": "Balance P − ET",
+      "unidad_mensual": "mm/mes",
+      "unidad_anual": "mm/año",
+      "media_mensual": 1.473479166666667,
+      "media_anual": 17.681750000000015,
+      "mensual_anomalias": {
+        "mco": {
+          "pendiente": -0.749257441857661,
+          "ee": 1.5108720933640813,
+          "ic95": [
+            -3.7386561348741,
+            2.2401412511587786
+          ],
+          "t": -0.4959105705562259,
+          "p": 0.6208043657682709,
+          "r2": 0.001909579684245112,
+          "r1_residuos": 0.3762120255895334,
+          "n": 288,
+          "n_efectivo": 130.54015899421938,
+          "intercepto": 0.8959870242214526,
+          "sigma_residuos": 11.90908360089422
+        },
+        "mco_unidad_pendiente": "mm/mes por década",
+        "mann_kendall_hamed_rao": {
+          "S": -1436.0,
+          "tau": -0.03474641889276035,
+          "z": -0.7278304435110388,
+          "p": 0.46671738613999925,
+          "factor_hamed_rao": 1.4570194724663978,
+          "sen": -0.005501207729468575,
+          "sen_ic95": [
+            -0.019726485148514807,
+            0.009338888888888884
+          ],
+          "sen_por_decada": -0.660144927536229,
+          "sen_ic95_por_decada": [
+            -2.3671782178217766,
+            1.120666666666666
+          ]
+        },
+        "veredicto": "no significativa",
+        "snr_pendiente_sobre_ee": -0.4959105705562259,
+        "anios_para_detectar_weatherhead": 84.66883729843443
+      },
+      "anual": {
+        "mco": {
+          "pendiente": -9.006617391304339,
+          "ee": 21.57418461857114,
+          "ic95": [
+            -53.74873783374831,
+            35.73550305113963
+          ],
+          "t": -0.41747197173567374,
+          "p": 0.6803792877492157,
+          "r2": 0.007859683597704139,
+          "r1_residuos": -0.2649042705405406,
+          "n": 24,
+          "n_efectivo": 24.0,
+          "intercepto": 28.039360000000006,
+          "sigma_residuos": 73.16161960000753
+        },
+        "mco_unidad_pendiente": "mm/año por década",
+        "mann_kendall_hamed_rao": {
+          "S": -20.0,
+          "tau": -0.07246376811594203,
+          "z": -0.47128365713220055,
+          "p": 0.6374381847429542,
+          "factor_hamed_rao": 1.0,
+          "sen": -1.3285657894736909,
+          "sen_ic95": [
+            -5.914999999999978,
+            3.7593888888888847
+          ],
+          "sen_por_decada": -13.285657894736909,
+          "sen_ic95_por_decada": [
+            -59.14999999999978,
+            37.59388888888885
+          ]
+        },
+        "veredicto": "no significativa",
+        "cambio_total_periodo": -20.71521999999998,
+        "cambio_pct_respecto_media": null
+      }
+    }
+  },
+  "relaciones": {
+    "mensual_anomalias": {
+      "P-T": {
+        "pearson_r": 0.151685032116409,
+        "pearson_ic95": [
+          0.007676374293944829,
+          0.2895297200523008
+        ],
+        "pearson_p_ajustado": 0.039163369021956176,
+        "spearman_rho": 0.1473285871019857,
+        "spearman_p_ajustado": 0.045223833911034426,
+        "n": 288,
+        "n_efectivo": 185.24249044181187,
+        "significativa": true,
+        "descripcion": "muy débil / nula"
+      },
+      "P-SM": {
+        "pearson_r": 0.5430998085350355,
+        "pearson_ic95": [
+          0.4376177251818646,
+          0.6338365114772451
+        ],
+        "pearson_p_ajustado": 7.99796659874956e-17,
+        "spearman_rho": 0.6099046960725972,
+        "spearman_p_ajustado": 7.121820617068513e-22,
+        "n": 288,
+        "n_efectivo": 201.08466811909017,
+        "significativa": true,
+        "descripcion": "moderada positiva"
+      },
+      "P-ET": {
+        "pearson_r": 0.9538152802088099,
+        "pearson_ic95": [
+          0.94060276834101,
+          0.964143063465679
+        ],
+        "pearson_p_ajustado": 9.996152923018337e-123,
+        "spearman_rho": 0.8517701915773483,
+        "spearman_p_ajustado": 7.785515997296251e-67,
+        "n": 288,
+        "n_efectivo": 233.16585282141637,
+        "significativa": true,
+        "descripcion": "fuerte positiva"
+      },
+      "T-SM": {
+        "pearson_r": -0.3615336640940625,
+        "pearson_ic95": [
+          -0.49479851137592484,
+          -0.21165507085656785
+        ],
+        "pearson_p_ajustado": 7.196562706940938e-06,
+        "spearman_rho": -0.35752925641939376,
+        "spearman_p_ajustado": 9.228711818328937e-06,
+        "n": 288,
+        "n_efectivo": 146.27573972547708,
+        "significativa": true,
+        "descripcion": "débil negativa"
+      },
+      "T-ET": {
+        "pearson_r": 0.07371324481876707,
+        "pearson_ic95": [
+          -0.06760017877292915,
+          0.2121272871310725
+        ],
+        "pearson_p_ajustado": 0.30611628663384943,
+        "spearman_rho": 0.04942400202548739,
+        "spearman_p_ajustado": 0.4929223048429354,
+        "n": 288,
+        "n_efectivo": 194.72932692802718,
+        "significativa": false,
+        "descripcion": "muy débil / nula"
+      },
+      "SM-ET": {
+        "pearson_r": 0.555804167353074,
+        "pearson_ic95": [
+          0.4544529206922069,
+          0.642948756638008
+        ],
+        "pearson_p_ajustado": 2.273364256883716e-18,
+        "spearman_rho": 0.5666196882748191,
+        "spearman_p_ajustado": 3.552899030447753e-19,
+        "n": 288,
+        "n_efectivo": 209.35198161900948,
+        "significativa": true,
+        "descripcion": "moderada positiva"
+      }
+    },
+    "mensual_anomalias_sin_tendencia": {
+      "P-T": {
+        "pearson_r": 0.20868285875474696,
+        "pearson_ic95": [
+          0.07109196563646268,
+          0.3384806419567007
+        ],
+        "pearson_p_ajustado": 0.0032220797291387195,
+        "spearman_rho": 0.2146464037551893,
+        "spearman_p_ajustado": 0.0024303237676448854,
+        "n": 288,
+        "n_efectivo": 197.3812265071052,
+        "significativa": true
+      },
+      "P-SM": {
+        "pearson_r": 0.6000481551583878,
+        "pearson_ic95": [
+          0.5115611144469808,
+          0.6759413630445179
+        ],
+        "pearson_p_ajustado": 1.7604837804015894e-24,
+        "spearman_rho": 0.6777244613770903,
+        "spearman_p_ajustado": 4.238129248912899e-33,
+        "n": 288,
+        "n_efectivo": 236.08490024224727,
+        "significativa": true
+      },
+      "P-ET": {
+        "pearson_r": 0.9541996439080511,
+        "pearson_ic95": [
+          0.9411815896167958,
+          0.964389317769084
+        ],
+        "pearson_p_ajustado": 1.3784005627368325e-124,
+        "spearman_rho": 0.857339779527306,
+        "spearman_p_ajustado": 2.0765429951194127e-69,
+        "n": 288,
+        "n_efectivo": 235.92894091099762,
+        "significativa": true
+      },
+      "T-SM": {
+        "pearson_r": -0.16617711223195694,
+        "pearson_ic95": [
+          -0.2955149062898054,
+          -0.030857271384514228
+        ],
+        "pearson_p_ajustado": 0.01642333809898674,
+        "spearman_rho": -0.16164765762833114,
+        "spearman_p_ajustado": 0.019643748140574416,
+        "n": 288,
+        "n_efectivo": 208.08026087811004,
+        "significativa": true
+      },
+      "T-ET": {
+        "pearson_r": 0.14334124005816068,
+        "pearson_ic95": [
+          0.007393686343807392,
+          0.27408627072929226
+        ],
+        "pearson_p_ajustado": 0.038943971904974936,
+        "spearman_rho": 0.12240434193763589,
+        "spearman_p_ajustado": 0.0782889723880256,
+        "n": 288,
+        "n_efectivo": 207.85303786292675,
+        "significativa": true
+      },
+      "SM-ET": {
+        "pearson_r": 0.5884701268886735,
+        "pearson_ic95": [
+          0.49952571261016754,
+          0.6651372673117315
+        ],
+        "pearson_p_ajustado": 5.458440757537408e-24,
+        "spearman_rho": 0.6129555839552465,
+        "spearman_p_ajustado": 2.065653268778536e-26,
+        "n": 288,
+        "n_efectivo": 242.50338484986844,
+        "significativa": true
+      }
+    },
+    "anual": {
+      "P-T": {
+        "pearson_r": 0.45856009696484423,
+        "pearson_ic95": [
+          0.06767578923562756,
+          0.7274046846895474
+        ],
+        "pearson_p_ajustado": 0.02421358770959017,
+        "spearman_rho": 0.44869565217391305,
+        "spearman_p_ajustado": 0.027860041901524808,
+        "n": 24,
+        "n_efectivo": 24.0,
+        "significativa": true
+      },
+      "P-SM": {
+        "pearson_r": 0.29765414536991674,
+        "pearson_ic95": [
+          -0.1201796789378436,
+          0.625902414795307
+        ],
+        "pearson_p_ajustado": 0.15776932894272466,
+        "spearman_rho": 0.28782608695652173,
+        "spearman_p_ajustado": 0.17261549938271945,
+        "n": 24,
+        "n_efectivo": 24.0,
+        "significativa": false
+      },
+      "P-ET": {
+        "pearson_r": 0.9631406048354079,
+        "pearson_ic95": [
+          0.9154023217130239,
+          0.9841630147473477
+        ],
+        "pearson_p_ajustado": 4.956784134676746e-14,
+        "spearman_rho": 0.9565217391304346,
+        "spearman_p_ajustado": 2.9563631530944734e-13,
+        "n": 24,
+        "n_efectivo": 24.0,
+        "significativa": true
+      },
+      "T-SM": {
+        "pearson_r": -0.5793141263059212,
+        "pearson_ic95": [
+          -0.8108057370848537,
+          -0.191104319159487
+        ],
+        "pearson_p_ajustado": 0.00656819168652604,
+        "spearman_rho": -0.5460869565217391,
+        "spearman_p_ajustado": 0.011429343112239452,
+        "n": 24,
+        "n_efectivo": 20.543628881868617,
+        "significativa": true
+      },
+      "T-ET": {
+        "pearson_r": 0.30609617132192235,
+        "pearson_ic95": [
+          -0.11214192460094373,
+          0.6322046722891337
+        ],
+        "pearson_p_ajustado": 0.14680360922403465,
+        "spearman_rho": 0.328695652173913,
+        "spearman_p_ajustado": 0.11777562588534816,
+        "n": 24,
+        "n_efectivo": 23.888420738312284,
+        "significativa": false
+      },
+      "SM-ET": {
+        "pearson_r": 0.4287152171735639,
+        "pearson_ic95": [
+          0.023026190598726962,
+          0.7131735697971305
+        ],
+        "pearson_p_ajustado": 0.039901044736184846,
+        "spearman_rho": 0.3782608695652173,
+        "spearman_p_ajustado": 0.07319971060578158,
+        "n": 24,
+        "n_efectivo": 23.274597935810057,
+        "significativa": true
+      }
+    },
+    "valores_brutos_con_estacionalidad": {
+      "P-T": {
+        "pearson_r": 0.6918710810260771,
+        "nota": "incluye el ciclo estacional; no usar para inferencia"
+      },
+      "P-SM": {
+        "pearson_r": 0.7025601340831763,
+        "nota": "incluye el ciclo estacional; no usar para inferencia"
+      },
+      "P-ET": {
+        "pearson_r": 0.9801220107843932,
+        "nota": "incluye el ciclo estacional; no usar para inferencia"
+      },
+      "T-SM": {
+        "pearson_r": 0.8385077170638464,
+        "nota": "incluye el ciclo estacional; no usar para inferencia"
+      },
+      "T-ET": {
+        "pearson_r": 0.6952134442882031,
+        "nota": "incluye el ciclo estacional; no usar para inferencia"
+      },
+      "SM-ET": {
+        "pearson_r": 0.7292250634224001,
+        "nota": "incluye el ciclo estacional; no usar para inferencia"
+      }
+    },
+    "desfases": {
+      "P->SM": {
+        "por_desfase": [
+          {
+            "desfase_meses": 0,
+            "pearson_r": 0.5430998085350355,
+            "p_ajustado": 7.99796659874956e-17,
+            "significativa": true
+          },
+          {
+            "desfase_meses": 1,
+            "pearson_r": 0.18488526381539888,
+            "p_ajustado": 0.008622235522399518,
+            "significativa": true
+          },
+          {
+            "desfase_meses": 2,
+            "pearson_r": 0.025382920726395603,
+            "p_ajustado": 0.7210202604838672,
+            "significativa": false
+          },
+          {
+            "desfase_meses": 3,
+            "pearson_r": 0.0105009856165623,
+            "p_ajustado": 0.8826338438473768,
+            "significativa": false
+          }
+        ],
+        "desfase_optimo_meses": 0,
+        "r_optimo": 0.5430998085350355
+      },
+      "P->ET": {
+        "por_desfase": [
+          {
+            "desfase_meses": 0,
+            "pearson_r": 0.9538152802088099,
+            "p_ajustado": 9.996152923018337e-123,
+            "significativa": true
+          },
+          {
+            "desfase_meses": 1,
+            "pearson_r": 0.3292546520279334,
+            "p_ajustado": 2.8112565760389616e-07,
+            "significativa": true
+          },
+          {
+            "desfase_meses": 2,
+            "pearson_r": 0.12861373867394757,
+            "p_ajustado": 0.05061998283804467,
+            "significativa": false
+          },
+          {
+            "desfase_meses": 3,
+            "pearson_r": 0.08462890465323507,
+            "p_ajustado": 0.20023625273879625,
+            "significativa": false
+          }
+        ],
+        "desfase_optimo_meses": 0,
+        "r_optimo": 0.9538152802088099
+      },
+      "SM->ET": {
+        "por_desfase": [
+          {
+            "desfase_meses": 0,
+            "pearson_r": 0.555804167353074,
+            "p_ajustado": 2.273364256883716e-18,
+            "significativa": true
+          },
+          {
+            "desfase_meses": 1,
+            "pearson_r": 0.19913594217650854,
+            "p_ajustado": 0.0038857280739945893,
+            "significativa": true
+          },
+          {
+            "desfase_meses": 2,
+            "pearson_r": 0.04935233441952065,
+            "p_ajustado": 0.4791916576562223,
+            "significativa": false
+          },
+          {
+            "desfase_meses": 3,
+            "pearson_r": 0.05998742603868633,
+            "p_ajustado": 0.3904459840112223,
+            "significativa": false
+          }
+        ],
+        "desfase_optimo_meses": 0,
+        "r_optimo": 0.555804167353074
+      },
+      "T->SM": {
+        "por_desfase": [
+          {
+            "desfase_meses": 0,
+            "pearson_r": -0.3615336640940625,
+            "p_ajustado": 7.196562706940938e-06,
+            "significativa": true
+          },
+          {
+            "desfase_meses": 1,
+            "pearson_r": -0.2703605020572481,
+            "p_ajustado": 0.0009499306046582767,
+            "significativa": true
+          },
+          {
+            "desfase_meses": 2,
+            "pearson_r": -0.1975743159858605,
+            "p_ajustado": 0.01677559618947648,
+            "significativa": true
+          },
+          {
+            "desfase_meses": 3,
+            "pearson_r": -0.19939948085716058,
+            "p_ajustado": 0.015723495173117677,
+            "significativa": true
+          }
+        ],
+        "desfase_optimo_meses": 0,
+        "r_optimo": -0.3615336640940625
+      },
+      "T->ET": {
+        "por_desfase": [
+          {
+            "desfase_meses": 0,
+            "pearson_r": 0.07371324481876707,
+            "p_ajustado": 0.30611628663384943,
+            "significativa": false
+          },
+          {
+            "desfase_meses": 1,
+            "pearson_r": 0.01622145006421167,
+            "p_ajustado": 0.8223776453463185,
+            "significativa": false
+          },
+          {
+            "desfase_meses": 2,
+            "pearson_r": 0.11197745475320817,
+            "p_ajustado": 0.12070246192219966,
+            "significativa": false
+          },
+          {
+            "desfase_meses": 3,
+            "pearson_r": 0.08484651312587826,
+            "p_ajustado": 0.24118507435878367,
+            "significativa": false
+          }
+        ],
+        "desfase_optimo_meses": 2,
+        "r_optimo": 0.11197745475320817
+      },
+      "T->P": {
+        "por_desfase": [
+          {
+            "desfase_meses": 0,
+            "pearson_r": 0.151685032116409,
+            "p_ajustado": 0.039163369021956176,
+            "significativa": true
+          },
+          {
+            "desfase_meses": 1,
+            "pearson_r": 0.08099912539465369,
+            "p_ajustado": 0.273702823891485,
+            "significativa": false
+          },
+          {
+            "desfase_meses": 2,
+            "pearson_r": 0.1679781202689238,
+            "p_ajustado": 0.022699603054347907,
+            "significativa": true
+          },
+          {
+            "desfase_meses": 3,
+            "pearson_r": 0.1251773275907882,
+            "p_ajustado": 0.09114299065688075,
+            "significativa": false
+          }
+        ],
+        "desfase_optimo_meses": 2,
+        "r_optimo": 0.1679781202689238
+      }
+    },
+    "regresiones_multiples_anomalias": {
+      "SM~P+T": {
+        "y": "SM",
+        "x": [
+          "P",
+          "T"
+        ],
+        "r2": 0.4966576318221423,
+        "coeficientes": {
+          "P": {
+            "beta": 0.00030462406001150664,
+            "p_hac": 1.558032838528841e-21
+          },
+          "T": {
+            "beta": -0.007745942701205873,
+            "p_hac": 2.0815619774047746e-17
+          }
+        },
+        "coef_estandarizados": {
+          "P": 0.6120206384085215,
+          "T": -0.4543680342869646
+        }
+      },
+      "ET~P+T+SM": {
+        "y": "ET",
+        "x": [
+          "P",
+          "T",
+          "SM"
+        ],
+        "r2": 0.9149794321177309,
+        "coeficientes": {
+          "P": {
+            "beta": 0.46354891185076247,
+            "p_hac": 7.271345560844239e-186
+          },
+          "T": {
+            "beta": -1.120786589178033,
+            "p_hac": 0.004047429386784369
+          },
+          "SM": {
+            "beta": 10.703586640636242,
+            "p_hac": 0.6907524972536716
+          }
+        },
+        "coef_estandarizados": {
+          "P": 0.9580941397774193,
+          "T": -0.0676343262855755,
+          "SM": 0.011011337680860555
+        }
+      }
+    }
+  },
+  "balance_hidrico": {
+    "P_media_anual_mm": 483.09725,
+    "ET_media_anual_mm": 465.41550000000007,
+    "ET_sobre_P": 0.9633991913636438,
+    "anios_con_ET_mayor_que_P": [
+      2005,
+      2006,
+      2007,
+      2008,
+      2010,
+      2014,
+      2017,
+      2021,
+      2022,
+      2024
+    ],
+    "meses_climatologicos_con_ET_mayor_que_P": [
+      1,
+      2,
+      3,
+      4,
+      10,
+      11,
+      12
+    ]
+  }
+}

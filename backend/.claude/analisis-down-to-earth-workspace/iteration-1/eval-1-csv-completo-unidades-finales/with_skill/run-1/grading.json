@@ -1,0 +1,65 @@
+{
+  "expectations": [
+    {
+      "text": "Existe un JSON con metadata, las cuatro variables P, T, SM, ET y una sección del análisis conjunto",
+      "passed": true,
+      "evidence": "1 JSON; variables encontradas=True; sección conjunta=True"
+    },
+    {
+      "text": "Las pendientes por década de P, T, SM y ET coinciden con OLS anual (tolerancia 1 %)",
+      "passed": true,
+      "evidence": "P: ref -32.52 ✓; T: ref +0.3758 ✓; SM: ref -0.008646 ✓; ET: ref -23.51 ✓"
+    },
+    {
+      "text": "Publica p ajustados por Holm sobre las cuatro variables que coinciden con HAC rezago 1 (tolerancia 0.005)",
+      "passed": true,
+      "evidence": "menciona Holm=True; P: ref p_holm 0.3435 ✓; T: ref p_holm 0.0000 ✓; SM: ref p_holm 0.0000 ✓; ET: ref p_holm 0.2837 ✓"
+    },
+    {
+      "text": "Las etiquetas siguen el p de Holm: T y SM con evidencia (aumento/disminución), P y ET 'evidencia insuficiente'; nunca 'sin cambio'/'no cambió'",
+      "passed": true,
+      "evidence": "T=True SM=True P=True ET=True; frases prohibidas=[]"
+    },
+    {
+      "text": "Reporta la sensibilidad con rezagos 2 y 3",
+      "passed": true,
+      "evidence": "rezago2=True rezago3=True"
+    },
+    {
+      "text": "Correlaciones solo de los pares P–SM, T–SM y P–ET con r (±0.02 de la referencia sin estación ni tendencia) y n = 288",
+      "passed": true,
+      "evidence": "P–SM: ref r=0.719, n=288 ✓; T–SM: ref r=-0.159, n=288 ✓; P–ET: ref r=0.782, n=288 ✓; pares extra=[]; matriz completa=False"
+    },
+    {
+      "text": "Las correlaciones no llevan p-valor ni se califican de 'significativas'",
+      "passed": true,
+      "evidence": "claves p en sección conjunta=[]; líneas con 'significativ'=[]"
+    },
+    {
+      "text": "El CSV anual tiene T y SM como media ponderada por días (no suma) y P y ET como suma",
+      "passed": true,
+      "evidence": "coinciden en 2004, 2015, 2023"
+    },
+    {
+      "text": "El resumen y el JSON rotulan los datos como simulados",
+      "passed": true,
+      "evidence": "md=True json=True"
+    },
+    {
+      "text": "El resumen no afirma causas (causó/provocó/debido a) y menciona límites",
+      "passed": true,
+      "evidence": "frases causales=[]; menciona límites=True"
+    },
+    {
+      "text": "Se generaron gráficos (serie anual y anomalías z)",
+      "passed": true,
+      "evidence": "5 archivos de gráfico"
+    }
+  ],
+  "summary": {
+    "passed": 11,
+    "failed": 0,
+    "total": 11,
+    "pass_rate": 1.0
+  }
+}

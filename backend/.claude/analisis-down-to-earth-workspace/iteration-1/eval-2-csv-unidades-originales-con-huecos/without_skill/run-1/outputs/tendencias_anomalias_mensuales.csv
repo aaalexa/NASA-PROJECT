@@ -1,0 +1,5 @@
+variable,n_meses,pendiente_por_decada,p_valor,r1,n_efectivo
+Precipitación (GPCP) [mm/día],287,-0.0896995,0.285784,0.331771,144.005
+Temperatura 2 m (MERRA-2) [°C],286,0.373919,7.18558e-05,0.545871,84.0178
+Humedad del suelo 0-10 cm (GLDAS) [kg/m²],286,-0.873677,6.15963e-15,0.286954,158.46
+Evapotranspiración (GLDAS) [mm/día],287,-0.0646886,0.0951879,0.290382,157.83

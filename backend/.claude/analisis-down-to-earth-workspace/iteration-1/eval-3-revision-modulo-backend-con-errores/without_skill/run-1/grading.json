@@ -1,0 +1,45 @@
+{
+  "expectations": [
+    {
+      "text": "Señala fillna(0) como error y lo corrige dejando NaN / años incompletos",
+      "passed": true,
+      "evidence": "Problema 1: fillna(0) → NaN."
+    },
+    {
+      "text": "Señala que T y SM no se suman y los corrige a media ponderada por días (P y ET siguen como suma)",
+      "passed": false,
+      "evidence": "Lo señala, pero corrige T y SM a media SIMPLE ('mean'), no ponderada por días."
+    },
+    {
+      "text": "Señala maxlags=3 y lo corrige a 1 como principal (2 y 3 solo sensibilidad)",
+      "passed": false,
+      "evidence": "Critica maxlags=3, pero sustituye HAC por una prueba t con n efectivo (Santer) + Theil-Sen: no deja rezago 1 principal ni sensibilidad 2–3; cambia el método decidido."
+    },
+    {
+      "text": "Señala que p no se multiplica por 10 y lo corrige",
+      "passed": true,
+      "evidence": "Problema 4: p ya no se multiplica por 10."
+    },
+    {
+      "text": "Señala Bonferroni sobre las variables visibles y lo corrige a Holm sobre la familia fija [P, T, SM, ET]",
+      "passed": true,
+      "evidence": "Problema 6: Holm sobre las 4 variables; las visibles solo filtran la salida (excluye de la familia las variables con datos insuficientes)."
+    },
+    {
+      "text": "Señala la etiqueta 'sin cambio' y la cambia por 'evidencia insuficiente'",
+      "passed": false,
+      "evidence": "Señala 'sin cambio', pero lo cambia por 'no concluyente', no por 'evidencia insuficiente' (sentido correcto, redacción distinta a la especificada)."
+    },
+    {
+      "text": "Entrega un archivo .py corregido que no contiene fillna(0), maxlags 3 principal, p*10, Bonferroni ni 'sin cambio'",
+      "passed": true,
+      "evidence": "tendencias_demo_corregido.py no contiene fillna(0), maxlags=3, p*10, Bonferroni ni 'sin cambio' (solo en comentarios)."
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 3,
+    "total": 7,
+    "pass_rate": 0.5714
+  }
+}

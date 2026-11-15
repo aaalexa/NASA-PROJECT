@@ -7,6 +7,9 @@ _netrc
 # Datos descargados y caché (pueden pesar decenas de GB)
 data/
 
+# Salidas de `nasa-project dte` (resultados de análisis con datos reales)
+resultados/
+
 # Entorno y temporales de Python
 .venv/
 __pycache__/

@@ -9,6 +9,7 @@ from fastapi.responses import PlainTextResponse
 from core.api.esquemas import (
     PeticionDosCarasDTO,
     PeticionEscanerDTO,
+    ResultadoDTE,
     SerieRespuestaDTO,
     TendenciaRespuestaDTO,
 )
@@ -286,11 +287,13 @@ def ruta_mapa_tendencias(
 @router.get(
     "/demo/result",
     tags=["Down to Earth (4 Variables)"],
+    response_model=ResultadoDTE,
     summary="Análisis completo Down to Earth: 4 variables (P, T, SM, ET), OLS+HAC+Holm y lectura conjunta",
 )
 @router.get(
     "/down-to-earth/analisis",
     tags=["Down to Earth (4 Variables)"],
+    response_model=ResultadoDTE,
     summary="Análisis completo Down to Earth: 4 variables (P, T, SM, ET), OLS+HAC+Holm y lectura conjunta",
 )
 def ruta_demo_result_dte(

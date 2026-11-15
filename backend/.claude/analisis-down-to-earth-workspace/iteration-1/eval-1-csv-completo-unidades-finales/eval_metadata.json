@@ -1,0 +1,18 @@
+{
+  "eval_id": 1,
+  "eval_name": "csv-completo-unidades-finales",
+  "prompt": "Tengo el CSV mensual de la región de la demo de Down to Earth ya convertido: evals/files/dte_simulado_completo.csv (fecha, P en mm/mes, T en °C, SM en m³/m³, ET en mm/mes, de 2001 a 2024). Son datos simulados para probar el flujo. Hazme el análisis completo: si cada variable tiene tendencia y si es significativa, y cómo se relacionan entre ellas. Déjame en la carpeta de salida el JSON de resultados, el CSV anual, un resumen en markdown para la demo y las gráficas.",
+  "assertions": [
+    "Existe un JSON con metadata, las cuatro variables P, T, SM, ET y una sección del análisis conjunto",
+    "Las pendientes por década de P, T, SM y ET coinciden con OLS anual (tolerancia 1 %)",
+    "Publica p ajustados por Holm sobre las cuatro variables que coinciden con HAC rezago 1 (tolerancia 0.005)",
+    "Las etiquetas siguen el p de Holm: T y SM con evidencia (aumento/disminución), P y ET 'evidencia insuficiente'; nunca 'sin cambio'/'no cambió'",
+    "Reporta la sensibilidad con rezagos 2 y 3",
+    "Correlaciones solo de los pares P–SM, T–SM y P–ET con r (±0.02 de la referencia sin estación ni tendencia) y n = 288",
+    "Las correlaciones no llevan p-valor ni se califican de 'significativas'",
+    "El CSV anual tiene T y SM como media ponderada por días (no suma) y P y ET como suma",
+    "El resumen y el JSON rotulan los datos como simulados",
+    "El resumen no afirma causas (causó/provocó/debido a) y menciona límites",
+    "Se generaron gráficos (serie anual y anomalías z)"
+  ]
+}

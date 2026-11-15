@@ -1,0 +1,4 @@
+fecha,variable,tipo
+2001-03-01,T2M,valor centinela -9999
+2013-06-01,TODAS,mes ausente (fila faltante)
+2024-11-01,SoilMoi0_10cm_inst,celda vacía (NaN)

@@ -1,0 +1,14 @@
+{
+  "eval_id": 3,
+  "eval_name": "revision-modulo-backend-con-errores",
+  "prompt": "Revisa este módulo que escribió alguien del equipo para calcular las tendencias que salen en la pantalla de resultados de la demo: evals/files/modulo_backend_simulado.py. ¿Está bien hecho estadísticamente? Dime qué problemas tiene y deja una versión corregida en la carpeta de salida.",
+  "assertions": [
+    "Señala fillna(0) como error y lo corrige dejando NaN / años incompletos",
+    "Señala que T y SM no se suman y los corrige a media ponderada por días (P y ET siguen como suma)",
+    "Señala maxlags=3 y lo corrige a 1 como principal (2 y 3 solo sensibilidad)",
+    "Señala que p no se multiplica por 10 y lo corrige",
+    "Señala Bonferroni sobre las variables visibles y lo corrige a Holm sobre la familia fija [P, T, SM, ET]",
+    "Señala la etiqueta 'sin cambio' y la cambia por 'evidencia insuficiente'",
+    "Entrega un archivo .py corregido que no contiene fillna(0), maxlags 3 principal, p*10, Bonferroni ni 'sin cambio'"
+  ]
+}
