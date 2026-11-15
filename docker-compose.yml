@@ -17,6 +17,8 @@ services:
       UVICORN_WORKERS: ${UVICORN_WORKERS:-2}
       EARTHDATA_USERNAME: ${EARTHDATA_USERNAME:-}
       EARTHDATA_PASSWORD: ${EARTHDATA_PASSWORD:-}
+      # Regiones cuyo análisis Down to Earth real se precalcula al arrancar (cada worker precarga las suyas)
+      NASA_DTE_PRECARGA: ${NASA_DTE_PRECARGA:-}
     ports:
       - "127.0.0.1:8000:8000"
     healthcheck:

@@ -84,6 +84,26 @@ def _validar_diario(pr: xr.DataArray) -> None:
             )
 
 
+def _reindexar_diario(pr: xr.DataArray) -> xr.DataArray:
+    """Reindexa al calendario diario completo (1-ene del primer año → 31-dic del último).
+
+    Los días ausentes del cubo (gránulos que no llegaron) pasan a ser NaN: así cortan las rachas secas y cuentan
+    como faltantes en el control de calidad por año. Sin esto, dos rachas separadas por un hueco se unirían.
+    """
+    fechas = pd.DatetimeIndex(pr["time"].values).normalize()
+    _, unicos = np.unique(fechas.values, return_index=True)
+    if unicos.size != fechas.size:
+        pr = pr.isel(time=np.sort(unicos))
+        fechas = fechas[np.sort(unicos)]
+    calendario = pd.date_range(f"{fechas.year.min()}-01-01", f"{fechas.year.max()}-12-31", freq="D")
+    if fechas.size == calendario.size and bool((fechas == calendario).all()):
+        return pr
+    attrs = dict(pr.attrs)
+    out = pr.assign_coords(time=fechas).reindex(time=calendario)
+    out.attrs = attrs
+    return out
+
+
 def _cdd_por_anio(seco_anio: xr.DataArray) -> xr.DataArray:
     if seco_anio.chunks is not None and "time" in seco_anio. dims:
         seco_anio = seco_anio.chunk({"time": -1})
@@ -112,6 +132,7 @@ def indicadores_anuales(
     if not 0.0 <= max_faltantes <= 1.0:
         raise ValueError(f"max_faltantes debe estar entre 0 y 1, no {max_faltantes}")
 
+    pr = _reindexar_diario(pr)
     if pr.chunks is not None:
         pr = pr.chunk({"time": -1})
 

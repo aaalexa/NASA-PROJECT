@@ -11,6 +11,7 @@ Orden fijo de operaciones:
 """
 from __future__ import annotations
 
+from collections.abc import Sequence
 from pathlib import Path
 from typing import Any, Literal
 
@@ -178,22 +179,94 @@ def aplicar_mascara(da: xr.DataArray, mascara: xr.DataArray | Literal["tierra"])
 
 
 # ----------------------------------------------------------------------------------------------- 3. Promedio espacial
-def promedio_area(da: xr.DataArray, min_area_valida: float = 0.9,
-                  fraccion: xr.DataArray | None = None) -> xr.DataArray:
-    """Promedio espacial ponderado por cos(latitud) (referencia §1).
+def _bordes_celdas(centros: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """Bordes inferior y superior de cada celda a partir de sus centros (puntos medios; extremos por medio paso)."""
+    c = np.asarray(centros, dtype=np.float64).ravel()
+    if c.size == 1:
+        paso = 0.5
+        return c - paso / 2, c + paso / 2
+    medios = (c[:-1] + c[1:]) / 2.0
+    inf = np.concatenate([[c[0] - (medios[0] - c[0])], medios])
+    sup = np.concatenate([medios, [c[-1] + (c[-1] - medios[-1])]])
+    return np.minimum(inf, sup), np.maximum(inf, sup)
 
-    Si la fracción de área válida de la región en un paso de tiempo es < min_area_valida (0.9 por defecto),
-    ese paso se marca como NaN. Conserva attrs['units'].
+
+def pesos_area_region(da: xr.DataArray, bbox: Sequence[float] | None = None) -> xr.DataArray:
+    """Área de cada celda que cae dentro de la región: Aᵢ ∝ Δλᵢ·|sin φ₂ − sin φ₁| recortada a la caja (Down to Earth §02).
+
+    Usa los bordes de cada celda (deducidos del espaciado de la malla) y los recorta a (oeste, sur, este, norte),
+    de modo que una celda que queda a medias fuera de la caja pesa solo por la parte que está dentro. Sin `bbox`
+    devuelve el área esférica completa de cada celda. Las unidades son relativas (radianes·adimensional).
+    """
+    lat_inf, lat_sup = _bordes_celdas(da["lat"].values)
+    lon_inf, lon_sup = _bordes_celdas(da["lon"].values)
+    lat_inf, lat_sup = np.clip(lat_inf, -90.0, 90.0), np.clip(lat_sup, -90.0, 90.0)
+    if bbox is not None:
+        oeste, sur, este, norte = validar_bbox(bbox)
+        lat_inf, lat_sup = np.clip(lat_inf, sur, norte), np.clip(lat_sup, sur, norte)
+        if oeste <= este:
+            lon_inf, lon_sup = np.clip(lon_inf, oeste, este), np.clip(lon_sup, oeste, este)
+        else:  # cruza el antimeridiano: cada celda se recorta al segmento que contiene su centro
+            centros = np.asarray(da["lon"].values, dtype=np.float64)
+            en_oeste = centros >= oeste
+            lon_inf = np.where(en_oeste, np.clip(lon_inf, oeste, 180.0), np.clip(lon_inf, -180.0, este))
+            lon_sup = np.where(en_oeste, np.clip(lon_sup, oeste, 180.0), np.clip(lon_sup, -180.0, este))
+    franja = np.abs(np.sin(np.deg2rad(lat_sup)) - np.sin(np.deg2rad(lat_inf)))
+    ancho = np.deg2rad(np.clip(lon_sup - lon_inf, 0.0, None))
+    return xr.DataArray(np.outer(franja, ancho), coords={"lat": da["lat"], "lon": da["lon"]}, dims=("lat", "lon"))
+
+
+def fraccion_tierra_desde_malla(malla: xr.DataArray, huella: xr.DataArray) -> xr.DataArray:
+    """Fracción de cada celda de `malla` cubierta por las celdas de tierra de `huella` (Down to Earth §02).
+
+    `huella` es un cubo de una fuente que solo tiene datos sobre tierra (GLDAS, 0.25°): una subcelda cuenta como
+    tierra si tiene algún dato válido en el período. Para cada celda de `malla` (GPCP 0.5°, MERRA-2 0.5°×0.625°)
+    se cuenta qué fracción de las subceldas de `huella` cuyo centro cae dentro de ella son tierra. Así P y T se
+    promedian sobre la misma huella terrestre que SM y ET, sin descargar máscaras externas. Las celdas de `malla`
+    sin ninguna subcelda de `huella` dentro reciben 0.
+    """
+    dim_t = "time" if "time" in huella.dims else ("anio" if "anio" in huella.dims else None)
+    tierra = huella.notnull().any(dim_t) if dim_t else huella.notnull()
+    t_vals = np.asarray(tierra.values, dtype=bool)
+    lat_h = np.asarray(tierra["lat"].values, dtype=np.float64)
+    lon_h = np.asarray(tierra["lon"].values, dtype=np.float64)
+    lat_inf, lat_sup = _bordes_celdas(malla["lat"].values)
+    lon_inf, lon_sup = _bordes_celdas(malla["lon"].values)
+    frac = np.zeros((lat_inf.size, lon_inf.size), dtype=np.float64)
+    for i in range(lat_inf.size):
+        fil = (lat_h >= lat_inf[i]) & (lat_h < lat_sup[i])
+        if not fil.any():
+            continue
+        sub_filas = t_vals[fil, :]
+        for j in range(lon_inf.size):
+            col = (lon_h >= lon_inf[j]) & (lon_h < lon_sup[j])
+            if col.any():
+                frac[i, j] = float(sub_filas[:, col].mean())
+    return xr.DataArray(frac, coords={"lat": malla["lat"], "lon": malla["lon"]}, dims=("lat", "lon"))
+
+
+def promedio_area(da: xr.DataArray, min_area_valida: float = 0.9,
+                  fraccion: xr.DataArray | None = None,
+                  pesos: xr.DataArray | None = None) -> xr.DataArray:
+    """Promedio espacial ponderado X = Σ(wᵢ·Xᵢ)/Σ(wᵢ) (referencia §1 y Down to Earth §02).
+
+    Por defecto wᵢ = cos(latitud) × `fraccion` (o la coordenada `_fraccion_poligono`). Si se pasa `pesos`
+    (p. ej. `pesos_area_region(...) × fraccion_tierra_desde_malla(...)`), se usan tal cual. Si la fracción de área
+    válida de la región en un paso de tiempo es < min_area_valida (0.9 por defecto), ese paso se marca como NaN.
+    Conserva attrs['units'] y registra la cobertura de área válida en attrs `cobertura_area_*`.
     """
     if not 0.0 <= min_area_valida <= 1.0:
         raise ValueError(f"min_area_valida debe estar entre 0 y 1, no {min_area_valida}")
     attrs = dict(da.attrs)
-    lat_2d, _ = xr.broadcast(da["lat"], da["lon"])
-    w = np.cos(np.deg2rad(lat_2d)).clip(min=0.0)
-    if fraccion is None and "_fraccion_poligono" in da.coords:
-        fraccion = da.coords["_fraccion_poligono"]
-    if fraccion is not None:
-        w = w * fraccion.fillna(0.0)
+    if pesos is not None:
+        w = pesos.fillna(0.0).clip(min=0.0)
+    else:
+        lat_2d, _ = xr.broadcast(da["lat"], da["lon"])
+        w = np.cos(np.deg2rad(lat_2d)).clip(min=0.0)
+        if fraccion is None and "_fraccion_poligono" in da.coords:
+            fraccion = da.coords["_fraccion_poligono"]
+        if fraccion is not None:
+            w = w * fraccion.fillna(0.0)
 
     dim_tiempo = "time" if "time" in da.dims else ("anio" if "anio" in da.dims else None)
     en_region = da.notnull().any(dim_tiempo) if dim_tiempo else da.notnull()
@@ -270,13 +343,14 @@ def anomalias(serie: xr.DataArray, clim: xr.DataArray | None = None,
     return anom
 
 
-def anomalias_estandarizadas(serie: xr.DataArray, base: tuple[str, str] | None = None) -> xr.DataArray:
+def anomalias_estandarizadas(serie: xr.DataArray, base: tuple[str, str] | None = None,
+                             min_valores: int = 2) -> xr.DataArray:
     """Anomalías mensuales estandarizadas z = (valor − μ_mes) / s_mes (Down to Earth §04).
 
     Para cada mes calendario m = 1..12 calcula el promedio μ_mes y la desviación estándar muestral s_mes (ddof=1)
-    en el periodo de referencia `base` (o en toda la serie si `base` es None). Si s_mes = 0 o hay menos de 2
-    datos válidos en ese mes calendario, devuelve NaN en ese mes. La serie resultante conserva la tendencia
-    y está en escala adimensional ('1').
+    en el periodo de referencia `base` (o en toda la serie si `base` es None). Si s_mes = 0 o hay menos de
+    `min_valores` datos válidos en ese mes calendario (2 por defecto; Down to Earth usa 10), devuelve NaN en ese
+    mes. La serie resultante conserva la tendencia y está en escala adimensional ('1').
     """
     if "time" not in serie.dims:
         raise ValueError("anomalias_estandarizadas requiere dimensión 'time' mensual")
@@ -287,7 +361,8 @@ def anomalias_estandarizadas(serie: xr.DataArray, base: tuple[str, str] | None =
     mu_mes = sub.groupby("time.month").mean("time", skipna=True)
     s_mes = sub.groupby("time.month").std("time", ddof=1, skipna=True)
     n_mes = sub.notnull().groupby("time.month").sum("time")
-    s_valida = s_mes.where((s_mes > 0.0) & (n_mes >= 2))
+    mu_mes = mu_mes.where(n_mes >= max(2, int(min_valores)))
+    s_valida = s_mes.where((s_mes > 0.0) & (n_mes >= max(2, int(min_valores))))
 
     anom = (serie.groupby("time.month") - mu_mes).drop_vars("month", errors="ignore")
     z = (anom.groupby("time.month") / s_valida).drop_vars("month", errors="ignore")
@@ -466,6 +541,10 @@ def serie_region(
             ) else serie_abs
             serie_out = agregar_anual(fuente_anual, anual)
             serie_out = reindexar_calendario(serie_out, inicio[:4], fin[:4])
+            # Un mes faltante anula su año entero: 10 % de meses faltantes repartidos pueden dejar
+            # todos los años en NaN. Por eso la serie anual pasa también su propio control de calidad.
+            reporte["anual"] = control_calidad(serie_out, inicio[:4], fin[:4],
+                                               max_faltantes=max_faltantes, lanzar=True)
             vals = serie_out.values
             media_anual = float(np.nanmean(vals)) if np.isfinite(vals).any() else None
             if media_anual is not None:
