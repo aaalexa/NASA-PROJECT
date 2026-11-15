@@ -10,7 +10,11 @@ export const COLORS = {
   white: new THREE.Color("#ffffff"),
 };
 
-export const SCENE_BG = { dark: "#00202f", light: "#eaf1f6" } as const;
+/** Scene background per theme: deep space blue in dark mode, white in light mode. */
+export const SCENE_BG = { dark: "#003049", light: "#ffffff" } as const;
+
+/** The only hex values the 3D scenes use (the project palette). */
+export const HEX = { lava: "#780000", red: "#c1121f", deep: "#003049", blue: "#669bbc", olive: "#9c914f", white: "#ffffff" } as const;
 
 const tmp = new THREE.Color();
 
@@ -29,5 +33,5 @@ export const VAR_COLORS: Record<string, THREE.Color> = {
   P: COLORS.blue,
   T: COLORS.red,
   SM: COLORS.olive,
-  ET: new THREE.Color("#c75a3a"),
+  ET: COLORS.lava,
 };

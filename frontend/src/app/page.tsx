@@ -15,6 +15,8 @@ import { VoiceController } from "@/components/hud/VoiceController";
 import { useBackend } from "@/context/BackendContext";
 import { MoodyChat } from "@/components/chat/MoodyChat";
 import { AnalysisDrawer } from "@/components/analysis/AnalysisDrawer";
+import { useAnalysisData } from "@/hooks/useAnalysisData";
+import { buildDigest } from "@/lib/analysisText";
 import { ExperienceModal } from "@/components/onboarding/ExperienceModal";
 import { GuidedFlow, GuidedStage } from "@/components/guided/GuidedFlow";
 import { StepNavigation } from "@/components/nasa/StepNavigation";
@@ -61,7 +63,7 @@ export default function HomePage() {
   const { theme, toggleTheme } = useTheme();
   const speech = useSpeak(language);
   const backend = useBackend();
-  const [digest, setDigest] = useState<string | null>(null);
+  const [analysisOpen, setAnalysisOpen] = useState(false);
 
   const [phase, setPhase] = useState<AppPhase>("onboarding");
   const [activeStep, setActiveStep] = useState<WorkflowStep>("region");
@@ -76,6 +78,10 @@ export default function HomePage() {
   const dateRange = rangeOverride ?? defaultRange;
   const [selectedVariables, setSelectedVariables] = useState<VariableId[]>(DEFAULT_VARIABLES);
   const [isSearching, setIsSearching] = useState(false);
+
+  // One fetch of the backend analysis, shared by the side panel and the 3D drawer.
+  const analysis = useAnalysisData(regionData, dateRange, selectedVariables, activeStep === "results" && phase !== "onboarding");
+  const digest = useMemo(() => buildDigest(analysis.coreIds, analysis.dte, analysis.extras), [analysis.coreIds, analysis.dte, analysis.extras]);
 
   const voiceHandlerRef = useRef<((text: string) => void) | null>(null);
   const registerVoice = useCallback((fn: ((text: string) => void) | null) => {
@@ -161,6 +167,7 @@ export default function HomePage() {
   // ---- Mode ---------------------------------------------------------------------------------
 
   const resetAll = () => {
+    setAnalysisOpen(false);
     clearDemoTimer();
     setDemo(null);
     setPoints([]);
@@ -259,7 +266,13 @@ export default function HomePage() {
   const toggleVariable = (id: VariableId) =>
     setSelectedVariables((cur) => (cur.includes(id) ? cur.filter((v) => v !== id) : [...cur, id]));
 
+  const goStep = (step: WorkflowStep) => {
+    setAnalysisOpen(false);
+    setActiveStep(step);
+  };
+
   const editCriteria = () => {
+    setAnalysisOpen(false);
     if (phase === "guided") {
       setGuidedStart("suggest");
       setGuidedKey((k) => k + 1);
@@ -287,12 +300,13 @@ export default function HomePage() {
       {activeStep === "variables" && (
         <VariablesStep selected={selectedVariables} onToggleVariable={toggleVariable} onBack={() => setActiveStep("period")} onContinue={() => setActiveStep("results")} />
       )}
-      {activeStep === "results" && regionData && readOnly && (
+      {activeStep === "results" && regionData && (
         <ResultsStep
           regionData={regionData}
           range={dateRange}
           selectedVariables={selectedVariables}
-          onDigest={setDigest}
+          analysis={analysis}
+          onOpen3d={() => setAnalysisOpen(true)}
           readOnly={readOnly}
           onEditCriteria={editCriteria}
           onRestart={resetAll}
@@ -301,7 +315,8 @@ export default function HomePage() {
     </>
   );
 
-  const drawerOpen = activeStep === "results" && demo === null && regionData !== null && phase !== "onboarding";
+  // The 3D analysis opens only on request; the results always live in the side panel first.
+  const drawerOpen = analysisOpen && activeStep === "results" && demo === null && regionData !== null && phase !== "onboarding";
 
   const centerLat = points.length ? points.reduce((s, p) => s + p.lat, 0) / points.length : null;
   const centerLng = points.length ? points.reduce((s, p) => s + p.lng, 0) / points.length : null;
@@ -328,7 +343,7 @@ export default function HomePage() {
 
         {showNav && (
           <div className="pointer-events-auto absolute left-1/2 hidden -translate-x-1/2 lg:block">
-            <StepNavigation activeStep={activeStep} onSelectStep={setActiveStep} hasRegion={points.length >= 3} hasVariables={selectedVariables.length > 0} readOnly={demo !== null} />
+            <StepNavigation activeStep={activeStep} onSelectStep={goStep} hasRegion={points.length >= 3} hasVariables={selectedVariables.length > 0} readOnly={demo !== null} />
           </div>
         )}
 
@@ -403,7 +418,7 @@ export default function HomePage() {
       </header>
 
       {/* Work panel */}
-      {phase !== "onboarding" && !drawerOpen && (
+      {phase !== "onboarding" && (
         <Card className="fixed inset-x-4 bottom-[132px] z-20 gap-0 bg-card/95 py-0 backdrop-blur sm:inset-x-auto sm:bottom-auto sm:left-4 sm:top-[68px] sm:w-[400px]">
           <ScrollArea className="[&_[data-slot=scroll-area-viewport]]:max-h-[46dvh] sm:[&_[data-slot=scroll-area-viewport]]:max-h-[calc(100dvh-7.5rem)]">
             <div className="p-5">
@@ -491,9 +506,9 @@ export default function HomePage() {
         regionData={regionData}
         range={dateRange}
         selectedVariables={selectedVariables}
-        onClose={editCriteria}
+        analysis={analysis}
+        onClose={() => setAnalysisOpen(false)}
         onRestart={resetAll}
-        onDigest={setDigest}
       />
 
       <MoodyChat

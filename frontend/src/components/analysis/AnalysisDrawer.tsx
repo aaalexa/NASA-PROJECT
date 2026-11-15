@@ -6,9 +6,9 @@ import { ArrowLeftIcon, ArrowPathIcon, ArrowUturnLeftIcon, XMarkIcon } from "@he
 import { useTranslation } from "@/context/LanguageContext";
 import { useBackend } from "@/context/BackendContext";
 import { ApiFailure, DteCode, ID_TO_DTE, MapaTendencias, classifyError, dteParams, fetchMapa } from "@/lib/api";
-import { buildDigest, failureMessage } from "@/lib/analysisText";
+import { failureMessage } from "@/lib/analysisText";
 import { buildSeriesData } from "@/lib/seriesData";
-import { useAnalysisData } from "@/hooks/useAnalysisData";
+import type { useAnalysisData } from "@/hooks/useAnalysisData";
 import type { DateRange, RegionAnalysisPayload, VariableId } from "@/types/geo";
 import { AnalysisTabs } from "@/components/analysis/AnalysisTabs";
 import type { CarpetHover } from "@/components/analysis/CarpetScene";
@@ -39,16 +39,16 @@ interface AnalysisDrawerProps {
   regionData: RegionAnalysisPayload | null;
   range: DateRange;
   selectedVariables: VariableId[];
+  /** Backend data for the selection, fetched once by the page and shared with the side panel. */
+  analysis: ReturnType<typeof useAnalysisData>;
   onClose: () => void;
   onRestart: () => void;
-  onDigest?: (digest: string | null) => void;
 }
 
 /** Full-screen analysis: the backend's results as interactive 3D scenes plus the numbers beside them. */
-export function AnalysisDrawer({ open, regionData, range, selectedVariables, onClose, onRestart, onDigest }: AnalysisDrawerProps) {
+export function AnalysisDrawer({ open, regionData, range, selectedVariables, analysis, onClose, onRestart }: AnalysisDrawerProps) {
   const { language, t } = useTranslation();
   const backend = useBackend();
-  const analysis = useAnalysisData(regionData, range, selectedVariables, open);
   const { dte, extras, loading, failure, anyResult, synthetic, mode } = analysis;
 
   const [view, setView] = useState<View>("series");
@@ -56,16 +56,11 @@ export function AnalysisDrawer({ open, regionData, range, selectedVariables, onC
   const [carpetHover, setCarpetHover] = useState<CarpetHover | null>(null);
   const [mapHover, setMapHover] = useState<MapHover | null>(null);
   const [relCode, setRelCode] = useState<DteCode | null>(null);
+  // The WebGL scenes mount only after the slide-in finishes, so the animation never stutters.
+  const [slideDone, setSlideDone] = useState(false);
 
   const activeVar = pickedVar && selectedVariables.includes(pickedVar) ? pickedVar : selectedVariables.find((id) => backend.variableById(id)) ?? null;
   const activeInfo = activeVar ? backend.variableById(activeVar) : undefined;
-
-  useEffect(() => {
-    if (!onDigest || !open) return;
-    onDigest(buildDigest(analysis.coreIds, dte, extras));
-    return () => onDigest(null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [analysis.current, open]);
 
   const series = useMemo(
     () => (activeVar && activeInfo ? buildSeriesData(activeVar, activeInfo.nombre_simple, dte, extras) : null),
@@ -99,11 +94,11 @@ export function AnalysisDrawer({ open, regionData, range, selectedVariables, onC
   const monthName = (m: number) => new Date(2000, m, 1).toLocaleDateString(language === "es" ? "es-ES" : "en-US", { month: "long" });
 
   return (
-    <Sheet open={open} onOpenChange={(v) => !v && onClose()} modal={false}>
+    <Sheet open={open} onOpenChange={(v) => !v && onClose()} onOpenChangeComplete={setSlideDone} modal={false}>
       <SheetContent
-        side="bottom"
+        side="left"
         showCloseButton={false}
-        className="data-[side=bottom]:top-2 data-[side=bottom]:h-auto gap-0 overflow-hidden rounded-t-[2rem] border-0 p-0 ring-1 ring-border"
+        className="data-[side=left]:w-screen! data-[side=left]:max-w-none! gap-0 overflow-hidden rounded-r-[2rem] border-0 p-0 ring-1 ring-border"
       >
         <SheetTitle className="sr-only">{t("analysis.title")}</SheetTitle>
         <SheetDescription className="sr-only">{t("analysis.hint")}</SheetDescription>
@@ -170,8 +165,8 @@ export function AnalysisDrawer({ open, regionData, range, selectedVariables, onC
 
         {/* Body: 3D scene + numbers */}
         <div className="grid min-h-0 flex-1 grid-rows-[minmax(0,46%)_minmax(0,1fr)] lg:grid-cols-[minmax(0,1fr)_400px] lg:grid-rows-1">
-          <div className="relative min-h-0 bg-[#00202f]">
-            {(loading || mapLoading) && (
+          <div className="relative min-h-0 bg-[var(--deep-space-blue)]">
+            {(loading || mapLoading || !slideDone) && (
               <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-background/70 px-8 backdrop-blur-sm" role="status">
                 <p className="text-sm text-muted-foreground">{mode === "descargar" ? t("resultsStep.loadingLive") : t("analysis.loading")}</p>
                 <Progress value={null} className="w-56" aria-label={t("analysis.loading")} />
@@ -199,13 +194,13 @@ export function AnalysisDrawer({ open, regionData, range, selectedVariables, onC
             )}
 
             {/* Scenes */}
-            {!loading && view === "series" && series && (
+            {!loading && slideDone && view === "series" && series && (
               <CarpetScene key={`${activeVar}-${series.annual.length}`} data={series} onHover={setCarpetHover} />
             )}
-            {!loading && view === "relations" && dte && (
+            {!loading && slideDone && view === "relations" && dte && (
               <RelationsScene dte={dte} selected={relCode ?? (activeVar ? ID_TO_DTE[activeVar] ?? null : null)} onSelect={(c) => { setRelCode(c); const id = Object.keys(ID_TO_DTE).find((k) => ID_TO_DTE[k] === c); if (id && selectedVariables.includes(id)) setPickedVar(id); }} />
             )}
-            {!loading && view === "map" && mapCurrent?.mapa && <MapScene key={mapKey} mapa={mapCurrent.mapa} onHover={setMapHover} />}
+            {!loading && slideDone && view === "map" && mapCurrent?.mapa && <MapScene key={mapKey} mapa={mapCurrent.mapa} onHover={setMapHover} />}
 
             {view === "map" && mapCurrent?.failure && !mapLoading && (
               <div className="absolute inset-0 z-10 flex items-center justify-center p-6">
@@ -241,7 +236,7 @@ export function AnalysisDrawer({ open, regionData, range, selectedVariables, onC
               </Card>
             </div>
 
-            <div className="pointer-events-none absolute bottom-3 left-4 z-20 text-[11px] text-muted-foreground">{t("analysis.hint")}</div>
+            <div className="pointer-events-none absolute bottom-3 left-4 z-20 text-[11px] text-[var(--steel-blue)]">{t("analysis.hint")}</div>
 
             {view === "series" && carpetHover && (
               <Card size="sm" className="pointer-events-none absolute right-4 top-4 z-20 gap-0.5 bg-card/90 px-4 backdrop-blur">

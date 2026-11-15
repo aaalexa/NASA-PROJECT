@@ -181,7 +181,12 @@
     "none": "Ninguno",
     "familyNote": "Las cuatro variables se prueban juntas (ajuste de Holm), aunque ocultes alguna.",
     "indicio": "Indicio de tendencia",
-    "yearsMissing": "faltan ~{n} años para confirmarla"
+    "yearsMissing": "faltan ~{n} años para confirmarla",
+    "valueLabel": "Valor",
+    "trendLabel": "Tendencia",
+    "anomalyLabel": "Anomalía",
+    "correlationsTitle": "Fuerza de cada relación",
+    "open3d": "Abrir análisis en 3D"
   },
   "backend": {
     "offlineShort": "No hay conexión con el backend. Revisa que esté encendido y vuelve a intentarlo."

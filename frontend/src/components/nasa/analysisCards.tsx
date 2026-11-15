@@ -3,7 +3,7 @@
 import { ArrowTrendingDownIcon, ArrowTrendingUpIcon, MinusIcon } from "@heroicons/react/24/outline";
 import { useTranslation } from "@/context/LanguageContext";
 import type { BackendVariable, DteVariable, TendenciaRespuesta } from "@/lib/api";
-import { MiniChart } from "@/components/charts/MiniChart";
+import { TrendChart } from "@/components/charts/TrendChart";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 
@@ -78,14 +78,12 @@ export function DteCard({ info, v, language }: { info: BackendVariable; v: DteVa
     <Card size="sm" className="gap-0 px-3">
       <CardHeader info={info} value={`${signed(v.slope_decade)} ${unit}`} caption={t("resultsStep.perDecade")} tone={dir === "aumento" ? "up" : dir === "disminucion" ? "down" : "flat"} />
       {first !== undefined && last !== undefined && (
-        <MiniChart
-          className="mt-2"
-          ariaLabel={`${info.nombre_simple}: ${t("resultsStep.annualChart")}`}
-          xLabels={[String(first), String(last)]}
-          series={[
-            { label: "valor", color: "var(--blue)", values: v.annual.map((a) => a.value) },
-            { label: "tendencia", color: v.significant ? "var(--red)" : "var(--olive)", values: v.annual.map((a) => a.fitted), dashed: true },
-          ]}
+        <TrendChart
+          className="mt-2 h-36 w-full"
+          valueLabel={t("resultsStep.valueLabel")}
+          fitLabel={t("resultsStep.trendLabel")}
+          significant={v.significant}
+          data={v.annual.map((a) => ({ x: a.year, value: a.value, fit: a.fitted }))}
         />
       )}
       <div className="mt-2 flex items-center justify-between border-t border-border pt-2 text-xs tabular-nums text-muted-foreground">
@@ -124,14 +122,12 @@ export function TrendCard({ info, r }: { info: BackendVariable; r: TendenciaResp
     <Card size="sm" className="gap-0 px-3">
       <CardHeader info={info} value={`${signed(tr.pendiente_ols_decada)} ${unit}`} caption={t("resultsStep.perDecade")} tone={tone} />
       {pts.length > 1 && (
-        <MiniChart
-          className="mt-2"
-          ariaLabel={`${info.nombre_simple}: ${t("resultsStep.annualChart")}`}
-          xLabels={[pts[0].fecha, pts[pts.length - 1].fecha]}
-          series={[
-            { label: "valor", color: "var(--blue)", values: useAnom ? anomalies : pts.map((p) => p.valor) },
-            ...(useAnom && fitted.length ? [{ label: "tendencia", color: significant ? "var(--red)" : "var(--olive)", values: fitted, dashed: true }] : []),
-          ]}
+        <TrendChart
+          className="mt-2 h-36 w-full"
+          valueLabel={useAnom ? t("resultsStep.anomalyLabel") : t("resultsStep.valueLabel")}
+          fitLabel={t("resultsStep.trendLabel")}
+          significant={significant}
+          data={pts.map((p, i) => ({ x: p.fecha, value: useAnom ? anomalies[i] : p.valor, fit: useAnom && fitted.length ? fitted[i] : null }))}
         />
       )}
       <div className="mt-2 flex items-center justify-between border-t border-border pt-2 text-xs tabular-nums text-muted-foreground">

@@ -3,18 +3,16 @@
 import { ArrowDownTrayIcon } from "@heroicons/react/24/outline";
 import { useTranslation } from "@/context/LanguageContext";
 import { useBackend } from "@/context/BackendContext";
-import { DTE_CODES, ID_TO_DTE, csvUrl } from "@/lib/api";
+import { ID_TO_DTE, csvUrl } from "@/lib/api";
 import type { RegionAnalysisPayload, DateRange, VariableId } from "@/types/geo";
 import type { useAnalysisData } from "@/hooks/useAnalysisData";
 import { failureMessage } from "@/lib/analysisText";
-import { MiniChart } from "@/components/charts/MiniChart";
+import { AnomalyChart, CorrelationBars } from "@/components/charts/RelationCharts";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Block, DteCard, FailedCard, TrendCard, signed } from "@/components/nasa/analysisCards";
-
-const SERIES_COLORS = { P: "var(--blue)", T: "var(--red)", SM: "var(--olive)", ET: "var(--lava)" } as const;
 
 type Analysis = ReturnType<typeof useAnalysisData>;
 
@@ -82,22 +80,11 @@ export function AnalysisTabs({
             <p className="text-sm font-bold">{t("resultsStep.anomaliesTitle")}</p>
             <p className="mt-0.5 text-xs text-muted-foreground">{t("resultsStep.anomaliesNote")}</p>
           </div>
-          <MiniChart
-            ariaLabel={t("resultsStep.anomaliesTitle")}
-            height={96}
-            xLabels={[dte.metadata.period[0], dte.metadata.period[1]]}
-            series={DTE_CODES.map((c) => ({ label: c, color: SERIES_COLORS[c], values: dte.joint.standardized_anomalies.map((p) => p[c]) }))}
-          />
-          <div className="flex flex-wrap gap-x-3 gap-y-1 text-[11px]">
-            {DTE_CODES.map((c) => (
-              <span key={c} className="flex items-center gap-1.5">
-                <span className="size-2 rounded-full" style={{ background: SERIES_COLORS[c] }} />
-                {c}
-              </span>
-            ))}
-          </div>
+          <AnomalyChart dte={dte} />
           <Separator />
           <p className="text-xs text-muted-foreground">{t("resultsStep.relationsNote")}</p>
+          <p className="text-sm font-bold">{t("resultsStep.correlationsTitle")}</p>
+          <CorrelationBars dte={dte} />
           {dte.joint.pairs_list.map((p) => (
             <Card key={p.pair} size="sm" className="gap-1 px-3">
               <div className="flex items-baseline justify-between gap-2">

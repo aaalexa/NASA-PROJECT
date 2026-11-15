@@ -181,7 +181,12 @@
     "none": "None",
     "familyNote": "The four variables are tested together (Holm adjustment), even if you hide one.",
     "indicio": "Hint of a trend",
-    "yearsMissing": "~{n} more years needed to confirm"
+    "yearsMissing": "~{n} more years needed to confirm",
+    "valueLabel": "Value",
+    "trendLabel": "Trend",
+    "anomalyLabel": "Anomaly",
+    "correlationsTitle": "Strength of each relation",
+    "open3d": "Open 3D analysis"
   },
   "backend": {
     "offlineShort": "No connection to the backend. Check that it is running and try again."
