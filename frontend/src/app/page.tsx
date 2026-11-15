@@ -10,6 +10,7 @@ import {
   UserCircleIcon,
 } from "@heroicons/react/24/outline";
 // Swap back to CobeGlobePulse to restore the previous globe.
+import Image from "next/image";
 import GlobeGlExplorer from "@/components/globe/GlobeGlExplorer";
 import { VoiceController } from "@/components/hud/VoiceController";
 import { useBackend } from "@/context/BackendContext";
@@ -334,7 +335,8 @@ export default function HomePage() {
       {/* Header */}
       <header className="pointer-events-none fixed left-4 right-4 top-4 z-30 flex items-center justify-between gap-3">
         <div className="pointer-events-auto flex items-center gap-2.5">
-          <span className="size-3 rounded-full bg-brand-red" aria-hidden />
+          <Image src="/logo-light.png" alt="" width={28} height={28} className="size-7 dark:hidden" aria-hidden />
+          <Image src="/logo-dark.png" alt="" width={28} height={28} className="hidden size-7 dark:block" aria-hidden />
           <span className="text-sm font-bold tracking-tight">{t("system.name")}</span>
           <Badge variant="secondary" className="hidden xl:inline-flex">
             {t("system.badge")}

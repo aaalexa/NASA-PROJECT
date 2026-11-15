@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { ArrowPathIcon, ChatBubbleLeftRightIcon, MicrophoneIcon, PaperAirplaneIcon, StopIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useTranslation } from "@/context/LanguageContext";
 import { useVoiceInput } from "@/hooks/useVoiceInput";
@@ -133,7 +134,8 @@ export function MoodyChat({ context }: { context: MoodyContext }) {
         <PopoverContent side="top" align="end" sideOffset={12} className="flex h-[min(560px,calc(100dvh-8rem))] w-[min(380px,calc(100vw-2rem))] flex-col gap-0 overflow-hidden rounded-3xl p-0">
           {/* Header */}
           <div className="flex items-center gap-3 px-4 py-3">
-            <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-brand-blue text-sm font-bold text-[var(--deep-space-blue)]">M</span>
+            <Image src="/logo-light.png" alt="" width={36} height={36} className="size-9 shrink-0 dark:hidden" aria-hidden />
+            <Image src="/logo-dark.png" alt="" width={36} height={36} className="hidden size-9 shrink-0 dark:block" aria-hidden />
             <div className="min-w-0 flex-1">
               <p className="text-sm font-bold leading-tight">Moody</p>
               <p className="truncate text-xs text-muted-foreground">{t("chat.subtitle")}</p>
