@@ -130,7 +130,8 @@ function Node({
   onSelect,
 }: {
   code: DteCode;
-  direction: "aumento" | "disminucion" | "estable";
+  /** Only set when the trend has statistical evidence (Holm); null = insufficient evidence, no arrow. */
+  direction: "aumento" | "disminucion" | null;
   /** 0..1, how strong the (Holm-adjusted) evidence for the trend is; sets the sphere size. */
   significance: number;
   selected: boolean;
@@ -173,7 +174,7 @@ function Node({
           <meshBasicMaterial color={color} transparent opacity={selected ? 0.7 : 0.25} toneMapped={false} />
         </mesh>
       </group>
-      {direction !== "estable" && (
+      {direction !== null && (
         <mesh position={[0, direction === "aumento" ? radius + 0.85 : -(radius + 0.85), 0]} rotation={[direction === "disminucion" ? Math.PI : 0, 0, 0]}>
           <coneGeometry args={[0.2, 0.5, 24]} />
           <meshStandardMaterial color={arrowColor} emissive={arrowColor} emissiveIntensity={1} roughness={0.3} />

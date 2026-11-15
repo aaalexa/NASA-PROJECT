@@ -23,6 +23,24 @@ Sustituye tanto el objeto estático `ILLUSTRATIVE` como el `fetch("${BACKEND_URL
 
 Estructura completa del JSON de `/demo/result`, `/catalog` y formato CSV: [referencia.md](referencia.md).
 
+## 0. Cómo está conectado hoy (léelo antes de tocar nada)
+
+- **Cliente**: `src/lib/api.ts`. Funciones `fetchDteResult` (`/api/v1/down-to-earth/analisis`), `runDteJob`
+  (`POST /trabajos` → sondeo `GET /trabajos/{id}` cada `JOB_POLL_MS` → `/resultado`; un 404 al sondear = respondió
+  otro worker → se repite el POST, que el backend deduplica), `dteTableUrl`, `analyzeCsv` (`/calcular/csv`),
+  `calculateDte` (`/calcular`), `csvUrl` y `rowsToCsv`. Errores: `classifyError` (incluye `job_failed`,
+  `job_not_ready`, `file_too_large`) y `failureDetail`.
+- **Datos**: `src/hooks/useAnalysisData.ts`. En modo `descargar` (por defecto con credenciales): primero
+  `analisis?estricto_memoria=true` (instantáneo si la región está precargada o ya se calculó); si da 404, trabajo
+  con progreso (`analysis.job`). Expone `dte`, `job`, `jobId`, `failure`, `failureText`, `extrasPending`,
+  `uploaded` / `setUploaded` (resultado de un CSV propio) y `synthetic` (incluye `metadata.simulated`).
+- **Vistas**: `ResultsStep.tsx` (progreso del trabajo, tramo `trend_span`, banner del CSV propio,
+  `CsvUploadCard`), `AnalysisTabs.tsx` (avisos, `DataQuality` con `data_cleaning`, descargas por origen: tablas del
+  trabajo, CSV generado en el navegador o `csvUrl`), `analysisCards.tsx` (`DteCard`: flecha solo con evidencia,
+  etiqueta oficial con `labelText`, signo de la estimación sin evidencia).
+- **Nunca**: mostrar "sin cambio"/"estable", calcular estadística en el front, o presentar como real un resultado
+  con `metadata.simulated === true`.
+
 ## 1. Mapeo exacto entre `VariableId` (Frontend) y `DteCode` (Backend)
 
 | `VariableId` en `types/geo.ts` | Clave en `variables` (`/demo/result`) | `id` en catálogo backend | Colección NASA | Unidad mensual | Unidad anual | Unidad de `slope_decade` |

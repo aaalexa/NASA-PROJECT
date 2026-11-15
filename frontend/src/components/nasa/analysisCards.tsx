@@ -2,7 +2,8 @@
 
 import { ArrowTrendingDownIcon, ArrowTrendingUpIcon, MinusIcon } from "@heroicons/react/24/outline";
 import { useTranslation } from "@/context/LanguageContext";
-import type { BackendVariable, DteVariable, TendenciaRespuesta } from "@/lib/api";
+import type { BackendVariable, DteCleaningSummary, DteCode, DteVariable, TendenciaRespuesta } from "@/lib/api";
+import { labelText } from "@/lib/analysisText";
 import { TrendChart } from "@/components/charts/TrendChart";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -68,21 +69,30 @@ function CardHeader({ info, value, caption, tone }: { info: BackendVariable; val
 /** One of the four Down to Earth variables (P, T, SM, ET): OLS + HAC + Holm over the annual series. */
 export function DteCard({ info, v, language }: { info: BackendVariable; v: DteVariable; language: "es" | "en" }) {
   const { t } = useTranslation();
-  const dir = v.direction;
-  const dirWord = dir === "aumento" ? t("resultsStep.increase") : dir === "disminucion" ? t("resultsStep.decrease") : t("resultsStep.stable");
+  const significant = v.significant === true;
+  // The arrow only shows a change backed by statistical evidence (Holm); otherwise the estimate is shown neutral.
+  const tone = significant && v.direction === "aumento" ? "up" : significant && v.direction === "disminucion" ? "down" : "flat";
+  const estimate =
+    !significant && v.slope_decade !== null
+      ? v.estimate_sign === "positiva"
+        ? t("resultsStep.estimatePositive")
+        : v.estimate_sign === "negativa"
+          ? t("resultsStep.estimateNegative")
+          : t("resultsStep.estimateZero")
+      : null;
   const unit = prettyUnit(v.units.annual);
   const first = v.annual[0]?.year;
   const last = v.annual[v.annual.length - 1]?.year;
 
   return (
     <Card size="sm" className="gap-0 px-3">
-      <CardHeader info={info} value={`${signed(v.slope_decade)} ${unit}`} caption={t("resultsStep.perDecade")} tone={dir === "aumento" ? "up" : dir === "disminucion" ? "down" : "flat"} />
+      <CardHeader info={info} value={`${signed(v.slope_decade)} ${unit}`} caption={t("resultsStep.perDecade")} tone={tone} />
       {first !== undefined && last !== undefined && (
         <TrendChart
           className="mt-2 h-36 w-full"
           valueLabel={t("resultsStep.valueLabel")}
           fitLabel={t("resultsStep.trendLabel")}
-          significant={v.significant}
+          significant={significant}
           data={v.annual.map((a) => ({ x: a.year, value: a.value, fit: a.fitted }))}
         />
       )}
@@ -94,9 +104,10 @@ export function DteCard({ info, v, language }: { info: BackendVariable; v: DteVa
           {t("resultsStep.pAdj")} {fmtP(v.p_holm)}
         </span>
       </div>
-      <Badge variant="outline" className={`mt-2 w-fit ${v.significant ? "border-brand-red/50 text-brand-red" : "border-brand-olive/60 text-brand-olive"}`}>
-        {v.significant ? `${dirWord} · ${t("resultsStep.significant")}` : t("resultsStep.insufficient")}
+      <Badge variant="outline" className={`mt-2 w-fit ${significant ? "border-brand-red/50 text-brand-red" : "border-brand-olive/60 text-brand-olive"}`}>
+        {labelText(v, language, t)}
       </Badge>
+      {estimate && <p className="mt-1.5 text-xs text-muted-foreground">{estimate}</p>}
       {language === "es" && <p className="mt-2 text-xs leading-snug text-muted-foreground">{v.summary_text}</p>}
       {v.sensible_al_rezago && <p className="mt-1.5 text-xs text-brand-olive">{t("resultsStep.lagSensitive")}</p>}
       {v.quality.warnings.length > 0 && <p className="mt-1.5 text-xs text-brand-red">{v.quality.warnings.join(" · ")}</p>}
@@ -157,5 +168,68 @@ export function FailedCard({ info, text }: { info: BackendVariable; text: string
       <p className="text-sm font-bold">{info.nombre_simple}</p>
       <p className="text-xs text-brand-red">{text}</p>
     </Card>
+  );
+}
+
+/**
+ * Data quality behind the numbers (`data_cleaning` from the backend): valid months per variable, months removed by
+ * the structural cleaning (fill values, out of physical range, non-finite, contradictory duplicates) and exact zeros.
+ * Missing months are never filled with 0 nor interpolated.
+ */
+export function DataQuality({ summary, steps }: { summary: Record<DteCode, DteCleaningSummary>; steps: string[] }) {
+  const { t } = useTranslation();
+  const codes = (["P", "T", "SM", "ET"] as DteCode[]).filter((c) => summary[c]);
+  return (
+    <div className="space-y-2">
+      <p className="text-sm font-bold">{t("resultsStep.qualityTitle")}</p>
+      <p className="text-xs text-muted-foreground">{t("resultsStep.qualityNote")}</p>
+      <div className="overflow-hidden rounded-2xl border border-border">
+        <table className="w-full text-xs tabular-nums">
+          <thead className="bg-muted text-muted-foreground">
+            <tr>
+              <th className="px-2 py-1.5 text-left font-medium" scope="col" />
+              <th className="px-2 py-1.5 text-right font-medium" scope="col">{t("resultsStep.qualityValid")}</th>
+              <th className="px-2 py-1.5 text-right font-medium" scope="col">{t("resultsStep.qualityMissing")}</th>
+              <th className="px-2 py-1.5 text-right font-medium" scope="col">{t("resultsStep.qualityRemoved")}</th>
+              <th className="px-2 py-1.5 text-right font-medium" scope="col">{t("resultsStep.qualityZeros")}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {codes.map((c) => {
+              const s = summary[c];
+              const removed = s.relleno + s.fuera_de_rango + s.no_finitos + s.duplicados_contradictorios;
+              return (
+                <tr key={c} className="border-t border-border">
+                  <th className="px-2 py-1.5 text-left font-bold" scope="row">{c}</th>
+                  <td className="px-2 py-1.5 text-right">
+                    {s.n_meses_validos}/{s.n_meses_esperados}
+                  </td>
+                  <td className={`px-2 py-1.5 text-right ${s.n_meses_faltantes ? "text-brand-red" : ""}`}>{s.n_meses_faltantes}</td>
+                  <td className={`px-2 py-1.5 text-right ${removed ? "text-brand-red" : ""}`}>{removed}</td>
+                  <td className={`px-2 py-1.5 text-right ${s.ceros_exactos ? "text-brand-olive" : ""}`}>{s.ceros_exactos}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+      {codes.some((c) => summary[c].anios_incompletos.length > 0) && (
+        <p className="text-xs text-muted-foreground">
+          {t("resultsStep.qualityIncomplete")}{" "}
+          {codes
+            .filter((c) => summary[c].anios_incompletos.length > 0)
+            .map((c) => `${c}: ${summary[c].anios_incompletos.join(", ")}`)
+            .join(" · ")}
+        </p>
+      )}
+      <details className="text-xs text-muted-foreground">
+        <summary className="cursor-pointer select-none">{t("resultsStep.qualitySteps")}</summary>
+        <ul className="mt-1.5 list-disc space-y-1 pl-4">
+          {steps.map((s, i) => (
+            <li key={i}>{s}</li>
+          ))}
+        </ul>
+      </details>
+    </div>
   );
 }

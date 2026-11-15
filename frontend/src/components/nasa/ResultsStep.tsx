@@ -5,8 +5,10 @@ import { DateRange, RegionAnalysisPayload, VariableId } from "@/types/geo";
 import { useTranslation } from "@/context/LanguageContext";
 import { useBackend } from "@/context/BackendContext";
 import { failureMessage } from "@/lib/analysisText";
+import { BACKEND_URL } from "@/lib/api";
 import type { useAnalysisData } from "@/hooks/useAnalysisData";
 import { AnalysisTabs } from "@/components/analysis/AnalysisTabs";
+import { CsvUploadCard } from "@/components/analysis/CsvUploadCard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -29,7 +31,10 @@ interface ResultsStepProps {
 export function ResultsStep({ regionData, range, selectedVariables, analysis, onEditCriteria, onRestart, onOpen3d, readOnly }: ResultsStepProps) {
   const { t } = useTranslation();
   const backend = useBackend();
-  const { dte, failure, anyResult, synthetic, mode, loading } = analysis;
+  const { dte, failure, failureText, anyResult, synthetic, mode, loading, job, uploaded } = analysis;
+  const span = dte?.metadata.trend_span;
+  const stageKey = (etapa: string) =>
+    ["P", "T", "SM", "ET", "analisis"].includes(etapa) ? `resultsStep.stages.${etapa}` : "resultsStep.stages.pending";
 
   return (
     <div className="space-y-5 animate-in fade-in duration-300">
@@ -53,9 +58,31 @@ export function ResultsStep({ regionData, range, selectedVariables, analysis, on
         )}
       </div>
 
-      {loading && (
+      {uploaded && (
+        <Card size="sm" className="gap-2 px-4" role="status">
+          <p className="text-sm font-bold">{t("resultsStep.uploadedBanner").replace("{file}", uploaded.fileName)}</p>
+          <Button size="sm" variant="outline" className="w-fit" onClick={() => analysis.setUploaded(null)}>
+            {t("resultsStep.backToRegion")}
+          </Button>
+        </Card>
+      )}
+
+      {loading && job && (
+        <div className="space-y-2 rounded-2xl bg-muted p-4" role="status" aria-live="polite">
+          <p className="text-sm font-bold">{t("resultsStep.jobTitle")}</p>
+          <div className="flex items-baseline justify-between gap-2 text-xs tabular-nums">
+            <span>{t(stageKey(job.etapa))}</span>
+            <span className="font-bold">{Math.round(job.porcentaje)} %</span>
+          </div>
+          <Progress value={job.porcentaje} aria-label={t("resultsStep.jobTitle")} />
+          <p className="truncate text-xs text-muted-foreground">{job.mensaje}</p>
+          <p className="text-xs leading-relaxed text-muted-foreground">{t("resultsStep.jobNote")}</p>
+        </div>
+      )}
+
+      {loading && !job && (
         <div className="space-y-3" role="status" aria-live="polite">
-          <p className="text-sm text-muted-foreground">{mode === "descargar" ? t("resultsStep.loadingLive") : t("resultsStep.loading")}</p>
+          <p className="text-sm text-muted-foreground">{mode === "descargar" ? t("resultsStep.checkingMemory") : t("resultsStep.loading")}</p>
           <Progress value={null} aria-label={t("resultsStep.loading")} />
         </div>
       )}
@@ -74,6 +101,7 @@ export function ResultsStep({ regionData, range, selectedVariables, analysis, on
         <Card className="gap-3 px-4" role="alert">
           <p className="text-sm font-bold text-brand-red">{failure === "offline" ? t("resultsStep.offline") : failureMessage(failure, t)}</p>
           {failure === "offline" && <p className="text-xs text-muted-foreground">{failureMessage(failure, t)}</p>}
+          {failure !== "offline" && failureText && <p className="text-xs text-muted-foreground">{failureText}</p>}
           <div className="flex flex-wrap gap-2">
             <Button size="sm" onClick={analysis.retry}>
               {t("resultsStep.retry")}
@@ -99,8 +127,16 @@ export function ResultsStep({ regionData, range, selectedVariables, analysis, on
               </span>
             )}
           </div>
+          {span && (
+            <p className="text-xs tabular-nums text-muted-foreground">
+              {t("resultsStep.trendSpan")
+                .replace("{start}", String(span.start))
+                .replace("{end}", String(span.end))
+                .replace("{n}", String(span.n_years))}
+            </p>
+          )}
 
-          {onOpen3d && !readOnly && (
+          {onOpen3d && !readOnly && !uploaded && (
             <Button size="lg" className="w-full gap-2" onClick={onOpen3d}>
               <CubeTransparentIcon className="size-5" />
               {t("resultsStep.open3d")}
@@ -109,10 +145,18 @@ export function ResultsStep({ regionData, range, selectedVariables, analysis, on
 
           <AnalysisTabs analysis={analysis} regionData={regionData} range={range} selectedVariables={selectedVariables} />
 
+          {synthetic && !uploaded && !backend.earthdata && (
+            <Card size="sm" className="gap-1 px-4" role="note">
+              <p className="text-sm font-bold text-brand-red">{t("resultsStep.noCredentialsTitle")}</p>
+              <p className="text-xs leading-relaxed text-muted-foreground">{t("resultsStep.noCredentials").replace("{url}", BACKEND_URL)}</p>
+            </Card>
+          )}
           {synthetic && <p className="text-xs leading-relaxed text-muted-foreground">{t("resultsStep.syntheticNote")}</p>}
           <p className="text-xs leading-relaxed text-muted-foreground">{t("resultsStep.limits")}</p>
         </>
       )}
+
+      {!readOnly && !loading && <CsvUploadCard onResult={(result, fileName) => analysis.setUploaded(result, fileName)} />}
 
       {!readOnly && (
         <div className="flex gap-2">
