@@ -1,6 +1,14 @@
 {
-  "system": { "name": "Moody Trends", "badge": "NASA Space Apps 2026" },
-  "nav": { "step1": "Región", "step2": "Periodo", "step3": "Variables", "step4": "Análisis" },
+  "system": {
+    "name": "Moody Trends",
+    "badge": "NASA Space Apps 2026"
+  },
+  "nav": {
+    "step1": "Región",
+    "step2": "Periodo",
+    "step3": "Variables",
+    "step4": "Análisis"
+  },
   "header": {
     "searchPlaceholder": "Escribe una región: Amazonas, Nicaragua…",
     "clearButton": "Reiniciar",
@@ -97,7 +105,8 @@
     "delimited": "Región delimitada",
     "continue": "Continuar a periodo",
     "locating": "Localizando con Gemini…",
-    "notFound": "No reconocí ese lugar. Prueba con otro nombre."
+    "notFound": "No reconocí ese lugar. Prueba con otro nombre.",
+    "moreRegions": "Más regiones del backend ({n})"
   },
   "periodStep": {
     "title": "Periodo",
@@ -118,7 +127,7 @@
   },
   "resultsStep": {
     "title": "Resultados",
-    "description": "Tendencia lineal por variable, con intervalo de confianza y ajuste para varias pruebas.",
+    "description": "Tendencia lineal por variable con intervalo de confianza y ajuste de Holm, calculada en el backend.",
     "perDecade": "por década",
     "ci": "IC 95 %",
     "pAdj": "p ajustado",
@@ -134,6 +143,73 @@
     "sendFailed": "El backend no respondió. Inicia el servidor en {url}.",
     "modify": "Modificar criterios",
     "restart": "Nueva búsqueda",
-    "limits": "La coincidencia entre variables no demuestra causa. Relevante no es lo mismo que significativa."
+    "limits": "La coincidencia entre variables no demuestra causa. Relevante no es lo mismo que significativa.",
+    "loading": "Calculando las cuatro tendencias en el backend…",
+    "loadingLive": "Consultando datos de NASA en vivo; puede tardar hasta un minuto…",
+    "offline": "No pude conectar con el backend",
+    "offlineHint": "Comprueba que el servidor esté encendido en {url} y vuelve a intentarlo.",
+    "retry": "Reintentar",
+    "useDemo": "Ver con datos de demostración",
+    "noData": "Estos datos aún no están en la memoria del servidor.",
+    "seriesRejected": "La serie tiene demasiados meses sin datos para analizarse con confianza.",
+    "badRequest": "El periodo o la región no son válidos para el backend. Revisa las fechas (2001-2024).",
+    "genericError": "El backend devolvió un error. Inténtalo de nuevo.",
+    "sourceSynthetic": "Datos sintéticos de demostración",
+    "sourceNasa": "Datos NASA (OPeNDAP)",
+    "syntheticNote": "Valores sintéticos y deterministas calculados por el backend sin conexión a NASA: sirven para probar la interfaz, no son mediciones reales.",
+    "tabVars": "Variables",
+    "tabRelations": "Relaciones",
+    "tabSummary": "Resumen",
+    "vegetationSoon": "Vegetación (NDVI): próximamente. El backend aún no incluye esta variable.",
+    "lagSensitive": "El resultado cambia al variar el rezago del ajuste (sensible al rezago).",
+    "annualChart": "Valor anual y recta de tendencia",
+    "increase": "Aumento",
+    "decrease": "Disminución",
+    "stable": "Sin cambio claro",
+    "relationsTitle": "Cómo se mueven juntas",
+    "relationsNote": "Correlaciones exploratorias tras quitar la estación y la tendencia. Describen coincidencias, no causas.",
+    "anomaliesTitle": "Anomalías estandarizadas",
+    "anomaliesNote": "Cada serie en desviaciones respecto a su mes típico (sin unidades).",
+    "months": "meses",
+    "downloadAnnual": "CSV anual",
+    "downloadMonthly": "CSV mensual",
+    "download": "Descargar datos",
+    "jointReading": "Lectura conjunta",
+    "withEvidence": "Cambios con evidencia estadística",
+    "withoutEvidence": "Sin evidencia suficiente",
+    "limitsTitle": "Límites del análisis",
+    "none": "Ninguno",
+    "familyNote": "Las cuatro variables se prueban juntas (ajuste de Holm), aunque ocultes alguna.",
+    "indicio": "Indicio de tendencia",
+    "yearsMissing": "faltan ~{n} años para confirmarla"
+  },
+  "backend": {
+    "offlineShort": "No hay conexión con el backend. Revisa que esté encendido y vuelve a intentarlo."
+  },
+  "analysis": {
+    "title": "Análisis en 3D",
+    "back": "Volver",
+    "close": "Cerrar análisis",
+    "views": "Vistas",
+    "viewSeries": "Serie 3D",
+    "viewRelations": "Relaciones 3D",
+    "viewMap": "Mapa 3D",
+    "loading": "Calculando y preparando la escena 3D…",
+    "hint": "Arrastra para girar · rueda para acercar · pasa el cursor para ver el valor",
+    "carpetTitle": "Alfombra climática",
+    "carpetDesc": "Cada fila es un año y cada columna un mes. La altura y el color muestran qué tan lejos estuvo de lo normal. A la derecha, el valor de cada año con su recta de tendencia.",
+    "relationsTitle": "Red de variables",
+    "relationsDesc": "Cada esfera es una variable. El grosor y el flujo de los enlaces siguen la fuerza de la correlación; la flecha indica si sube o baja.",
+    "mapTitle": "Mapa de tendencias",
+    "mapDesc": "Cada barra es un píxel de la región. La altura es el cambio por década; las barras apagadas no tienen tendencia clara.",
+    "below": "Bajo lo normal",
+    "above": "Sobre lo normal",
+    "falls": "Baja",
+    "rises": "Sube",
+    "verdictSig": "Tendencia significativa",
+    "verdictHint": "Indicio de tendencia",
+    "verdictNone": "Sin tendencia clara",
+    "mapError": "No se pudo cargar el mapa de esta variable",
+    "noSeries": "Esta variable no tiene serie para mostrar en 3D."
   }
 }

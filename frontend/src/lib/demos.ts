@@ -1,4 +1,4 @@
-import type { VariableId, WorkflowStep } from "@/types/geo";
+import type { WorkflowStep } from "@/types/geo";
 
 type L10n = { es: string; en: string };
 
@@ -9,7 +9,8 @@ export interface DemoStep {
   region?: string;
   step?: WorkflowStep;
   preset?: string;
-  variables?: VariableId[];
+  /** Backend variable ids. */
+  variables?: string[];
 }
 
 export interface DemoDef {
@@ -25,17 +26,17 @@ export const DEMOS: DemoDef[] = [
     id: "two-faces",
     title: { es: "Las dos caras de la lluvia", en: "The two faces of rain" },
     blurb: {
-      es: "Mediterráneo frente al norte de Europa: ¿se secan o se mojan?",
-      en: "Mediterranean versus northern Europe: drier or wetter?",
+      es: "El Sahel frente al sureste de México: ¿cambia igual la lluvia?",
+      en: "The Sahel versus southeast Mexico: does rainfall change the same way?",
     },
     steps: [
       {
         caption: {
-          es: "Todo empieza con una pregunta: ¿está cambiando la lluvia donde vivo? Primero elegimos una región: el Mediterráneo.",
-          en: "It starts with a question: is rainfall changing where I live? First we pick a region: the Mediterranean.",
+          es: "Todo empieza con una pregunta: ¿está cambiando la lluvia donde vivo? Primero elegimos una región: el Sahel, en África.",
+          en: "It starts with a question: is rainfall changing where I live? First we pick a region: the Sahel, in Africa.",
         },
         duration: 5200,
-        region: "mediterranean",
+        region: "sahel",
         step: "region",
       },
       {
@@ -54,7 +55,7 @@ export const DEMOS: DemoDef[] = [
         },
         duration: 5600,
         step: "variables",
-        variables: ["precipitation", "temperature", "moisture", "evapotranspiration"],
+        variables: ["lluvia_gpcp", "temp_aire", "humedad_suelo", "evapotranspiracion"],
       },
       {
         caption: {
@@ -66,11 +67,11 @@ export const DEMOS: DemoDef[] = [
       },
       {
         caption: {
-          es: "Ahora el contraste: el norte de Europa. Lo húmedo tiende a volverse más húmedo y lo seco más seco, pero hay que medir cada lugar.",
-          en: "Now the contrast: northern Europe. Wet places tend to get wetter and dry ones drier, but each place must be measured.",
+          es: "Ahora el contraste: el sureste de México, otra región con otro clima. Cada lugar cambia a su manera y hay que medirlo.",
+          en: "Now the contrast: southeast Mexico, another region with another climate. Each place changes in its own way and must be measured.",
         },
         duration: 6000,
-        region: "northeurope",
+        region: "sureste_mexico",
         step: "results",
       },
     ],
@@ -89,7 +90,7 @@ export const DEMOS: DemoDef[] = [
           en: "The Dry Corridor holds subsistence farming areas. Less rain here directly affects families.",
         },
         duration: 5600,
-        region: "nicaragua",
+        region: "corredor_seco_centroamericano",
         step: "region",
       },
       {
@@ -103,12 +104,12 @@ export const DEMOS: DemoDef[] = [
       },
       {
         caption: {
-          es: "Lluvia, suelo y vegetación cuentan la misma historia desde ángulos distintos.",
-          en: "Rain, soil and vegetation tell the same story from different angles.",
+          es: "Lluvia, humedad del suelo y evapotranspiración cuentan la historia del agua desde ángulos distintos.",
+          en: "Rain, soil moisture and evapotranspiration tell the water story from different angles.",
         },
         duration: 5000,
         step: "variables",
-        variables: ["precipitation", "moisture", "vegetation"],
+        variables: ["lluvia_gpcp", "humedad_suelo", "evapotranspiracion"],
       },
       {
         caption: {
@@ -134,7 +135,7 @@ export const DEMOS: DemoDef[] = [
           en: "The Amazon regulates humidity for half a continent. Let's outline its basin.",
         },
         duration: 5000,
-        region: "amazon",
+        region: "amazonia",
         step: "region",
       },
       {
@@ -148,12 +149,12 @@ export const DEMOS: DemoDef[] = [
       },
       {
         caption: {
-          es: "Vegetación y lluvia, más humedad del suelo, para ver cómo responde el bosque.",
-          en: "Vegetation and rain, plus soil moisture, to see how the forest responds.",
+          es: "Lluvia, humedad del suelo y temperatura, para ver cómo responde la selva.",
+          en: "Rain, soil moisture and temperature, to see how the forest responds.",
         },
         duration: 5000,
         step: "variables",
-        variables: ["vegetation", "precipitation", "moisture"],
+        variables: ["lluvia_gpcp", "humedad_suelo", "temp_aire"],
       },
       {
         caption: {

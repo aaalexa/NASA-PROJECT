@@ -1,138 +1,105 @@
-import type { TopicId, VariableId } from "@/types/geo";
+import type { DateRange, TopicId } from "@/types/geo";
 
 type L10n = { es: string; en: string };
 
-export interface VariableInfo {
-  id: VariableId;
-  name: L10n;
-  question: L10n;
-  desc: L10n;
-  product: string;
-  unit: string;
-}
-
-/** Variable catalog (see "Guía práctica": 3 NASA collections -> 4 core variables, + NDVI). */
-export const VARIABLES: Record<VariableId, VariableInfo> = {
-  precipitation: {
-    id: "precipitation",
-    name: { es: "Precipitación", en: "Precipitation" },
-    question: { es: "¿Está llegando más o menos agua?", en: "Is more or less water arriving?" },
-    desc: {
-      es: "Lluvia acumulada por mes. Es el fenómeno principal del análisis.",
-      en: "Monthly accumulated rainfall. The main phenomenon of the analysis.",
-    },
-    product: "GPCP v3.2",
-    unit: "mm/mes",
-  },
-  temperature: {
-    id: "temperature",
-    name: { es: "Temperatura del aire", en: "Air temperature" },
-    question: { es: "¿La región se está calentando?", en: "Is the region warming?" },
-    desc: {
-      es: "Temperatura a 2 m del suelo. Permite ver si los cambios de lluvia coinciden con más calor.",
-      en: "Temperature 2 m above ground. Shows whether rainfall changes coincide with more heat.",
-    },
-    product: "MERRA-2 T2M",
-    unit: "°C",
-  },
-  moisture: {
-    id: "moisture",
-    name: { es: "Humedad del suelo", en: "Soil moisture" },
-    question: { es: "¿El suelo conserva más o menos agua?", en: "Does the soil hold more or less water?" },
-    desc: {
-      es: "Agua en los primeros 10 cm de suelo. Muestra cómo responde la tierra.",
-      en: "Water in the top 10 cm of soil. Shows how the land responds.",
-    },
-    product: "GLDAS Noah",
-    unit: "m³/m³",
-  },
-  evapotranspiration: {
-    id: "evapotranspiration",
-    name: { es: "Evapotranspiración", en: "Evapotranspiration" },
-    question: { es: "¿Cuánta agua pasa del suelo y las plantas al aire?", en: "How much water moves from soil and plants to the air?" },
-    desc: {
-      es: "Agua que sube a la atmósfera. Si falta agua en el suelo, puede bajar aunque haga calor.",
-      en: "Water returned to the atmosphere. If soil is dry it can drop even when it is hot.",
-    },
-    product: "GLDAS Noah",
-    unit: "mm/mes",
-  },
-  vegetation: {
-    id: "vegetation",
-    name: { es: "Vegetación (NDVI)", en: "Vegetation (NDVI)" },
-    question: { es: "¿Las plantas están más o menos verdes?", en: "Are plants greener or less green?" },
-    desc: {
-      es: "Vigor de la vegetación visto desde satélite. Útil para cultivos y bosques.",
-      en: "Plant vigor seen from space. Useful for crops and forests.",
-    },
-    product: "MODIS MOD13C2",
-    unit: "NDVI",
-  },
-};
-
-export const ALL_VARIABLES: VariableId[] = [
-  "precipitation",
-  "temperature",
-  "moisture",
-  "evapotranspiration",
-  "vegetation",
-];
+/**
+ * Everything about data (variables, units, datasets, regions, valid periods) comes from the
+ * backend (`GET /api/v1/catalogo`, see context/BackendContext). This file only holds UI concepts
+ * the backend does not model: the guided-flow topics and how a period preset is labelled.
+ */
 
 export interface TopicInfo {
   id: TopicId;
   name: L10n;
   desc: L10n;
-  variables: VariableId[];
+  /** Backend variable ids, most relevant first. Ids missing from the backend catalog are skipped. */
+  variables: string[];
 }
 
-/** Topics the guided flow offers; each maps to related data variables, most relevant first. */
 export const TOPICS: TopicInfo[] = [
   {
     id: "rain",
     name: { es: "Lluvia y sequía", en: "Rain and drought" },
     desc: { es: "¿Llueve más o menos que antes?", en: "Is it raining more or less than before?" },
-    variables: ["precipitation", "moisture", "evapotranspiration", "temperature"],
+    variables: ["lluvia_gpcp", "humedad_suelo", "evapotranspiracion", "temp_aire"],
   },
   {
     id: "heat",
     name: { es: "Calor", en: "Heat" },
     desc: { es: "¿Se está calentando este lugar?", en: "Is this place getting warmer?" },
-    variables: ["temperature", "evapotranspiration", "moisture", "precipitation"],
-  },
-  {
-    id: "vegetation",
-    name: { es: "Plantas y cultivos", en: "Plants and crops" },
-    desc: { es: "¿Hay más o menos vegetación?", en: "Is there more or less vegetation?" },
-    variables: ["vegetation", "precipitation", "moisture", "temperature"],
+    variables: ["temp_aire", "evapotranspiracion", "humedad_suelo", "lluvia_gpcp"],
   },
   {
     id: "soil",
     name: { es: "Agua en el suelo", en: "Soil water" },
     desc: { es: "¿El suelo está más seco o más húmedo?", en: "Is the soil getting drier or wetter?" },
-    variables: ["moisture", "precipitation", "evapotranspiration", "temperature"],
+    variables: ["humedad_suelo", "lluvia_gpcp", "evapotranspiracion", "temp_aire"],
+  },
+  {
+    id: "extremes",
+    name: { es: "Sequías y aguaceros", en: "Droughts and downpours" },
+    desc: { es: "¿Más días secos seguidos o lluvias más fuertes?", en: "More dry spells or heavier rain?" },
+    variables: ["cdd_imerg", "r20mm_imerg", "sdii_imerg", "lluvia_gpcp"],
   },
 ];
 
-export const PERIODS = [
-  {
-    id: "5y",
-    start: "2019-01-01",
-    end: "2024-12-31",
-    label: { es: "Últimos 5 años", en: "Last 5 years" },
-    desc: { es: "Rápido, pero la lluvia varía mucho de un año a otro.", en: "Quick, but rainfall varies a lot year to year." },
-  },
-  {
-    id: "10y",
-    start: "2014-01-01",
-    end: "2024-12-31",
-    label: { es: "Últimos 10 años", en: "Last 10 years" },
-    desc: { es: "Un punto medio entre rapidez y evidencia.", en: "A middle ground between speed and evidence." },
-  },
-  {
-    id: "archive",
-    start: "2001-01-01",
-    end: "2024-12-31",
-    label: { es: "2001 – 2024", en: "2001 – 2024" },
-    desc: { es: "24 años completos. Recomendado para detectar tendencias.", en: "24 full years. Recommended for detecting trends." },
-  },
-] as const;
+/** Labels for the backend variable groups (`grupo`). */
+export const GROUP_LABELS: Record<string, L10n> = {
+  lluvia: { es: "Lluvia", en: "Rainfall" },
+  causa: { es: "Causas", en: "Drivers" },
+  agua: { es: "Agua en la tierra", en: "Water on land" },
+  calculada: { es: "Extremos de lluvia", en: "Rainfall extremes" },
+};
+
+export const ZONE_LABELS: Record<string, L10n> = {
+  mexico: { es: "México", en: "Mexico" },
+  centroamerica: { es: "Centroamérica", en: "Central America" },
+  caribe: { es: "Caribe", en: "Caribbean" },
+  sudamerica: { es: "Sudamérica", en: "South America" },
+  referencia_global: { es: "Referencia global", en: "Global reference" },
+};
+
+export interface PeriodPreset {
+  id: string;
+  start: string;
+  end: string;
+  label: L10n;
+  desc: L10n;
+}
+
+/** Period presets derived from the backend's common period (`periodos.comun`). */
+export function periodPresets(comun: [string, string]): PeriodPreset[] {
+  const [from, to] = comun;
+  const endYear = Number(to.slice(0, 4));
+  const startYear = Number(from.slice(0, 4));
+  const mk = (years: number) => {
+    const y = Math.max(startYear, endYear - years + 1);
+    return { start: `${y}-01-01`, end: `${endYear}-12-31` };
+  };
+  return [
+    {
+      id: "5y",
+      ...mk(5),
+      label: { es: "Últimos 5 años", en: "Last 5 years" },
+      desc: { es: "Rápido, pero la lluvia varía mucho de un año a otro.", en: "Quick, but rainfall varies a lot year to year." },
+    },
+    {
+      id: "10y",
+      ...mk(10),
+      label: { es: "Últimos 10 años", en: "Last 10 years" },
+      desc: { es: "Un punto medio entre rapidez y evidencia.", en: "A middle ground between speed and evidence." },
+    },
+    {
+      id: "archive",
+      start: `${from}-01`,
+      end: `${to}-31`,
+      label: { es: `${startYear} – ${endYear}`, en: `${startYear} – ${endYear}` },
+      desc: {
+        es: `${endYear - startYear + 1} años completos. Recomendado para detectar tendencias.`,
+        en: `${endYear - startYear + 1} full years. Recommended for detecting trends.`,
+      },
+    },
+  ];
+}
+
+export const rangeFromPreset = (p: PeriodPreset): DateRange => ({ start: p.start, end: p.end, preset: p.id });

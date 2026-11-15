@@ -17,7 +17,6 @@ interface GlobeGlExplorerProps {
 // Moody Trends palette
 const BRICK_RED = "#c1121f";
 const STEEL_BLUE = "#669bbc";
-const PALM_LEAF = "#9c914f";
 
 const TEXTURE = "https://unpkg.com/three-globe/example/img";
 
@@ -48,15 +47,18 @@ export default function GlobeGlExplorer({ trianglePoints, className }: GlobeGlEx
     return () => ro.disconnect();
   }, []);
 
-  const hasRegion = trianglePoints.length === 3;
+  const hasRegion = trianglePoints.length >= 3;
 
   const polygons = useMemo(() => {
     if (!hasRegion) return [];
     // The globe uses d3-geo spherical winding: exterior rings must be clockwise, or the polygon
-    // is treated as everything except the triangle.
-    const [a, b, c] = trianglePoints;
-    const signedArea = (b.lng - a.lng) * (c.lat - a.lat) - (c.lng - a.lng) * (b.lat - a.lat);
-    const ring = signedArea <= 0 ? [a, b, c] : [a, c, b];
+    // is treated as everything except the region.
+    let area = 0;
+    trianglePoints.forEach((p, i) => {
+      const q = trianglePoints[(i + 1) % trianglePoints.length];
+      area += p.lng * q.lat - q.lng * p.lat;
+    });
+    const ring = area <= 0 ? trianglePoints : [...trianglePoints].reverse();
     return [
       {
         type: "Feature",
@@ -77,8 +79,8 @@ export default function GlobeGlExplorer({ trianglePoints, className }: GlobeGlEx
     controls.enableZoom = true;
 
     if (hasRegion) {
-      const lat = trianglePoints.reduce((s, p) => s + p.lat, 0) / 3;
-      const lng = trianglePoints.reduce((s, p) => s + p.lng, 0) / 3;
+      const lat = trianglePoints.reduce((s, p) => s + p.lat, 0) / trianglePoints.length;
+      const lng = trianglePoints.reduce((s, p) => s + p.lng, 0) / trianglePoints.length;
       const span = spanDegrees(trianglePoints);
       const altitude = span < 10 ? 1.2 : span < 25 ? 1.8 : span < 50 ? 2.3 : 2.6;
       g.pointOfView({ lat, lng, altitude }, 1200);

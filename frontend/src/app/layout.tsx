@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { LanguageProvider } from "@/context/LanguageContext";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { BackendProvider } from "@/context/BackendContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 
 export const metadata: Metadata = {
@@ -19,7 +20,9 @@ export default function RootLayout({
       <body className="font-sans bg-background text-foreground antialiased selection:bg-primary selection:text-white">
         <ThemeProvider>
           <LanguageProvider>
-            <TooltipProvider>{children}</TooltipProvider>
+            <BackendProvider>
+              <TooltipProvider>{children}</TooltipProvider>
+            </BackendProvider>
           </LanguageProvider>
         </ThemeProvider>
       </body>

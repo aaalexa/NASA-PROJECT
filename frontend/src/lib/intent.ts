@@ -37,10 +37,10 @@ export function classifyExperience(raw: string): Experience | null {
 
 export function classifyTopic(raw: string): TopicId | null {
   const t = norm(raw);
-  if (hasAny(t, ["lluvia", "sequia", "seco", "precip", "llueve", "inund", "rain", "drought", "dry", "flood", "water"])) return "rain";
+  if (hasAny(t, ["extrem", "aguacero", "tormenta", "racha", "intens", "inund", "storm", "extreme", "downpour", "heavy", "flood", "dry spell"])) return "extremes";
+  if (hasAny(t, ["lluvia", "sequia", "seco", "precip", "llueve", "rain", "drought", "dry", "water"])) return "rain";
   if (hasAny(t, ["calor", "temperatura", "caliente", "calent", "heat", "temperature", "warm", "hot"])) return "heat";
-  if (hasAny(t, ["vegetaci", "cultivo", "bosque", "selva", "planta", "verde", "cosecha", "crop", "forest", "plant", "green", "vegetation", "farm"])) return "vegetation";
-  if (hasAny(t, ["suelo", "humedad", "tierra", "soil", "moisture", "ground"])) return "soil";
+  if (hasAny(t, ["suelo", "humedad", "tierra", "planta", "cultivo", "soil", "moisture", "ground", "crop"])) return "soil";
   return null;
 }
 

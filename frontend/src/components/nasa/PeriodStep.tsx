@@ -2,7 +2,8 @@
 
 import { DateRange } from "@/types/geo";
 import { useTranslation } from "@/context/LanguageContext";
-import { PERIODS } from "@/lib/catalog";
+import { useBackend } from "@/context/BackendContext";
+import { periodPresets } from "@/lib/catalog";
 import { Button } from "@/components/ui/button";
 import { ChoiceButton } from "@/components/ui/choice-button";
 import { DatePicker } from "@/components/ui/date-picker";
@@ -19,6 +20,10 @@ interface PeriodStepProps {
 
 export function PeriodStep({ range, onChangeRange, onBack, onContinue }: PeriodStepProps) {
   const { language, t } = useTranslation();
+  const backend = useBackend();
+  const presets = periodPresets(backend.period);
+  const boundsMin = `${backend.period[0]}-01`;
+  const boundsMax = `${backend.period[1]}-31`;
 
   return (
     <div className="space-y-5 animate-in fade-in duration-300">
@@ -29,7 +34,7 @@ export function PeriodStep({ range, onChangeRange, onBack, onContinue }: PeriodS
 
       <div className="space-y-2">
         <p className="eyebrow">{t("periodStep.presets")}</p>
-        {PERIODS.map((p) => (
+        {presets.map((p) => (
           <ChoiceButton
             key={p.id}
             selected={range.preset === p.id}
@@ -54,6 +59,8 @@ export function PeriodStep({ range, onChangeRange, onBack, onContinue }: PeriodS
               language={language}
               label={t("periodStep.from")}
               max={range.end}
+              boundsMin={boundsMin}
+              boundsMax={boundsMax}
               onChange={(iso) => onChangeRange({ ...range, start: iso, preset: "custom" })}
             />
           </div>
@@ -64,6 +71,8 @@ export function PeriodStep({ range, onChangeRange, onBack, onContinue }: PeriodS
               language={language}
               label={t("periodStep.to")}
               min={range.start}
+              boundsMin={boundsMin}
+              boundsMax={boundsMax}
               onChange={(iso) => onChangeRange({ ...range, end: iso, preset: "custom" })}
             />
           </div>

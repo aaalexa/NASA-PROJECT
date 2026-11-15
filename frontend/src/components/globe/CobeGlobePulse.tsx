@@ -36,14 +36,17 @@ interface RegionShape {
   span: number;
 }
 
-/** Delicate outline (fine blue dots), a soft dotted fill (palm leaf) and three thin arcs. */
+/** Delicate outline (fine blue dots), a soft dotted fill (palm leaf) and thin arcs for any polygon. */
 function buildShape(points: GeoPoint[]): RegionShape | null {
-  if (points.length !== 3) return null;
-  const [a, b, c] = points;
-  const sides: [GeoPoint, GeoPoint][] = [[a, b], [b, c], [c, a]];
+  if (points.length < 3) return null;
+  const sides: [GeoPoint, GeoPoint][] = points.map((p, i) => [p, points[(i + 1) % points.length]]);
 
+  const lats = points.map((p) => p.lat);
+  const lngs = points.map((p) => p.lng);
+  const midLat = (Math.min(...lats) + Math.max(...lats)) / 2;
   const span = Math.max(
-    ...sides.map(([p, q]) => Math.hypot(p.lat - q.lat, (p.lng - q.lng) * Math.cos(((p.lat + q.lat) / 2) * (Math.PI / 180))))
+    Math.max(...lats) - Math.min(...lats),
+    (Math.max(...lngs) - Math.min(...lngs)) * Math.cos((midLat * Math.PI) / 180)
   );
 
   const edgeSteps = Math.max(18, Math.min(60, Math.round(span * 3)));
@@ -54,26 +57,29 @@ function buildShape(points: GeoPoint[]): RegionShape | null {
     }
   }
 
-  // Interior dots on a barycentric grid (interior points only).
+  // Interior dots on a grid over the bounding box, kept when inside the polygon.
+  const inside = (lat: number, lng: number) => {
+    let hit = false;
+    for (let i = 0, j = points.length - 1; i < points.length; j = i++) {
+      const a = points[i];
+      const b = points[j];
+      if (a.lat > lat !== b.lat > lat && lng < ((b.lng - a.lng) * (lat - a.lat)) / (b.lat - a.lat) + a.lng) hit = !hit;
+    }
+    return hit;
+  };
   const n = Math.max(5, Math.min(13, Math.round(span / 3)));
   const fill: Marker[] = [];
+  const [minLat, maxLat] = [Math.min(...lats), Math.max(...lats)];
+  const [minLng, maxLng] = [Math.min(...lngs), Math.max(...lngs)];
   for (let i = 1; i < n; i++) {
-    for (let j = 1; i + j < n; j++) {
-      const k = n - i - j;
-      fill.push({
-        location: [(a.lat * i + b.lat * j + c.lat * k) / n, (a.lng * i + b.lng * j + c.lng * k) / n],
-        size: 0.007,
-        color: PALM_LEAF,
-      });
+    for (let j = 1; j < n; j++) {
+      const lat = minLat + ((maxLat - minLat) * i) / n;
+      const lng = minLng + ((maxLng - minLng) * j) / n;
+      if (inside(lat, lng)) fill.push({ location: [lat, lng], size: 0.007, color: PALM_LEAF });
     }
   }
 
-  const arcs: Arc[] = sides.map(([p, q]) => ({
-    from: [p.lat, p.lng],
-    to: [q.lat, q.lng],
-    color: STEEL_BLUE,
-  }));
-
+  const arcs: Arc[] = sides.map(([p, q]) => ({ from: [p.lat, p.lng], to: [q.lat, q.lng], color: STEEL_BLUE }));
   return { edges, fill, arcs, vertices: points, span };
 }
 
